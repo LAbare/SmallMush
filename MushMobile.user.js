@@ -1925,7 +1925,7 @@ MM.locale = function(forced) {
 /* VARIABLES */
 
 //MM.src = "http://labare.alwaysdata.net/MushMobile/";
-MM.src = "https://github.com/LAbare/MushMobile/raw/master/";
+MM.src = "http://github.com/LAbare/MushMobile/raw/master/";
 if (typeof self.options != 'undefined') //Addon FF
 	{ MM.src = self.options.baseURL.slice(0, -7); }
 alert(MM.src);
