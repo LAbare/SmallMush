@@ -2,95 +2,88 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="initial-scale=1.0">
+	<meta name="viewport" content="width=424px, initial-scale=1.0">
 	<title>MushMobile</title>
 	<style>
-        .but { background-image: url("ui/butbg.png"); background-repeat: repeat-x; height: 21px; display: inline-block; vertical-align: middle; }
-        .but:before { content: url("ui/butleft.png"); }
-        .but:after { content: url("ui/butright.png"); }
-        .but img { position: relative; bottom: 3px; }
-        
-        table { text-align: center; border-collapse: collapse; }
-        thead { font-weight: bold; }
-        td { border: 1px solid black; padding: 2px; }
-        td.ok { background-color: green; }
-        td.no { background-color: red; }
-        td.bof { background-color: #FE7D00; }
-        
-        .warning { background-color: red; padding: 10px; border: 2px #900 solid; color: black; }
-        
-        img { border: 2px black solid; max-width: 300px; }
-        .but img { border: none; }
+		html { margin: 0; padding: 0; }
+		body { margin: 0; padding: 5px; background-color: #AAF; }
+		h1 { color: white; text-align: center; text-shadow: black 2px 2px 2px; }
+		h2 { margin-left: 10px; }
+		h3 { font-variant: small-caps; color: #003; }
+		p { text-align: justify; }
+		li { margin-bottom: 5px; }
+
+		.but { background-image: url("ui/butbg.png"); background-repeat: repeat-x; height: 21px; display: inline-block; vertical-align: middle; }
+		.but:before { content: url("ui/butleft.png"); }
+		.but:after { content: url("ui/butright.png"); }
+		.but img { position: relative; bottom: 3px; }
+
+		#code { border: 1px black solid; background-color: #EEE; padding: 2px; font-family: monospace; }
     </style>
 </head>
 
 <body>
-	<header><h1>MushMobile</h1></header>
-	
-	<p class='warning'>Veuillez lire la page entière avant d'installer le script !</p>
+	<h1><img src='ico.png' /> MushMobile <img src='ico.png' /></h1>
 
-    <p>Firefox est <b>vivement recommandé</b> pour ce script, puisque le <a href='#installFlash'>Flash</a> reste nécessaire pour avoir accès à toutes les fonctions du jeu. Ce script modifie l'interface et permet une redondance de certaines fonctions sans Flash ; cependant, <strong>la minimap</strong> et <strong>la liste et la visée des Hunters</strong> ne sont pas supportées : il faut toujours passer par le jeu Flash pour y avoir accès.</p>
-        
-	<p><b>Activation manuelle :</b> ajoutez ce lien dans vos favoris (<a href="#addBookmark">comment faire ?</a>) : <a href='javascript:(function(){var%20MM=document.createElement("script");MM.src="http://labare.alwaysdata.net/MushMobile/MushMobile.user.js?v="+Math.random();document.head.appendChild(MM);})();'>MushMobile</a>.</p>
-	<p><b>Lien direct Tampermonkey TEST :</b> <a href='http://labare.alwaysdata.net/MushMobile/MushMobile.test.user.js'>ici</a></p>
-	
-	<!--<p><b>Activation automatique :</b> installez le script depuis ce lien (<a href="#addBookmark">comment faire ?</a>) : <a href='http://labare.alwaysdata.net/MushMobile/MushMobile.user.js'>MushMobile</a>.</p>-->
-	
-	<p>Le script doit être activé manuellement <strong>à chaque fois que vous rouvrez le navigateur</strong>. Heureusement, c'est simple : allez sur Mush, puis tapez « MushMobile » dans la barre d'adresse et cliquez sur le favori que vous avez enregistré qui sera proposé par votre navigateur. Vous pouvez recharger la page sans avoir à refaire cette procédure en utilisant le bouton <span class="but"><img src="ui/reload_Mush.png" alt="Recharger Mush" /></span>. Le bouton <span class="but"><img src="ui/reload_MM.png" alt="Recharger MushMobile" /></span> permet de reconstruire l'interface mobile si jamais elle « casse » (après certaines actions).</p>
+	<nav>
+	<p style='text-align: center;'><a href='#Present'>Présentation</a> — <a href='#Use'>Utilisation</a> — <a href='#Install'>Installation</a> — <a href='#Flash'>Installer Flash</a></p>
+
+	<h2 id='Present'>Présentation</h2>
+	<p>MushMobile est un <em>script pour Mush</em> développé par un joueur grand, beau et magnifique (<a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>), grâce auquel vous allez pouvoir profiter d'un confort exceptionnel de votre jeu préféré sur mobile. Oui oui. Et en plus, pour les écrans réfractaires au Flash, les fonctions essentielles du jeu sont émulées pour vous permettre de jouer entre deux stations de métro. C'est pas trop la classe ? Essayez quand même d'<a href='#Flash'>installer Flash</a> pour avoir un jeu complètement fonctionnel.</p>
+	<p>Par contre, j'insiste sur le fait qu'il s'agit d'un <strong>script</strong>. C'est-à-dire qu'il est développé par un joueur, que la Motion Twin n'a rien à voir avec ça, que l'interface du jeu subit quelques modifications (pas trop déroutantes non plus), et que les éventuels bugs qui pourraient survenir ne sont pas à remonter sur le forum, mais à moi. Toutes les questions, les suggestions, les chocolats et l'amour que vous voudriez envoyer, c'est <a href='http://twinoid.com/user/8412516' target='_blank'>par là</a> et pas vraiment ailleurs.</p>
 
 	
-	<p>Navigateurs testés et fonctionnels :</p>
-	<table>
-	<thead>
-        <td>Navigateur</td>
-        <td>Flash possible</td>
-        <td>Activation du script</td>
-        <td>Commentaires</td>
-    </thead>
-    <tr>
-        <td>Firefox</td>
-        <td class='ok'>Oui</td>
-        <td class='bof'>Manuelle</td>
-        <td>Complètement fonctionnel.</td>
-    </tr>
-    <tr>
-        <td>Chrome</td>
-        <td class='no'>Non</td>
-        <td class='bof'>Manuelle</td>
-        <td>Complètement fonctionnel.</td>
-    </tr>
-    <tr>
-        <td>Opera</td>
-        <td class='no'>Non</td>
-        <td class='bof'>Manuelle</td>
-        <td>Non testé récemment</td>
-    </tr>
-    <tr>
-        <td>Dolphin Browser</td>
-        <td class='ok'>Oui</td>
-        <td class='ok'>Automatique avec l'extension Tampermonkey</td>
-        <td>Problèmes sur la minimap MushMobile.</td>
-    </tr>
-    </table>
-    
-    <h2 id="addBookmark">Ajouter le script en favori</h2>
-    
-    <h3>Avec Firefox</h3>
-    <p>Sur cette page : lien Activation manuelle <br /> <img src='MM-install_FF1.png' /></p>
-    <p>Activer le script sur Mush : <br /> <img src='MM-install_FF2.png' /></p>
-    
-    <!--<h3>Avec Dolphin Browser + addon Tampermonkey</h3>
-    <p>Sur cette page : lien Activation automatique <br /> <img src='MM-install_TM.png' /></p>-->
-    
-    <h2 id="installFlash">Installer Flash</h2>
-    <p><b>Requis :</b> Android 4.3 maximum. (Voir Paramètres → À propos du téléphone → Version d'Android)</p>
-    <ol>
+	<h2 id='Use'>Utilisation</h2>
+	<p>Pour tout faire rentrer dans un petit écran, MushMobile divise le jeu en cinq onglets. Regardez donc ces quelques images pour en avoir un aperçu, ça sera plus parlant que vingt lignes.</p>
+	[GALLERIE D'IMAGES]
+	<p>Vous pouvez recharger la page en interne en utilisant le bouton <span class="but"><img src="ui/reload_Mush.png" alt="Recharger Mush" /></span>. L'émulation (onglet Pièce) permet d'avoir accès aux équipements, aux coéquipiers et à l'inventaire, ainsi que de se déplacer. Elle ne permet <b>pas</b> de voir la minimap du vaisseau, ni les hunters lorsque vous êtes en tourelle ou en patrouilleur, ni de les viser. Vous pouvez tout de même tirer au hasard en patrouilleur en sélectionnant l'équipement <b>Poste de tir</b>, ça peut toujours dépanner.</p>
+
+
+	<h2 id='Install'>Installation et activation</h2>
+	<p>Le script peut être activé automatiquement pour <b>Firefox</b> et <b>Dolphin Browser</b> sur Android ; il reste parfois possible pour d'autres navigateurs (comme Chrome) de l'activer manuellement lorsque vous allez sur Mush.</p>
+
+	<h3>Firefox (Android)</h3>
+	<p><ol>
+		<li>Installez <a href='http://github.com/LAbare/MushMobile/raw/master/FirefoxAddon/mushmobile.xpi'>l'addon MushMobile</a>.</li>
+		<li>C'est tout. Sortez le champagne.</li>
+	</ol></p>
+
+	<h3>Dolphin Browser (Android)</h3>
+	<p><ol>
+		<li>Installez l'addon <a href='market://details?id=net.tampermonkey.dolphin'>Tampermonkey pour Dolphin Browser</a> depuis le Play Store.</li>
+		<li>Installez le script en cliquant sur <a href='http://github.com/LAbare/MushMobile/raw/master/MushMobile.user.js' target='_blank'>ce lien</a>, puis sur « Install » dans la fenêtre qui s'ouvre.</li>
+		<li>Débouchez la bouteille en visant l'œil de belle-mère. Servez frais.</li>
+	</ol></p>
+
+	<h3>Autres (activation manuelle)</h3>
+	<p><b>Attention :</b> cette technique peut ne pas fonctionner selon les navigateurs.</p>
+	<p><ol>
+		<li>Ajoutez cette page en favoris / marques-pages / <i>bookmarks</i>.</li>
+		<li>Ouvrez le menu des favoris et modifiez celui que vous venez d'ajouter (faites un appui long dessus).</li>
+		<li>Effacez le contenu du champ Adresse / URL, puis copiez/collez-y le code suivant :</li>
+		<li id='code' onclick='sel(this);'>javascript:(function(){var%20MM=document.createElement("script");MM.src="http://github.com/LAbare/MushMobile/raw/master/MushMobile.user.js;document.head.appendChild(MM);})();</li>
+		<li>Lorsque vous allez sur Mush, une fois la page chargée, entrez « MushMobile » dans la barre d'adresse de votre navigateur. Celui-ci devrait, pendant votre frappe, proposer quelques liens, et parmi eux le favori que vous avez ajouté. Cliquez dessus : si rien ne se passe… changez de navigateur.</li>
+	</ol></p>
+	<p>Cette technique fonctionne bien sous Chrome, qui en plus est dispo sur iPhone. Ces quelques images pourraient vous guider.</p>
+	[GALLERIE D'IMAGES]
+
+
+	<h2 id='Flash'>Installer Flash</h2>
+	<p><b>Requis :</b> Android 4.3 maximum. (Voir Paramètres → À propos du téléphone → Version d'Android)</p>
+	<ol>
 		<li>Activez l'installation d'applications externes (Paramètres → Sécurité → Sources inconnues <b>coché</b>) ;</li>
-		<li>Installez <a href="http://android.es/download/FlashPlayer.apk">Flash Player</a> (une fois le téléchargement terminé, ouvrez la barre de notifications et cliquez sur le fichier pour lancer directement l'installation) ;</li>
+		<li>Installez <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.115.81/install_flash_player_ics.apk">Flash Player pour Android 4.0+</a> ou <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.111.73/install_flash_player_pre_ics.apk">Flash Player pour Android 2 et 3</a> (une fois le téléchargement terminé, ouvrez la barre de notifications et cliquez sur le fichier pour lancer directement l'installation) ;</li>
 		<li>Installez un navigateur qui sait gérer le Flash (Firefox, Dolphin Browser).</li>
 	</ol>
-    
-    
-    
+	
+	<script>
+	function sel(el) {
+		var s = window.getSelection();
+		var r = document.createRange();
+		r.selectNodeContents(el);
+		s.removeAllRanges();
+		s.addRange(r);
+	};
+	</script>
 </body>
 </html>
