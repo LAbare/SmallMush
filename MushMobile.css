@@ -306,7 +306,7 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	font-variant: small-caps;
 }
 
-#MMpopup .but:first-of-type {
+#MMpopupclose {
 	position: absolute;
 	top: 5px;
 	right: 5px;
