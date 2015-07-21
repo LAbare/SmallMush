@@ -1,0 +1,9 @@
+{
+  "name": "mushmobile",
+  "title": "MushMobile",
+  "id": "jid1-hrXDmV7ABCZcFQ",
+  "description": "Extension Firefox Mobile permettant de charger le script MushMobile.",
+  "author": "LAbare",
+  "license": "MIT",
+  "version": "1.0"
+}
