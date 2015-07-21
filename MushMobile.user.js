@@ -815,7 +815,7 @@ MM.buildParamsMenu = function() {
 /* FONCTIONS D'ADAPTATION DE L'INTERFACE */
 
 MM.initCss = function() {
-	var css = MM.addNewEl('link', document.head, null, null, [['rel', 'stylesheet'], ['href', MM.src + "MushMobile.css"]]);
+	var css = MM.addNewEl('link', document.head, null, null, [['rel', 'stylesheet'], ['href', MM.src + "MushMobile.css"], ['type', 'text/css']]);
 	MM.addNewEl('meta', document.head, null, null, [['name', 'viewport'], ['content', 'width=424px, initial-scale=' + screen.width / 424]]);
 
 	var icon = MM.addNewEl('img', document.body, 'MMicon', null, [['src', MM.src + "ico.png"]]);
