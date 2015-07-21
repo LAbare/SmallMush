@@ -1,8 +1,6 @@
-var data = require("sdk/self").data;
 var pageMod = require("sdk/page-mod");
  
 pageMod.PageMod({
 	include: /https?:\/\/mush\.(vg|twinoid\.(com|es))\/?#?$/,
-	contentScriptFile: data.url('MushMobile.user.js'),
-	contentScriptOptions: { baseURL: data.url('ico.png') }
+	contentScript: 'var MM = document.createElement("script"); MM.src = "http://github.com/LAbare/MushMobile/raw/master/MushMobile.user.js"; document.head.appendChild(MM);',
 });
