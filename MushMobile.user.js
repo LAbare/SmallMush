@@ -175,9 +175,9 @@ MM.generateMinimap = function() {
 	MM.addNewEl('p', popup, null, MM.TEXT['minimap-legend']).className = 'nospace';
 	MM.addNewEl('p', popup, null, MM.TEXT['minimap-room']).className = 'nospace';
 
-	var fires = ((MM.sel('.alarm_bg [src$="fire.png"]')) ? MM.sel('.alarm_bg [src$="fire.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
-	var dooralerts = ((MM.sel('.alarm_bg [src$="door.png"]')) ? MM.sel('.alarm_bg [src$="door.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
-	var eqalerts = ((MM.sel('.alarm_bg [src$="alert.png"]')) ? MM.sel('.alarm_bg [src$="alert.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
+	var fires = ((MM.sel('.alarm_bg [src$="/fire.png"]')) ? MM.sel('.alarm_bg [src$="fire.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
+	var dooralerts = ((MM.sel('.alarm_bg [src$="/door.png"]')) ? MM.sel('.alarm_bg [src$="door.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
+	var eqalerts = ((MM.sel('.alarm_bg [src$="/alert.png"]')) ? MM.sel('.alarm_bg [src$="alert.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
 
 	var bloc = MM.addNewEl('div', popup, 'MMminimapbloc');
 	var svg = MM.addNewEl('svg', bloc, 'MMminimap', null, [['width', '320'], ['height', '530']]);
@@ -820,6 +820,21 @@ MM.initCss = function() {
 
 	var icon = MM.addNewEl('img', document.body, 'MMicon', null, [['src', MM.src + "ico.png"]]);
 	MM.moveEl(MM.addNewEl('img', null, 'MMbottom', null, [['src', MM.src + "ui/bottom.png"]]), document.body, MM.sel('#tid_bar_down'));
+
+	var relcss = MM.addNewEl('style', document.head);
+	relcss.innerHTML += '#content { background: transparent url("' + MM.src + 'ui/background.png"); }\n'; //Bloc conteneur d'onglets
+	//Fenêtre d'alerte (« Vous vous êtes sali… »)
+	relcss.innerHTML += '.poptop { background: transparent url("' + MM.src + 'ui/poptop.png") no-repeat left top; }\n';
+	relcss.innerHTML += '.poptop .popbottom { background: transparent url("' + MM.src + 'ui/popbottom.png") no-repeat left bottom; }\n';
+	relcss.innerHTML += '.poptop .popbg { background: transparent url("' + MM.src + 'ui/popbg.png") repeat left bottom; }\n';
+	//Barre de liens
+	relcss.innerHTML += '#MMlinks { background: transparent url("' + MM.src + 'ui/background.png"); }\n';
+	//Conteneurs compétences
+	relcss.innerHTML += 'li.skill { background-image: url("' + MM.src + 'ui/skillblock.png"); }\n';
+	relcss.innerHTML += '.once_skill .container { background-image: url("' + MM.src + 'ui/once_skill.png"); }\n';
+	relcss.innerHTML += '.gold_skill .container { background-image: url("' + MM.src + 'ui/gold_skill.png"); }\n';
+	//Énergie
+	relcss.innerHTML += '#MMenergybar td { background: transparent url("' + MM.src + 'ui/pabar.png") no-repeat left top; }';
 };
 
 
@@ -827,7 +842,7 @@ MM.initMenubar = function() {
 	var bar = MM.moveEl(MM.addNewEl('div', null, 'MMbar'), MM.sel('.mxhead'), MM.sel('.mainmenu'));
 
 	//Barre MushMobile : rechargement de l'interface MushMobile, rechargement interne de la page, aide, jour et cycle, horloge, paramètres MushMobile
-	MM.addButton(bar, "<img src='" + MM.src + "ui/reload_MM.png' />").addEventListener('click', function() { MM.reInit(); });
+	//MM.addButton(bar, "<img src='" + MM.src + "ui/reload_MM.png' />").addEventListener('click', function() { MM.reInit(); });
 	MM.addButton(bar, "<img src='" + MM.src + "ui/reload_Mush.png' />").addEventListener('click', function() {
 		MM.sel('#MMloadscreen').style.display = 'block';
 		Main.ajax('/', null, function() { MM.reInit(); MM.sel('#MMloadscreen').style.display = 'none'; });
@@ -1909,8 +1924,11 @@ MM.locale = function(forced) {
 
 /* VARIABLES */
 
-MM.src = "http://labare.alwaysdata.net/MushMobile/";
-//MM.src = "https://github.com/LAbare/MushMobile/raw/master/";
+//MM.src = "http://labare.alwaysdata.net/MushMobile/";
+MM.src = "https://github.com/LAbare/MushMobile/raw/master/";
+if (typeof self.options != 'undefined') //Addon FF
+	{ MM.src = self.options.baseURL.slice(0, -7); }
+alert(MM.src);
 
 MM.smileys_regex = [[/:(pa_pm):/g, 'pslots.png'], [/:(pa):/g, 'pa_slot1.png'], [/:(pm):/g, 'pa_slot2.png'], [/:(pv):/g, 'lp.png'], [/:(xp):/g, 'xp.png'], [/:(xpbig):/g, 'xpbig.png'], [/:(pa_heal):/g, 'pa_heal.png'], [/:(asocial):/g, 'status/unsociable.png'], [/:(disabled):/g, 'status/disabled.png'], [/:(hungry):/g, 'status/hungry.png'], [/:(hurt):/g, 'status/hurt.png'], [/:(ill):/g, 'status/disease.png'], [/:(psy_disease):/g, 'status/psy_disease.png'], [/:(commander):/g, 'title_01.png'], [/:(admin_neron):/g, 'title_02.png'], [/:(resp_comm):/g, 'title_03.png'], [/:(alert):/g, 'alert.png'], [/:(com):/g, 'comm.png'], [/:(door):/g, 'door.png'], [/:(plant_youngling):/g, 'plant_youngling.png'], [/:(plant_thirsty):/g, 'plant_thirsty.png'], [/:(plant_dry):/g, 'plant_dry.png'], [/:(plant_diseased):/g, 'plant_diseased.png'], [/:(bin):/g, 'bin.png'], [/:(next):/g, 'pageright.png'], [/:(ship_triumph):/g, 'daedalus_triumph.png'], [/:(pa_comp):/g, 'pa_comp.png'], [/:(pa_cook):/g, 'pa_cook.png'], [/:(pa_core):/g, 'pa_core.png'], [/:(pa_eng):/g, 'pa_eng.png'], [/:(pa_garden):/g, 'pa_garden.png'], [/:(pa_pilgred):/g, 'pa_pilgred.png'], [/:(pa_shoot):/g, 'pa_shoot.png'], [/:(laid):/g, 'status/laid.png'], [/:(mastered):/g, 'status/mastered.png'], [/:(mush):/g, 'mush.png'], [/:(stink):/g, 'status/stinky.png'], [/:(fuel):/g, 'fuel.png'], [/:(o2):/g, 'o2.png'], [/:(moral):/g, 'moral.png'], [/:(pmo):/g, 'moral.png'], [/:(hp):/g, 'lp.png'], [/:(eat):/g, 'sat.png'], [/:(pills):/g, 'demoralized2.png'], [/:(dead):/g, 'dead.png'], [/:(hunter):/g, 'hunter.png'], [/:(fire):/g, 'fire.png'], [/:(more):/g, 'more.png'], [/:(less):/g, 'less.png'], [/:(chut):/g, 'discrete.png'], [/:(talk):/g, 'talk.gif'], [/:(talky):/g, 'talkie.png'], [/:(cat):/g, 'cat.png'], [/:(eng):/g, 'pa_eng.png'], [/:(time):/g, 'casio.png'], [/:(tip):/g, 'tip.png'], [/:(triumph):/g, 'triumph.png']];
 

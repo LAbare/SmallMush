@@ -233,9 +233,6 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 
 #MMloadscreen img { margin-top: 50px; }
 
-/* Bloc conteneur d'onglets */
-#content { background: transparent url("http://labare.alwaysdata.net/MushMobile/ui/background.png"); }
-
 #content .but { margin-bottom: 30px; }
 
 /* Fenêtre d'alerte (« Vous vous êtes sali… ») */
@@ -244,12 +241,7 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	top: 100px;
 	left: 12px;
 	width: 400px;
-	background: transparent url("http://labare.alwaysdata.net/MushMobile/ui/poptop.png") no-repeat left top;
 }
-
-.poptop .popbottom { background: transparent url("http://labare.alwaysdata.net/MushMobile/ui/popbottom.png") no-repeat left bottom; }
-
-.poptop .popbg { background: transparent url("http://labare.alwaysdata.net/MushMobile/ui/popbg.png") repeat left bottom; }
 
 /* Fenêtre d'alerte MushMobile, copiée depuis #dialog */
 #MMdialog_body { font-size: 10pt; }
@@ -260,7 +252,6 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	padding: 0;
 	padding-top: 5px;
 	border-top: 2px #000440 solid;
-	background: transparent url("http://labare.alwaysdata.net/MushMobile/ui/background.png");
 	text-align: center;
 	font-size: 10pt;
 	font-variant: small-caps;
@@ -548,14 +539,7 @@ p.MMfire {
 	padding-top: 1px;
 }
 
-li.skill {
-	width: 35px !important;
-	background-image: url("http://labare.alwaysdata.net/MushMobile/ui/skillblock.png");
-}
-
-.once_skill .container { background-image: url("http://labare.alwaysdata.net/MushMobile/ui/once_skill.png"); }
-
-.gold_skill .container { background-image: url("http://labare.alwaysdata.net/MushMobile/ui/gold_skill.png"); }
+li.skill { width: 35px !important; }
 
 /* Contenu */
 .once_skill .skill_inside, .gold_skill .skill_inside, .skill .skill_inside { /* Image */
@@ -626,7 +610,6 @@ table.pvsm {
 	height: 12px;
 	padding-left: 3px;
 	padding-top: 3px;
-	background: transparent url("http://labare.alwaysdata.net/MushMobile/ui/pabar.png") no-repeat left top;
 }
 
 #MMenergybar img {
