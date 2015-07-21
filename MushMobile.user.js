@@ -11,81 +11,6 @@
 // ==/UserScript==
 
 
-/***** FONCTIONS *****
- * 
- *** Fonctions développeur : ***
- * .sel(name): sélectionne un élément par ID, par classe ou par sélecteur CSS
- * .getAttributesList(el): retourne un tableau d'attributs d'un élément [[nom, valeur]]
- * .addNewEl(type, *parent, *id, *content, *attrs): retourne un nouvel élément
- * .addButton(parent, text): retourne un bouton Mush
- * .moveEl(el, dest, *bef): déplace un élément dans un autre ; possibilité de préciser avant quel enfant
- * .copyEl(el, dest, *bef): copie un élément dans un autre, en ajoutant le préfixe 'MM' à tous les ID de l'arbre ; possibilité de préciser avant quel enfant
- * .getTipContent(tipFunction): retourne le contenu d'une infobulle
- * 
- *** Fonctions MushMobile : ***
- * .generateMinimap(): génère une minimap du vaisseau avec les alertes des avaries signalées
- * .changeTab(newtab): change d'onglet MushMobile
- * .MMhelp(e): affiche l'infobulle d'un élément
- * .toggleAlertList(expand): affiche ou cache les rapports d'alertes
- * .changeRoom(): déplace le personnage dans une autre salle
- * .displayRoomActions(type, serial): sélectionne le personnage/chat cliqué et remet les select à zéro
- * .updateRoomActions(type, serial): affiche le cadre d'actions et de personnage
- * .changeChatTab(el): change l'onglet de chat (remplace Main.chatTab pour inclure l'onglet Éditeur de messages)
- * .MMexitModule(): remplace Main.exitModule() pour éviter le rechargement total de la page
- * .changeActionFunctions(): ajoute un appel à MM.beforeAction() avant chaque action
- * .beforeAction(): appelée avant chaque action pour sauvegarder le message actuel de l'éditeur, demander confirmation de l'action si besoin et changer d'onglet MushMobile pour certaines actions
- * .reInit(): reconstruit l'interface MushMobile après mise à jour de la page
- * .showLicense(): affiche la licence MIT
- * 
- *** Fonctions relatives à l'inventaire MushMobile (inventaire copié dans l'onglet Pièce) : ***
- * .selectItem(item): remplace Main.selectItem
- * .itemLeft(): remplace Main.itemLeft
- * .itemRight(): remplace Main.itemRight
- * 
- *** Fonctions relatives aux paramètres MushMobile : ***
- * .getMMParameters(): lit les paramètres depuis document.cookie
- * .setMMParameters(): enregistre les paramètres dans un cookie
- * .buildParamsMenu(): reconstruit le menu des paramètres
- * 
- *** Fonctions d'adaptation de l'interface et d'ajouts : ***
- * .initCss(): charge le CSS et modifie le viewport
- * .initMenubar(): crée la barre de menu MushMobile
- * .initTabs(): crée les onglets MushMobile
- * .charTab(): adapte l'onglet Personnage (#char_col)
- * .shipTab(): remplit l'onglet Vaisseau
- * .roomTab(): remplit l'onglet Pièce
- * .chatTab(): ajoute les boutons Coller aux topics du chat
- * .gameTab(): one-liner ajoutant un bouton « Afficher la minimap MushMobile » sous le jeu FLash
- * 
- *** Fonctions relatives à l'éditeur de messages : ***
- * .messageEditor(): construit l'éditeur de message
- * .refreshPreview(): rafraîchit la prévisualisation en ajoutant le formatage Mush
- * .savePreview(): enregistre le message actuel dans un cookie
- * .retrievePreview(): récupère le message enregistré depuis document.cookie
- * .buildMessage(): crée un message préformaté
- * .preformatPlanet(planet, *Schmanet, *Janet): crée un message de partage de planète préformaté
- * 
- *** Fonction de localisation : ***
- * .locale(*forced): fonction de localisation de l'interface
- * 
- * 
- ***** VARIABLES *****
- * .src: (string) adresse du dossier source du script
- * .smileys_regex: (list) expressions régulières des smileys Mush
- * .previewtext: (string) message actuel de l'éditeur de message
- * .parameters: (object) paramètres de l'interface MushMobile
- * .rooms: (list) nom des pièces du Daedalus dans la langue du serveur
- * .alertrooms: (list) nom des pièces du Daedalus telles qu'elles apparaissent dans les alertes (certaines sont mal écrites : « Jardin Hydoponique »)
- * .localerooms: (list) nom des pièces du Daedalus dans la langue choisie par le joueur
- * .TEXT: (object) textes de l'interface MushMobile, générés par MM.locale()
- * .ME_MODULING: (bool) le personnage est en train d'accéder à un terminal
- * .ME_NERON: (bool) le personnage a le titre d'Administrateur NERON
- * .ME_DISABLED: (bool) le personnage a le statut Handicapé
- * .ME_ALONE: (bool) le personnage est seul dans la pièce
- * .GUARDIAN: (bool) un Gardien est présent dans la pièce
- * .GRAVITY: (bool) le Simulateur de gravité est fonctionnel
- */
-
 var MM = {};
 
 
@@ -124,7 +49,14 @@ MM.addNewEl = function(type, parent, id, content, attrs) {
 
 MM.addButton = function(parent, text, attrs) {
 	var butattrs = [['class', 'but']];
-	if (attrs) { for (var i = 0; i < attrs.length; i++) { butattrs.push(attrs[i]); } }
+	if (attrs) {
+		for (var i = 0; i < attrs.length; i++) {
+			if (attrs[i][0] == 'class')
+				{ butattrs[0][1] += ' ' + attrs[i][1]; }
+			else
+				{ butattrs.push(attrs[i]); }
+		}
+	}
 	var a = MM.addNewEl('div', parent, null, null, butattrs);
 	var b = MM.addNewEl('div', a, null, null, [['class', 'butright']]);
 	var c = MM.addNewEl('div', b, null, text, [['class', 'butbg']]);
@@ -216,6 +148,7 @@ MM.generateMinimap = function() {
 				var c = [r[2] + (r[0] / 2), r[3] + (r[1] / 2) - 10];
 			}
 
+			//<div> plutôt que <text> car ce dernier n'est bizarrement pas supporté sur tous les navigateurs mobiles (coucou Dolphin)
 			var rd = (dooralerts.split(MM.alertrooms[i] + ' .').length - 1);
 			var re = (eqalerts.split(MM.alertrooms[i] + ' </strong>').length - 1);
 			if (rd && re)
@@ -320,14 +253,14 @@ MM.changeRoom = function(el) {
 		if (MM.sel('#myInventory [style*="rolling_boulder.jpg"]') && !(parseInt(MM.sel('.cycletime').textContent.match(/([0-9]+)/g)[1]) % 2)) //Monture non fonctionnelle aux cycles impairs
 			{ boulder = true; }
 		/* Soit :
-		- on n'est pas Terrence et on n'a pas d'énergie ;
-		- on est Terrence, on est seul, et soit on n'a pas d'énergie, soit le Simulateur de gravité est en panne et ni compétence Sprinter, ni Trottinette ni Monture rocheuse fonctionnelle sur soi. */
+		- on n'est pas handicapé et on n'a pas d'énergie ;
+		- on est handicapé, on est seul, et soit on n'a pas d'énergie, soit le Simulateur de gravité est en panne et ni compétence Sprinter, ni Trottinette ni Monture rocheuse fonctionnelle sur soi. */
 		if
 		(
 			(!MM.ME_DISABLED && !energy)
 			||
 			(MM.ME_DISABLED && MM.ME_ALONE
-				&& (!energy || (!MM.GRAVITY && !MM.sel('[src$="skills/sprint.png"]') && !MM.sel('#myInventory [style*="antigrav_scooter.jpg"]') && !boulder))
+				&& (!energy || (!MM.GRAVITY && !MM.sel('#char_col [src$="skills/sprint.png"]') && !MM.sel('#myInventory [style*="antigrav_scooter.jpg"]') && !boulder))
 			)
 		)
 		{
@@ -432,7 +365,8 @@ MM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 MM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 2: item; 3: chat; 4: reset
 	var actionListA = MM.sel('#MMroomActionList1');
 	var actionListB = MM.sel('#MMroomActionList2');
-	//Reset
+
+	//Reset au début nécessaire dans tous les cas
 	actionListA.innerHTML = "";
 	actionListB.innerHTML = "";
 	MM.sel('#MMtt_itemname').innerHTML = '';
@@ -500,7 +434,7 @@ MM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 			for (j = 0; j < actions.length; j++) { t.push(actions[j]); }
 			for (j = 0; j < t.length; j++)
 			{
-				if (j%2)
+				if (j % 2)
 					{ MM.copyEl(t[j], actionListB); }
 				else
 					{ MM.copyEl(t[j], actionListA); }
@@ -515,7 +449,7 @@ MM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 			for (j = 0; j < actions.length; j++) { t.push(actions[j]); }
 			for (j = 0; j < t.length; j++)
 			{
-				if (j%2)
+				if (j % 2)
 					{ MM.copyEl(t[j], actionListB); }
 				else
 					{ MM.copyEl(t[j], actionListA); }
@@ -577,7 +511,7 @@ MM.changeChatTab = function(el) {
 
 MM.MMexitModule = function() {
 	js.JQuery(".cdExitModuleButton").prepend("<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />");
-	new js.JQuery("#input").attr("isModule","false");
+	new js.JQuery("#input").attr("isModule", "false");
 	Main.firstLabDone = false;
 	Main.labPage = null;
 	Main.ajax("/clearSessionMods", null, function() { //Auparavant window.location, utilisation de Main.ajax() pour éviter le rechargement total
@@ -1103,7 +1037,7 @@ MM.roomTab = function() {
 	MM.addNewEl('p', room_tab, null, MM.TEXT['equipments']);
 	var equipmentlist = MM.addNewEl('select', room_tab, 'equipmentselect');
 	equipmentlist.addEventListener('change', function() { MM.displayRoomActions(1); });
-	MM.addNewEl('option', equipmentlist, null, MM.TEXT['equipment_none'], [['value', 'NULL']]);
+	MM.addNewEl('option', equipmentlist, null, "—", [['value', 'NULL']]);
 
 	var items = Main.items.iterator();
 	while (items.hasNext())
@@ -1291,7 +1225,12 @@ MM.chatTab = function() {
 
 
 MM.gameTab = function() {
-	if (MM.sel('#room_col').lastChild.className != 'but') { MM.addButton(MM.sel('#room_col'), MM.TEXT['minimap-button']).addEventListener('click', function() { MM.generateMinimap(); }); }
+	if (MM.sel('#room_col').lastChild.className != 'but')
+		{ MM.addButton(MM.sel('#room_col'), MM.TEXT['minimap-button']).addEventListener('click', function() { MM.generateMinimap(); }); }
+
+	var egg = MM.sel('#calcModule [style*="display:none"]');
+	if (egg)
+		{ egg.textContent = "nuqDaq ’oH eDen. " + egg.textContent; } //Dédicace à BM ! ^_^
 };
 
 
@@ -1702,7 +1641,6 @@ MM.locale = function(forced) {
 	MM.TEXT['cards-title'] = "Projets et recherches :";
 	MM.TEXT['fire'] = "La pièce est dévorée par les flammes. Faites quelque chose !";
 	MM.TEXT['equipments'] = "Équipements";
-	MM.TEXT['equipment_none'] = "Aucun";
 	MM.TEXT['broken'] = " — CASSÉ";
 	MM.TEXT['reac_b'] = "Réacteur latéral gauche"; //B = gauche
 	MM.TEXT['reac_a'] = "Réacteur latéral droit";
@@ -1818,7 +1756,6 @@ MM.locale = function(forced) {
 	MM.TEXT['cards-title'] = "Projects and researches:";
 	MM.TEXT['fire'] = "There is a fire in the room. Quick, grab an extinguisher!";
 	MM.TEXT['equipments'] = "Equipments";
-	MM.TEXT['equipment_none'] = "None";
 	MM.TEXT['broken'] = " — BROKEN";
 	MM.TEXT['reac_b'] = "Left lateral reactor";
 	MM.TEXT['reac_a'] = "Right lateral reactor";
@@ -1978,5 +1915,3 @@ window.setInterval(function() {
 	if (!MM.sel('#MMenergybar'))
 		{ MM.reInit(); }
 	}, 250);
-
-var egg = MM.sel('#calcModule [style*="display:none"]'); if (egg) { egg.textContent = "nuqDaq ’oH eDen. " + egg.textContent; } //Dédicace à BM ! ^_^

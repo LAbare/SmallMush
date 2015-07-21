@@ -911,6 +911,8 @@ input.tid_withFriends, { color: black; }
 	fill: #F00;
 	background-color: #F00;
 	padding: 0 2px;
+	stroke: #000;
+	stroke-width: 1;
 }
 
 .MMmapdoor {

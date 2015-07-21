@@ -1,0 +1,73 @@
+***** FONCTIONS *****
+ 
+*** Fonctions développeur : ***
+.sel(name): sélectionne un élément par ID, par classe ou par sélecteur CSS
+.getAttributesList(el): retourne un tableau d'attributs d'un élément [[nom, valeur]]
+.addNewEl(type, *parent, *id, *content, *attrs): retourne un nouvel élément
+.addButton(parent, text, *attrs): retourne un bouton Mush, avec d'éventuels attributs
+.moveEl(el, dest, *bef): déplace un élément dans un autre ; possibilité de préciser avant quel enfant
+.copyEl(el, dest, *bef): copie un élément dans un autre, en ajoutant le préfixe 'MM' à tous les ID de l'arbre ; possibilité de préciser avant quel enfant
+.getTipContent(tipFunction): retourne le contenu d'une infobulle
+
+*** Fonctions MushMobile : ***
+.generateMinimap(): génère une minimap du vaisseau avec les alertes des avaries signalées
+.changeTab(newtab): change d'onglet MushMobile
+.MMhelp(e): affiche l'infobulle d'un élément
+.toggleAlertList(expand): affiche ou cache les rapports d'alertes
+.changeRoom(): déplace le personnage dans une autre salle
+.displayRoomActions(type, serial): sélectionne le personnage/chat cliqué et remet les select à zéro
+.updateRoomActions(type, serial): affiche le cadre d'actions et de personnage
+.changeChatTab(el): change l'onglet de chat (remplace Main.chatTab pour inclure l'onglet Éditeur de messages)
+.MMexitModule(): remplace Main.exitModule() pour éviter le rechargement total de la page
+.changeActionFunctions(): ajoute un appel à MM.beforeAction() avant chaque action
+.beforeAction(): appelée avant chaque action pour sauvegarder le message actuel de l'éditeur, demander confirmation de l'action si besoin et changer d'onglet MushMobile pour certaines actions
+.reInit(): reconstruit l'interface MushMobile après mise à jour de la page
+.showLicense(): affiche la licence MIT
+
+*** Fonctions relatives à l'inventaire MushMobile (inventaire copié dans l'onglet Pièce) : ***
+.selectItem(item): remplace Main.selectItem
+.itemLeft(): remplace Main.itemLeft
+.itemRight(): remplace Main.itemRight
+
+*** Fonctions relatives aux paramètres MushMobile : ***
+.getMMParameters(): lit les paramètres depuis document.cookie
+.setMMParameters(): enregistre les paramètres dans un cookie
+.buildParamsMenu(): reconstruit le menu des paramètres
+
+*** Fonctions d'adaptation de l'interface et d'ajouts : ***
+.initCss(): charge le CSS et modifie le viewport
+.initMenubar(): crée la barre de menu MushMobile
+.initTabs(): crée les onglets MushMobile
+.charTab(): adapte l'onglet Personnage (#char_col)
+.shipTab(): remplit l'onglet Vaisseau
+.roomTab(): remplit l'onglet Pièce
+.chatTab(): ajoute les boutons Coller aux topics du chat
+.gameTab(): ajoute un bouton « Afficher la minimap MushMobile » sous le jeu Flash (+ easter egg)
+
+*** Fonctions relatives à l'éditeur de messages : ***
+.messageEditor(): construit l'éditeur de message
+.refreshPreview(): rafraîchit la prévisualisation en ajoutant le formatage Mush
+.savePreview(): enregistre le message actuel dans un cookie
+.retrievePreview(): récupère le message enregistré depuis document.cookie
+.buildMessage(): crée un message préformaté
+.preformatPlanet(planet, *Schmanet, *Janet): crée un message de partage de planète préformaté
+
+*** Fonction de localisation : ***
+.locale(*forced): fonction de localisation de l'interface
+
+
+***** VARIABLES *****
+.src: (string) adresse du dossier source du script
+.smileys_regex: (list) expressions régulières des smileys Mush
+.previewtext: (string) message actuel de l'éditeur de message
+.parameters: (object) paramètres de l'interface MushMobile
+.rooms: (list) nom des pièces du Daedalus dans la langue du serveur
+.alertrooms: (list) nom des pièces du Daedalus telles qu'elles apparaissent dans les alertes (certaines sont mal écrites : « Jardin Hydoponique »)
+.localerooms: (list) nom des pièces du Daedalus dans la langue choisie par le joueur
+.TEXT: (object) textes de l'interface MushMobile, générés par MM.locale()
+.ME_MODULING: (bool) le personnage est en train d'accéder à un terminal
+.ME_NERON: (bool) le personnage a le titre d'Administrateur NERON
+.ME_DISABLED: (bool) le personnage a le statut Handicapé
+.ME_ALONE: (bool) le personnage est seul dans la pièce
+.GUARDIAN: (bool) un Gardien est présent dans la pièce
+.GRAVITY: (bool) le Simulateur de gravité est fonctionnel
