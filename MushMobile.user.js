@@ -109,7 +109,7 @@ MM.generateMinimap = function() {
 	MM.addNewEl('p', popup, null, MM.TEXT['minimap-legend']).className = 'nospace';
 	MM.addNewEl('p', popup, null, MM.TEXT['minimap-room']).className = 'nospace';
 
-	var al = { fAl: 'fire', dAl: 'door', eAl: 'alert' };
+	var al = { fAl: 'fire', dAl: 'door', eAl: 'alert' }; //Incendies, portes, équipements
 	for (var j in al)
 	{
 		var k = MM.sel('.alarm_bg [src$="/' + al[j] + '.png"]');
@@ -125,7 +125,7 @@ MM.generateMinimap = function() {
 		if (!r.length)
 			{ continue; }
 
-		var regexp = RegExp(MM.alertrooms[i] + '\\s\[\^2\]', 'g'); //Attention à Baie Alpha et Baie Alpha 2
+		var regexp = RegExp(MM.alertrooms[i] + '\\s\*\[\^2\]', 'g'); //Attention à Baie Alpha et Baie Alpha 2
 		if (regexp.test(al.fAl))
 			{ var roomclass = 'MMmaproom MMmapfire'; }
 		else
@@ -144,8 +144,7 @@ MM.generateMinimap = function() {
 		{
 			MM.addNewEl('rect', svg, null, null, [['width', r[0]], ['height', r[1]], ['x', r[2]], ['y', r[3]], ['data-maproom', i], ['class', roomclass]]).addEventListener('click', function() {
 				var halo = MM.sel('#MMmapselected');
-				if (halo)
-					{ halo.id = ''; }
+				if (halo) { halo.id = ''; }
 				MM.sel('#MMminimaproom').textContent = MM.localerooms[parseInt(this.getAttribute('data-maproom'))];
 				this.id = 'MMmapselected';
 			});
