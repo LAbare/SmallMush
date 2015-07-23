@@ -876,6 +876,16 @@ table.pvsm {
 /* Recherche pour la balise Joueur & sélection d'un message préformaté */
 input.tid_withFriends, { color: black; }
 
+/* Smileys Mush */
+#MMsmileysblock {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 5px;
+	border: 1px black solid;
+}
+
+#MMsmileysblock img { margin: 5px; }
+
 /* Messages préformatés */
 #MMpremessages {
 	margin-bottom: 20px;
@@ -925,8 +935,14 @@ input.tid_withFriends, { color: black; }
 	stroke-width: 3;
 }
 
-.MMmapalertd { color: #FA0; }
+.MMmapalertd {
+	position: absolute;
+	color: #FA0;
+}
 
-.MMmapalerte { color: #0AF; }
+.MMmapalerte {
+	position: absolute;
+	color: #0AF;
+}
 
 #MMmapselected { fill: #0FA; }

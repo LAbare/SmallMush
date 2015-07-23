@@ -35,7 +35,7 @@ MM.getAttributesList = function(el) {
 
 
 MM.addNewEl = function(type, parent, id, content, attrs) {
-	if (['svg', 'path', 'rect', 'text'].indexOf(type) != -1) //Éléments SVG au namespace différent
+	if (['svg', 'path', 'rect', 'text'].indexOf(type) != -1)
 		{ var el = document.createElementNS('http://www.w3.org/2000/svg', type); }
 	else
 		{ var el = document.createElement(type); }
@@ -97,7 +97,7 @@ MM.getTipContent = function(tipFunction) {
 MM.generateMinimap = function() {
 	var rooms = [['m129.5 10.5 0 20 -20 0 0 60 100 0 0 -60 -20 0 0 -20 -60 0z', [155, 50]], [60, 120, 249.5, 230.5], [60, 120, 9.5, 230.5], [60, 120, 249.5, 350.5], [60, 40, 129.5, 310.5], [80, 60, 69.5, 170.5], [80, 60, 69.5, 110.5], [100, 60, 109.5, 250.5], [80, 60, 169.5, 110.5], [180, 90, 69.5, 430.5], [40, 40, 209.5, 50.5], [40, 40, 249.5, 190.5], [40, 40, 249.5, 470.5], [40, 40, 69.5, 50.5], [40, 40, 29.5, 190.5], [40, 40, 29.5, 470.5], [], [], [], [], [], [], [], [], ['m69.5 90.5 0 20 80 0 0 120 20 0 0 -120 80 0 0 -20 -180 0z', [160, 92]], [180, 20, 69.5, 230.5], [220, 20, 29.5, 350.5], [], [60, 100, 9.5, 370.5], ['m209.5 290.5 0 20 -20 0 0 40 60 0 0 -60 -40 0z', [210, 320]], ['m69.5 290.5 0 60 60 0 0 -40 -20 0 0 -20 -40 0z', [100, 320]], [80, 60, 169.5, 170.5], [40, 40, 209.5, 250.5], [40, 60, 209.5, 370.5], [40, 40, 69.5, 250.5], [40, 60, 69.5, 370.5]];
 
-	var doors = [['209.5 60.5 0 20', '0-10'], ['109.5 60.5 0 20', '0-13'], ['149.5 90.5 20 0', '0-24'], ['259.5 350.5 20 0', '1-3'], ['259.5 230.5 20 0', '1-11'], ['249.5 230.5 0 20', '1-25'], ['249.5 320.5 0 20', '1-29'], ['249.5 260.5 0 20', '1-32'], ['39.5 230.5 20 0', '2-14'], ['69.5 230.5 0 20', '2-25'], ['39.5 350.5 20 0', '2-26'], ['69.5 320.5 0 20', '2-30'], ['69.5 260.5 0 20', '2-34'], ['249.5 440.5 0 20', '3-9'], ['259.5 470.5 20 0', '3-12'], ['249.5 350.5 0 20', '3-26'], ['149.5 350.5 20 0', '4-26'], ['119.5 170.5 20 0', '5-6'], ['69.5 200.5 0 20', '5-14'], ['149.5 180.5 0 20', '5-24'], ['149.5 140.5 0 20', '6-24'], ['149.5 250.5 20 0', '7-25'], ['169.5 140.5 0 20', '8-24'], ['179.5 170.5 20 0', '8-31'], ['249.5 480.5 0 20', '9-12'], ['69.5 480.5 0 20', '9-15'], ['69.5 440.5 0 20', '9-28'], ['219.5 430.5 20 0', '9-33'], ['79.5 430.5 20 0', '9-35'], ['219.5 90.5 20 0', '10-24'], ['249.5 200.5 0 20', '11-31'], ['79.5 90.5 20 0', '13-24'], ['39.5 470.5 20 0', '15-28'], ['149.5 230.5 20 0', '24-25'], ['169.5 180.5 0 20', '24-31'], ['39.5 370.5 20 0', '26-28'],  ['219.5 350.5 20 0', '26-29'], ['79.5 350.5 20 0', '26-30'], ['219.5 370.5 20 0', '26-33'], ['79.5 370.5 20 0', '26-35']];
+	var doors = [['209.5 60.5 0 20', '0-10'], ['109.5 60.5 0 20', '0-13'], ['149.5 90.5 20 0', '0-24'], ['259.5 350.5 20 0', '1-3'], ['259.5 230.5 20 0', '1-11'], ['249.5 230.5 0 20', '1-25'], ['249.5 300.5 0 20', '1-29'], ['249.5 260.5 0 20', '1-32'], ['39.5 230.5 20 0', '2-14'], ['69.5 230.5 0 20', '2-25'], ['39.5 350.5 20 0', '2-26'], ['69.5 300.5 0 20', '2-30'], ['69.5 260.5 0 20', '2-34'], ['249.5 440.5 0 20', '3-9'], ['259.5 470.5 20 0', '3-12'], ['249.5 350.5 0 20', '3-26'], ['149.5 350.5 20 0', '4-26'], ['119.5 170.5 20 0', '5-6'], ['69.5 200.5 0 20', '5-14'], ['149.5 180.5 0 20', '5-24'], ['149.5 140.5 0 20', '6-24'], ['149.5 250.5 20 0', '7-25'], ['169.5 140.5 0 20', '8-24'], ['179.5 170.5 20 0', '8-31'], ['249.5 480.5 0 20', '9-12'], ['69.5 480.5 0 20', '9-15'], ['69.5 440.5 0 20', '9-28'], ['219.5 430.5 20 0', '9-33'], ['79.5 430.5 20 0', '9-35'], ['219.5 90.5 20 0', '10-24'], ['249.5 200.5 0 20', '11-31'], ['79.5 90.5 20 0', '13-24'], ['39.5 470.5 20 0', '15-28'], ['149.5 230.5 20 0', '24-25'], ['169.5 180.5 0 20', '24-31'], ['39.5 370.5 20 0', '26-28'],  ['219.5 350.5 20 0', '26-29'], ['79.5 350.5 20 0', '26-30'], ['219.5 370.5 20 0', '26-33'], ['79.5 370.5 20 0', '26-35']];
 
 	var popup = MM.sel('#MMpopup');
 	popup.innerHTML = '';
@@ -109,9 +109,12 @@ MM.generateMinimap = function() {
 	MM.addNewEl('p', popup, null, MM.TEXT['minimap-legend']).className = 'nospace';
 	MM.addNewEl('p', popup, null, MM.TEXT['minimap-room']).className = 'nospace';
 
-	var fires = ((MM.sel('.alarm_bg [src$="/fire.png"]')) ? MM.sel('.alarm_bg [src$="fire.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
-	var dooralerts = ((MM.sel('.alarm_bg [src$="/door.png"]')) ? MM.sel('.alarm_bg [src$="door.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
-	var eqalerts = ((MM.sel('.alarm_bg [src$="/alert.png"]')) ? MM.sel('.alarm_bg [src$="alert.png"]').parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
+	var al = { fAl: 'fire', dAl: 'door', eAl: 'alert' };
+	for (var j in al)
+	{
+		var k = MM.sel('.alarm_bg [src$="/' + al[j] + '.png"]');
+		al[j] = ((k) ? k.parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
+	}
 
 	var bloc = MM.addNewEl('div', popup, 'MMminimapbloc');
 	var svg = MM.addNewEl('svg', bloc, 'MMminimap', null, [['width', '320'], ['height', '530']]);
@@ -119,48 +122,48 @@ MM.generateMinimap = function() {
 	for (i = 0; i < rooms.length; i++)
 	{
 		var r = rooms[i];
-		if (r.length)
-		{
-			if (RegExp(MM.alertrooms[i] + ' ?</strong>').test(fires)) //Pour que "Baie Alpha" renvoie false si on a "Baie Alpha 2"
-				{ var roomclass = 'MMmaproom MMmapfire'; }
-			else
-				{ var roomclass = 'MMmaproom'; }
-			if (r.length == 2)
-			{
-				MM.addNewEl('path', svg, null, null, [['d', r[0]], ['data-maproom', i], ['class', roomclass]]).addEventListener('click', function() {
-					var halo = MM.sel('#MMmapselected');
-					if (halo)
-						{ halo.id = ''; }
-					MM.sel('#MMminimaproom').textContent = MM.localerooms[parseInt(this.getAttribute('data-maproom'))];
-					this.id = 'MMmapselected';
-				});
-				var c = r[1];
-			}
-			else
-			{
-				MM.addNewEl('rect', svg, null, null, [['width', r[0]], ['height', r[1]], ['x', r[2]], ['y', r[3]], ['data-maproom', i], ['class', roomclass]]).addEventListener('click', function() {
-					var halo = MM.sel('#MMmapselected');
-					if (halo)
-						{ halo.id = ''; }
-					MM.sel('#MMminimaproom').textContent = MM.localerooms[parseInt(this.getAttribute('data-maproom'))];
-					this.id = 'MMmapselected';
-				});
-				var c = [r[2] + (r[0] / 2), r[3] + (r[1] / 2) - 10];
-			}
+		if (!r.length)
+			{ continue; }
 
-			//<div> plutôt que <text> car ce dernier n'est bizarrement pas supporté sur tous les navigateurs mobiles (coucou Dolphin)
-			var rd = (dooralerts.split(MM.alertrooms[i] + ' .').length - 1);
-			var re = (eqalerts.split(MM.alertrooms[i] + ' </strong>').length - 1);
-			if (rd && re)
-			{
-				MM.addNewEl('div', bloc, null, rd, [['style', 'position: absolute; left: ' + (c[0] - 10) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalertd']]);
-				MM.addNewEl('div', bloc, null, re, [['style', 'position: absolute; left: ' + (c[0] +5) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalerte']]);
-			}
-			else if (rd)
-				{ MM.addNewEl('div', bloc, null, rd, [['style', 'position: absolute; left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalertd']]); }
-			else if (re)
-				{ MM.addNewEl('div', bloc, null, re, [['style', 'position: absolute; left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalerte']]); }
+		var regexp = RegExp(MM.alertrooms[i] + '\\s\[\^2\]', 'g'); //Attention à Baie Alpha et Baie Alpha 2
+		if (regexp.test(al.fAl))
+			{ var roomclass = 'MMmaproom MMmapfire'; }
+		else
+			{ var roomclass = 'MMmaproom'; }
+		if (r.length == 2)
+		{
+			MM.addNewEl('path', svg, null, null, [['d', r[0]], ['data-maproom', i], ['class', roomclass]]).addEventListener('click', function() {
+				var halo = MM.sel('#MMmapselected');
+				if (halo) { halo.id = ''; }
+				MM.sel('#MMminimaproom').textContent = MM.localerooms[parseInt(this.getAttribute('data-maproom'))];
+				this.id = 'MMmapselected';
+			});
+			var c = r[1];
 		}
+		else
+		{
+			MM.addNewEl('rect', svg, null, null, [['width', r[0]], ['height', r[1]], ['x', r[2]], ['y', r[3]], ['data-maproom', i], ['class', roomclass]]).addEventListener('click', function() {
+				var halo = MM.sel('#MMmapselected');
+				if (halo)
+					{ halo.id = ''; }
+				MM.sel('#MMminimaproom').textContent = MM.localerooms[parseInt(this.getAttribute('data-maproom'))];
+				this.id = 'MMmapselected';
+			});
+			var c = [r[2] + (r[0] / 2), r[3] + (r[1] / 2) - 10];
+		}
+
+		//<div> plutôt que <text> car ce dernier n'est bizarrement pas supporté sur tous les navigateurs mobiles (coucou Dolphin)
+		var rd = al.dAl.match(regexp).length;
+		var re = al.eAl.match(regexp).length;
+		if (rd && re)
+		{
+			MM.addNewEl('div', bloc, null, rd, [['style', 'left: ' + (c[0] - 10) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalertd']]);
+			MM.addNewEl('div', bloc, null, re, [['style', 'left: ' + (c[0] +5) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalerte']]);
+		}
+		else if (rd)
+			{ MM.addNewEl('div', bloc, null, rd, [['style', 'left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalertd']]); }
+		else if (re)
+			{ MM.addNewEl('div', bloc, null, re, [['style', 'left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;'], ['class', 'MMmapalerte']]); }
 	}
 	for (i = 0; i < doors.length; i++)
 		{ MM.addNewEl('path', svg, null, null, [['d', 'm' + doors[i][0]], ['data-mapdoor', doors[i][1]], ['class', 'MMmapdoor']]); }
@@ -174,7 +177,8 @@ MM.generateMinimap = function() {
 };
 
 MM.changeTab = function(newtab) {
-	//#room_col n'est pas caché pour que le jeu Flash fonctionne, juste hors-champ ; on fait glisser le conteneur #content dans ce cas, et avec la barre d'info et le logo/les liens/les onglets
+	//#room_col n'est pas caché pour que le jeu Flash fonctionne, juste hors-champ ; on fait glisser #content, la barre d'info et le logo/les liens/les onglets
+	var char = MM.sel('#char_col');
 	if (newtab == 'room_col')
 	{
 		MM.sel('#content').scrollLeft = 424;
@@ -183,19 +187,19 @@ MM.changeTab = function(newtab) {
 	}
 	else
 	{
-		if (MM.sel('#char_col').parentNode.getAttribute('data-visible-tab') == 'room_col') /* Si on vient de l'onglet Flash */
+		if (char.parentNode.getAttribute('data-visible-tab') == 'room_col') /* Si on vient de l'onglet Flash */
 		{
 			MM.sel('#content').scrollLeft = 0;
 			MM.sel('#topinfo_bar').style.left = '0';
 			MM.sel('.mxhead').style.left = '0';
 		}
-		MM.sel('#char_col').style.display = 'none';
+		char.style.display = 'none';
 		MM.sel('#ship_tab').style.display = 'none';
 		MM.sel('#room_tab').style.display = 'none';
 		MM.sel('#chat_col').style.display = 'none';
 		MM.sel('#' + newtab).style.display = 'block';
 	}
-	MM.sel('#char_col').parentNode.setAttribute('data-visible-tab', newtab);
+	char.parentNode.setAttribute('data-visible-tab', newtab);
 };
 
 
@@ -212,7 +216,7 @@ MM.MMhelp = function(e) {
 		else if (el.getAttribute('data-tip')) //Item : 4 niveaux au-dessus
 		{
 			var name = decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(el.getAttribute('data-tip'))[1]);
-			var desc = el.getAttribute('data-desc').replace(/\\'/g, "'");
+			var desc = el.getAttribute('data-desc').replace(/\\'/g, "'").replace(/\n|\r/g, '');
 			Main.showTip(el, "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>" + name + "</h1>" + desc + "</div></div></div></div>");
 			MM.sel('#MMhelpscreenB').style.display = 'block';
 			break;
@@ -279,7 +283,6 @@ MM.changeRoom = function(el) {
 			el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + MM.TEXT['move_button'];
 			if (MM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
 			{
-				console.log('Demoduling');
 				Main.ajax("/clearSessionMods", null, function() {
 					Main.ajax('/?fa=81&fp=' + select.value, null, function() {
 						MM.changeTab('room_tab');
@@ -305,7 +308,6 @@ MM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 			MM.sel('#equipmentselect').selectedIndex = 0;
 			var selectedhero = MM.sel('[data-serial="' + serial + '"]');
 
-			//Retrait du halo de sélection
 			if (herohalo)
 			{
 				if (herohalo.parentNode == selectedhero)
@@ -317,16 +319,12 @@ MM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 				else
 					{ herohalo.parentNode.removeChild(herohalo); }
 			}
-
-			//Ajout du halo de sélection
 			var hero = Main.heroes.get(serial);
 			MM.moveEl(MM.addNewEl('img', null, 'MMheroselected', null, [['src', selectedhero.lastElementChild.getAttribute('src').replace(/\.png/, '_selected.png')]]), selectedhero, selectedhero.lastElementChild);
 			MM.updateRoomActions(type, serial);
 			break;
 
 		case 1: //Équipement
-			if (MM.sel('.MMselected')) //Halo de sélection d'un item de l'inventaire MM
-				{ MM.sel('.MMselected').parentNode.removeChild(MM.sel('.MMselected')); }
 			if (herohalo)
 				{ herohalo.parentNode.removeChild(herohalo); }
 				
@@ -341,7 +339,6 @@ MM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 			MM.sel('#equipmentselect').selectedIndex = 0;
 			var cat = MM.sel('[data-serial="' + serial + '"]');
 
-			//Retrait du halo de sélection
 			if (herohalo)
 			{
 				if (herohalo.parentNode == cat)
@@ -353,8 +350,6 @@ MM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 				else
 					{ herohalo.parentNode.removeChild(herohalo); }
 			}
-
-			//Ajout du halo de sélection
 			MM.moveEl(MM.addNewEl('img', null, 'MMheroselected', null, [['src', MM.src + "ui/chars/schrodinger_selected.png"]]), cat, cat.lastElementChild);
 			MM.updateRoomActions(type, serial);
 			break;
@@ -418,7 +413,6 @@ MM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 
 			//Boutons d'action
 			var t = []; //Un .querySelectorAll est mis à jour à chaque copie d'éléments, ce qui créerait une boucle infinie ; donc copie dans un nouveau tableau pour couper le lien tableau-.querySelectorAll
-			//On ne sélectionne que les fils de .cdActionRepository pour éviter les doublons avec les boutons éventuellement affichés via le Flash
 			var actions = document.querySelectorAll('.cdActionRepository [webdata="' + serial + '"]');
 			for (j = 0; j < actions.length; j++) { t.push(actions[j]); }
 			for (j = 0; j < t.length; j++)
@@ -575,7 +569,8 @@ MM.reInit = function() {
 	MM.gameTab();
 	MM.messageEditor();
 	MM.changeActionFunctions();
-	
+	MM.sel("#MMbar .cycletime").textContent = MM.sel("#chat_col .cycletime").textContent;
+
 	MM.ME_NERON = false;
 	MM.ME_ALONE = true;
 	MM.ME_DISABLED = false;
@@ -786,14 +781,13 @@ MM.initMenubar = function() {
 	});
 	MM.addNewEl('div', document.body, 'MMloadscreen', "<img src='/img/icons/ui/loading1.gif' />").addEventListener('click', function() { this.style.display = 'none'; });
 
-	var help = MM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?");
-	//Premier écran noir : sélectionner l'élément ; second écran noir : cacher l'infobulle (sinon elle peut rester)
+	MM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?").addEventListener('click', function() { MM.sel('#MMhelpscreenA').style.display = 'block'; });
+	//Premier écran noir : sélectionner l'élément ; second écran noir : cacher l'infobulle (sinon elle reste)
 	MM.addNewEl('div', document.body, 'MMhelpscreenA', MM.TEXT['help_screen_A']).addEventListener('click', function(e) { this.style.display = 'none'; MM.MMhelp(e); });
 	MM.addNewEl('div', document.body, 'MMhelpscreenB', MM.TEXT['help_screen_B']).addEventListener('click', function(e) { this.style.display = 'none'; Main.hideTip(); });
-	help.addEventListener('click', function() { MM.sel('#MMhelpscreenA').style.display = 'block'; });
 
-	var cycle = MM.copyEl(MM.sel('.cycletime'), bar); //Jour et cycle
-	var clock = MM.copyEl(MM.sel('.cdShipCasio'), bar); //Horloge
+	MM.copyEl(MM.sel('.cycletime'), bar); //Jour et cycle
+	MM.copyEl(MM.sel('.cdShipCasio'), bar); //Horloge
 
 	MM.addNewEl('img', bar, 'MMparams', null, [['src', MM.src + "ui/params.png"]]).addEventListener('click', function() {
 		MM.buildParamsMenu();
@@ -807,16 +801,16 @@ MM.initMenubar = function() {
 
 	//Onglets MushMobile
 	var menu = MM.addNewEl('ul', MM.sel('.mxhead'), 'MMtabs');
-		MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/noob.png' />" + MM.TEXT['tabs_char']).addEventListener('click', function() { MM.changeTab('char_col'); });
-		MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/pa_core.png' />" + MM.TEXT['tabs_ship']).addEventListener('click', function() { MM.changeTab('ship_tab'); });
-		MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/door.png' />" + MM.TEXT['tabs_room']).addEventListener('click', function() { MM.changeTab('room_tab'); });
-		MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/wall.png' />" + MM.TEXT['tabs_chat']).addEventListener('click', function() { MM.changeTab('chat_col'); });
-		MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/moduling.png' />" + MM.TEXT['tabs_game']).addEventListener('click', function() { MM.changeTab('room_col'); });
-		MM.addNewEl('li', menu, 'MMvending', "<img src='/img/icons/ui/credit_small.png' />" + MM.TEXT['tabs_shop']).addEventListener('click', function() {
-			MM.sel('#MMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + MM.TEXT['tabs_shop']; Main.ajax('/vending', null, function() {
-				MM.reInit(); MM.changeTab('room_col'); MM.sel('#MMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + MM.TEXT['tabs_shop'];
-			});
+	MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/noob.png' />" + MM.TEXT['tabs_char']).addEventListener('click', function() { MM.changeTab('char_col'); });
+	MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/pa_core.png' />" + MM.TEXT['tabs_ship']).addEventListener('click', function() { MM.changeTab('ship_tab'); });
+	MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/door.png' />" + MM.TEXT['tabs_room']).addEventListener('click', function() { MM.changeTab('room_tab'); });
+	MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/wall.png' />" + MM.TEXT['tabs_chat']).addEventListener('click', function() { MM.changeTab('chat_col'); });
+	MM.addNewEl('li', menu, null, "<img src='/img/icons/ui/moduling.png' />" + MM.TEXT['tabs_game']).addEventListener('click', function() { MM.changeTab('room_col'); });
+	MM.addNewEl('li', menu, 'MMvending', "<img src='/img/icons/ui/credit_small.png' />" + MM.TEXT['tabs_shop']).addEventListener('click', function() {
+		MM.sel('#MMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + MM.TEXT['tabs_shop']; Main.ajax('/vending', null, function() {
+			MM.reInit(); MM.changeTab('room_col'); MM.sel('#MMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + MM.TEXT['tabs_shop'];
 		});
+	});
 
 	MM.addNewEl('div', document.body, 'MMpopup').style.display = 'none';
 	MM.buildParamsMenu();
@@ -849,51 +843,50 @@ MM.initTabs = function() {
 
 MM.charTab = function() {
 	var sheetmain = MM.sel('.sheetmain');
-
-	if (MM.sel('#MMenergybar') == null) //Si l'onglet n'a pas déjà été adapté
-	{
-		// COMPÉTENCES //
-		MM.moveEl(MM.sel('[class="skills"]'), sheetmain, sheetmain.firstChild);
-
-		// PERSONNAGE //
-		//Bloc comprenant le portrait en fond (.avatar), le nom (.who) en haut à gauche, le triomphe (triumphLi) en haut à droite, le niveau (.level) en bas à droite et le message de promo (.gogold) en bas
-		var characterdiv = MM.moveEl(MM.addNewEl('div', null, 'MMcharacterdiv'), sheetmain, sheetmain.firstChild);
-		MM.copyEl(MM.sel('.who'), characterdiv);
-		var triumphLi = MM.sel('[src$="triumph.png"]').parentNode;
-		MM.moveEl(MM.addNewEl('div', null, 'triumph', triumphLi.innerHTML.trim(), MM.getAttributesList(triumphLi)), characterdiv);
-		MM.copyEl(MM.sel('.level'), characterdiv);
-		MM.moveEl(MM.sel('.avatar'), characterdiv).className = 'avatar MM' + MM.sel('.who').textContent.trim().replace(" ", "_").toLowerCase();
-		if (MM.sel('.gogold')) //Message « Achetez du mode Or »
-			{ MM.moveEl(MM.sel('.gogold'), characterdiv); }
-
-		// ÉNERGIE //
-		//Copie des barres d'énergie pour les intégrer au tableau des barres de santé (plus léger et plus sûr niveau CSS)
-		var MMenergybar = MM.addNewEl('tr', MM.sel('.pvsm').firstElementChild, 'MMenergybar');
-		var oldPa = MM.sel('#cdPaBloc');
-		var APbar = oldPa.children[2];
-		MM.addNewEl('td', MMenergybar, null, APbar.innerHTML, MM.getAttributesList(APbar));
-		var MPbar = oldPa.children[3];
-		MM.addNewEl('td', MMenergybar, null, MPbar.innerHTML, MM.getAttributesList(MPbar));
-
-		var extraAPs = document.getElementsByClassName('extrapa'); //Points d'action spéciaux : ont la forme Nombre:Image dans la structure HTML de base
-		if (extraAPs.length)
-		{
-			var t = []; //Un .getElementsByClassName est mis à jour à chaque copie d'éléments, ce qui créerait une boucle infinie ; donc copie dans un nouveau tableau pour couper le lien
-			for (var i = 0; i < extraAPs.length; i++) { t.push(extraAPs[i]); }
-			var extratd = MM.addNewEl('td', MM.addNewEl('tr', MM.sel('.pvsm').firstElementChild), 'MMextratd', null, [['colspan', '2']]);
-			for (var i = 0; i < t.length; i++)
-			{ 
-				var extrapoint = MM.addNewEl('span', extratd, null, null, MM.getAttributesList(t[i]));
-				MM.moveEl(t[i].lastElementChild, extrapoint); //Image
-				MM.moveEl(t[i].firstElementChild, extrapoint); //Nombre
-			}
-		}
-
-		oldPa.style.display = 'none';
-	}
-
 	//Affiche les actions joueur, qui sont normalement cachées jusqu'au chargement du jeu Flash
 	ActionListMaintainer.prototype.changeHeroListState2(["DisplayHeroActions", 0]);
+
+	if (MM.sel('#MMenergybar')) //Si l'onglet n'a pas déjà été adapté
+		{ return; }
+
+	// COMPÉTENCES //
+	MM.moveEl(MM.sel('[class="skills"]'), sheetmain, sheetmain.firstChild);
+
+	// PERSONNAGE //
+	//Bloc comprenant le portrait en fond (.avatar), le nom (.who) en haut à gauche, le triomphe (triumphLi) en haut à droite, le niveau (.level) en bas à droite et le message de promo (.gogold) en bas
+	var characterdiv = MM.moveEl(MM.addNewEl('div', null, 'MMcharacterdiv'), sheetmain, sheetmain.firstChild);
+	MM.copyEl(MM.sel('.who'), characterdiv);
+	var triumphLi = MM.sel('[src$="triumph.png"]').parentNode;
+	MM.moveEl(MM.addNewEl('div', null, 'triumph', triumphLi.innerHTML.trim(), MM.getAttributesList(triumphLi)), characterdiv);
+	MM.copyEl(MM.sel('.level'), characterdiv);
+	MM.moveEl(MM.sel('.avatar'), characterdiv).className = 'avatar MM' + MM.sel('.who').textContent.trim().replace(" ", "_").toLowerCase();
+	if (MM.sel('.gogold')) //Message « Achetez du mode Or »
+		{ MM.moveEl(MM.sel('.gogold'), characterdiv); }
+
+	// ÉNERGIE //
+	//Copie des barres d'énergie pour les intégrer au tableau des barres de santé (plus léger et plus sûr niveau CSS)
+	var MMenergybar = MM.addNewEl('tr', MM.sel('.pvsm').firstElementChild, 'MMenergybar');
+	var oldPa = MM.sel('#cdPaBloc');
+	var APbar = oldPa.children[2];
+	MM.addNewEl('td', MMenergybar, null, APbar.innerHTML, MM.getAttributesList(APbar));
+	var MPbar = oldPa.children[3];
+	MM.addNewEl('td', MMenergybar, null, MPbar.innerHTML, MM.getAttributesList(MPbar));
+
+	var extraAPs = document.getElementsByClassName('extrapa'); //Points d'action spéciaux : ont la forme Nombre:Image dans la structure HTML de base
+	if (extraAPs.length)
+	{
+		var t = []; //Un .getElementsByClassName est mis à jour à chaque copie d'éléments → boucle infinie ; donc copie dans un nouveau tableau pour couper le lien
+		for (var i = 0; i < extraAPs.length; i++) { t.push(extraAPs[i]); }
+		var extratd = MM.addNewEl('td', MM.addNewEl('tr', MM.sel('.pvsm').firstElementChild), 'MMextratd', null, [['colspan', '2']]);
+		for (var i = 0; i < t.length; i++)
+		{ 
+			var extrapoint = MM.addNewEl('span', extratd, null, null, MM.getAttributesList(t[i]));
+			MM.moveEl(t[i].lastElementChild, extrapoint); //Image
+			MM.moveEl(t[i].firstElementChild, extrapoint); //Nombre
+		}
+	}
+
+	oldPa.style.display = 'none';
 };
 
 
@@ -930,8 +923,8 @@ MM.shipTab = function() {
 				}
 
 				//Mis à zéro, sinon l'infobulle s'affiche en passant la souris/le doigt sur l'alerte déjà lisible
-				alert.onmouseover = "";
-				alert.onmouseout = "";
+				alert.onmouseover = '';
+				alert.onmouseout = '';
 			}
 
 			if (alert.innerHTML.match(/simulator.png/))
@@ -942,20 +935,20 @@ MM.shipTab = function() {
 		alarmtext.textContent = alarmtext.textContent.replace(/:/, '!');
 	}
 
-	MM.sel('.alarm').addEventListener('click', function() { MM.changeTab('ship_tab'); }); //Cliquer sur ALERTES affichera l'onglet Vaisseau, donc les alertes détaillées
+	MM.sel('.alarm').addEventListener('click', function() { MM.changeTab('ship_tab'); }); //Renvoie aux alertes détaillées
 
 	// EXPÉDITION //
 	var expoblock = MM.sel('.exploring');
 	if (expoblock)
 	{
 		var firstalert = MM.sel('.alarm_bg li:first-of-type');
-		MM.copyEl(expoblock, ship_tab).style.display = 'block'; //Copie, et pas déplacement, sinon le bloc est perdu en cas de rechargement interne
+		MM.copyEl(expoblock, ship_tab).style.display = 'block'; //Copie, et pas déplacement, sinon le bloc est perdu au rechargement interne
 		expoblock.style.display = 'none';
-		MM.moveEl(MM.addNewEl('img', null, null, null, [['src', '/img/icons/ui/planet.png']]), firstalert, firstalert.firstChild); //Ajout d'une icône planète pour indiquer l'expédition dans la barre d'info
+		MM.moveEl(MM.addNewEl('img', null, null, null, [['src', '/img/icons/ui/planet.png']]), firstalert, firstalert.firstChild); //Icône planète = expédition en cours
 	}
 
 	// PROJETS, RECHERCHES & PILGRED //
-	//.MMcardsbreak : élément en display: block pour séparer visuellement les projets des recherches et du PILGRED, comme un saut de ligne
+	//.MMcardsbreak : saut de ligne
 	MM.addNewEl('h4', ship_tab, null, MM.TEXT['cards-title']);
 	var newcards = MM.copyEl(MM.sel('#cdBottomBlock'), ship_tab).firstElementChild;
 	if (MM.sel('#MMcdBottomBlock .research'))
@@ -985,14 +978,21 @@ MM.roomTab = function() {
 	MM.addNewEl('p', room_tab, null, MM.TEXT['MM-added_tab_text']).className = 'MMtabwarning';
 
 	// INCENDIE DANS LA PIÈCE //
-	var fireroom = MM.alertrooms[MM.rooms.indexOf(MM.sel('#input').getAttribute('d_name'))]; //Erreur : « Jardin Hydoponique » dans les alertes incendie
+	var infobar = MM.sel('#topinfo_bar');
+	var fireroom = MM.alertrooms[MM.rooms.indexOf(MM.sel('#input').getAttribute('d_name'))]; //Voir .alertrooms
 	if (MM.sel('[href^="?action=SIGNAL_FIRE"]') //Pas encore signalé
-		|| (document.querySelector('.alarm [src$="fire.png"]') //Au cas où l'incendie serait déjà signalé, on cherche dans les alertes
-		   && MM.getTipContent(document.querySelector('.alarm [src$="fire.png"]').parentNode.onmouseover).search(fireroom) != -1) //Recherche de la pièce dans les rapports
+		|| (document.querySelector('.alarm [src$="fire.png"]') //Signalé
+		   && RegExp(fireroom + '\\s\*.').test(MM.getTipContent(document.querySelector('.alarm [src$="fire.png"]').parentNode.onmouseover)))
 	)
 	{
-		MM.sel('#topinfo_bar').className += ' MMfire'; //Changement du fond de la barre d'info
-		MM.addNewEl('p', room_tab, null, MM.TEXT['fire'], [['class', 'MMfire']]); //Ajout d'un texte
+		infobar.className += ' MMfire'; //Changement du fond de la barre d'info
+		MM.addNewEl('p', room_tab, 'MMfiretext', MM.TEXT['fire'], [['class', 'MMfire']]); //Ajout d'un texte
+	}
+	else
+	{
+		infobar.className = infobar.className.replace(/ MMfire/, '');
+		if (MM.sel('#MMfiretext'))
+			{ room_tab.removeChild(MM.sel('#MMfiretext')); }
 	}
 
 	// SE DÉPLACER //
@@ -1001,7 +1001,7 @@ MM.roomTab = function() {
 	var roomname = MM.sel('#input').getAttribute('d_name');
 	var room = MM.rooms.indexOf(roomname);
 
-	if ([16, 17, 18, 19, 20, 21, 22, 23, 27, 36, 37].indexOf(room) == -1) //Salles sans porte (patrouilleurs x8, planète, espace infini, Limbes)
+	if ([16, 17, 18, 19, 20, 21, 22, 23, 27, 36, 37].indexOf(room) == -1) //Salles sans porte (patrouilleurs, planète, espace infini, Limbes)
 	{
 		//Recherche des portes cassées
 		var brokendoors = [];
@@ -1176,16 +1176,13 @@ MM.chatTab = function() {
 	{
 		chat.className = 'MMhidepaste';
 		//#wall : création d'un nouveau topic général ; #privateform : création d'un message privé
-		//TODO : réussir à faire fonctionner ça…
 		var wallinputs = [['#wall', '#cdChatInput5'], ['#privateform', '#cdChatInput7']];
 		for (i = 0; i < wallinputs.length; i++)
 		{
-			/*MM.sel(wallinputs[i][1]).value = '';
-			MM.sel(wallinputs[i][1]).innerHTML = '';*/
-			var button = MM.addButton(MM.sel(wallinputs[i][0]), MM.TEXT['paste']);
-			button.className += ' MMpastebutton';
-			button.setAttribute('data-id', wallinputs[i][1]);
-			button.addEventListener('click', function() {
+			var input = MM.sel(wallinputs[i][1]);
+			input.setAttribute('onfocus', '$(this).addClass("chatboxfocus"); return true;'); //Main.onChatFocus ne fait qu'empêcher le collage… -_-
+			input.value = '';
+			MM.addButton(MM.sel(wallinputs[i][0]), MM.TEXT['paste'], [['class', 'MMpastebutton'], ['data-id', wallinputs[i][1]]]).addEventListener('click', function() {
 				if (MM.previewtext)
 				{
 					var textarea = MM.sel(this.getAttribute('data-id'));
@@ -1203,10 +1200,7 @@ MM.chatTab = function() {
 	{
 		if (units[i].lastElementChild.className != 'but MMpastebutton')
 		{
-			var button = MM.addButton(units[i], MM.TEXT['paste']);
-			button.className += ' MMpastebutton';
-			button.setAttribute('data-id', units[i].getAttribute('data-k'));
-			button.addEventListener('click', function() {
+			MM.addButton(units[i], MM.TEXT['paste'], [['class', 'MMpastebutton'], ['data-id', units[i].getAttribute('data-k')]]).addEventListener('click', function() {
 				if (MM.previewtext)
 				{
 					var textarea = MM.sel('#wall_reply_' + this.getAttribute('data-id'));
@@ -1242,7 +1236,10 @@ MM.messageEditor = function() {
 	{
 		//On remet le message sauvegardé
 		if (MM.previewtext)
-			{ MM.sel('#tid_wallPost').value = MM.previewtext; }
+		{
+			MM.sel('#tid_wallPost').value = MM.previewtext;
+			setTimeout(function() { MM.refreshPreview(); }, 100);
+		}
 
 		//On rechange les fonctions des onglets du chat, au cas où
 		var tabs = MM.sel('#cdTabsChat').children;
@@ -1271,7 +1268,8 @@ MM.messageEditor = function() {
 		form.removeChild(form.lastElementChild);
 		form.action = '';
 		form.onsubmit = '';
-		MM.sel('#tid_wallPost').setAttribute('maxlength', '2500');
+		var wallpost = MM.sel('#tid_wallPost');
+		wallpost.setAttribute('maxlength', '2500');
 
 		//Retrait des balises non-fonctionnelles dans Mush
 		var buttonsbar = MM.sel('.tid_editorButtons');
@@ -1290,8 +1288,32 @@ MM.messageEditor = function() {
 			}
 		});
 
+		//Ajout des smileys Mush
+		MM.addNewEl('p', form, null, '↓ ' + MM.TEXT['editor-mush_smileys'] + ' ↓', [['class', 'MMcenter']]).addEventListener('click', function() {
+			var block = MM.sel('#MMsmileysblock');
+			if (block.style.display == 'none')
+			{
+				block.style.display = 'block';
+				this.textContent = '↑ ' + MM.TEXT['editor-mush_smileys'] + ' ↑';
+			}
+			else
+			{
+				block.style.display = 'none';
+				this.textContent = '↓ ' + MM.TEXT['editor-mush_smileys'] + ' ↓';
+			}
+		});
+		var s = MM.addNewEl('div', form, 'MMsmileysblock');
+		s.style.display = 'none';
+		for (i = 0; i < MM.smileys.length; i++) //Smileys Mush
+		{
+			MM.addNewEl('img', s, null, null, [['src', '/img/icons/ui/' + MM.smileys[i][1]], ['data-smiley', MM.smileys[i][0].split('|')[0]]]).addEventListener('click', function() {
+				MM.sel('#tid_wallPost').value += ':' + this.getAttribute('data-smiley') + ':';
+				setTimeout(function() { MM.refreshPreview(); }, 100);
+			});
+		}
+
 		//Liste des messages préformatés
-		MM.addNewEl('p', form, null, MM.TEXT['premessages_title']).style.color = 'black';
+		MM.addNewEl('p', form, null, MM.TEXT['premessages_title'], [['style', 'color: black; margin-top: 20px;']]);
 		var premessages = MM.addNewEl('select', form, 'MMpremessages');
 		premessages.addEventListener('change', function() { MM.buildMessage(); });
 		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet'];
@@ -1312,18 +1334,21 @@ MM.messageEditor = function() {
 		//Mise à jour de la prévisualisation avec surcouche de formatage Mush
 		var preview = MM.sel("#tid_wallPost_preview");
 		preview.className += ' talks'; //CSS « bulle »
-		MM.sel('#tid_wallPost').addEventListener('input', function() {
+		wallpost.addEventListener('input', function() {
 			setTimeout(function() { MM.refreshPreview(); }, 100); //Délai pour que la surcouche s'effectue après la prévisualisation Twinoid
 		});
+
+		if (MM.previewtext) //En cas de reconstruction de l'interface
+		{
+			wallpost.value = MM.previewtext;
+			setTimeout(function() { MM.refreshPreview(); }, 100);
+		}
 	};
 	
 	var tabs = MM.sel('#cdTabsChat').children;
 	for (i = 0; i < tabs.length; i++)
 		{ tabs[i].setAttribute('onclick', 'MM.changeChatTab(this);'); }
 	editor.style.display = 'none';
-
-	if (MM.previewtext) //En cas de reconstruction de l'interface
-		{ MM.sel('#tid_wallPost').value = MM.previewtext; }
 };
 
 
@@ -1336,8 +1361,8 @@ MM.refreshPreview = function () {
 	pre = pre.replace(/<span class=["']tid_preRoleplay["']>(.*)<\/span><span class=["']tid_roleplay["']><span class=["']tid_wroleplay["']>(.*)<\/span><\/span>/g, '[rp=$1]$2[/rp]'); //Balise RP
 	if (MM.ME_NERON) //Commande /neron
 		{ pre = pre.replace(/\/neron /, '<img src="http://mush.vg/img/icons/ui/pa_core.png" /> <span class="buddy">NERON : </span>'); }
-	for (i = 0; i < MM.smileys_regex.length; i++) //Smileys Mush
-		{ pre = pre.replace(MM.smileys_regex[i][0], '<img src="/img/icons/ui/' + MM.smileys_regex[i][1] + '" alt="$1" />'); }
+	for (i = 0; i < MM.smileys.length; i++) //Smileys Mush
+		{ pre = pre.replace(RegExp(':\(' + MM.smileys[i][0] + '\):', 'g'), '<img src="/img/icons/ui/' + MM.smileys[i][1] + '" alt="$1" />'); }
 	MM.sel("#tid_wallPost_preview").innerHTML = pre;
 };
 
@@ -1392,25 +1417,24 @@ MM.buildMessage = function() {
 				var item = inventory[i];
 				if (item.className == 'item cdEmptySlot') //On arrête dès qu'on tombe sur un slot vide
 					{ break; }
-				if (!/hidden\.png/.test(item.getAttribute('data-name'))) //On ne liste pas les objets cachés
-				{
-					name = (
-						(item.getAttribute('data-id') == 'BOOK')
-						? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour avoir la compétence en cas d'apprenton
-						: item.getAttribute('data-name').trim() //Pour avoir les attributs (lourd, cassé, etc.) pour les autres objets
-					);
-					name = name.replace(/<img(?:[^<]*)plant_diseased\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_diseased'] + "//");
-					name = name.replace(/<img(?:[^<]*)plant_thirsty\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_thirsty'] + "//");
-					name = name.replace(/<img(?:[^<]*)plant_dry\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_dry'] + "//");
-					name = name.replace(/<img(?:[^<]*)broken\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_broken'] + "//"); //Objet cassé
-					name = name.replace(/<img(?:[^<]*)charge\.png(?:[^<]*)>x([0-9]+)/, " [$1 " + MM.TEXT['preformat-inventory_charge'] + "]"); //Charges
-					name = name.replace(/ ?<img(?:.*)>/g, ''); //Les autres attributs n'importent pas
-					message += name;
+				if (/hidden\.png/.test(item.getAttribute('data-name'))) //On ne liste pas les objets cachés
+					{ continue; }
+				n = (
+					(item.getAttribute('data-id') == 'BOOK')
+					? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour avoir la compétence en cas d'apprenton
+					: item.getAttribute('data-name').trim() //Pour avoir les attributs (lourd, cassé, etc.) pour les autres objets
+				);
+				n = n.replace(/<img(?:[^<]*)plant_diseased\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_diseased'] + "//");
+				n = n.replace(/<img(?:[^<]*)plant_thirsty\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_thirsty'] + "//");
+				n = n.replace(/<img(?:[^<]*)plant_dry\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_dry'] + "//");
+				n = n.replace(/<img(?:[^<]*)broken\.png(?:[^<]*)>/, " //" + MM.TEXT['preformat-inventory_broken'] + "//"); //Objet cassé
+				n = n.replace(/<img(?:[^<]*)charge\.png(?:[^<]*)>x([0-9]+)/, " [$1 " + MM.TEXT['preformat-inventory_charge'] + "]"); //Charges
+				n = n.replace(/ ?<img(?:.*)>/g, ''); //Les autres attributs n'importent pas
+				message += n;
 
-					if (item.lastElementChild.className == 'qty') //Quantité
-						{ message += " (x" + item.lastElementChild.textContent.trim() + ")"; }
-					message += ', ';
-				}
+				if (item.lastElementChild.className == 'qty') //Quantité
+					{ message += " (x" + item.lastElementChild.textContent.trim() + ")"; }
+				message += ', ';
 			}
 
 			var items = Main.items.iterator();
@@ -1462,24 +1486,24 @@ MM.buildMessage = function() {
 			popup.style.display = 'block';
 			MM.addNewEl('h3', popup, null, MM.TEXT['preformat-researches++_title']);
 			var table = MM.addNewEl('table', popup);
-			var thead = MM.addNewEl('thead', table);
-				MM.addNewEl('td', thead, null, MM.TEXT['preformat-researches++_share']); //Partager ?
-				MM.addNewEl('td', thead, null, MM.TEXT['preformat-researches++_name']); //Nom
-				MM.addNewEl('td', thead, null, MM.TEXT['preformat-researches++_progress']); //Progression
-				MM.addNewEl('td', thead, null, MM.TEXT['preformat-researches++_important']); //Prioritaire ?
-				MM.addNewEl('td', thead, null, MM.TEXT['preformat-researches++_relay']); //Relais nécessaire ?
+			var h = MM.addNewEl('thead', table);
+			MM.addNewEl('td', h, null, MM.TEXT['preformat-researches++_share']); //Partager ?
+			MM.addNewEl('td', h, null, MM.TEXT['preformat-researches++_name']); //Nom
+			MM.addNewEl('td', h, null, MM.TEXT['preformat-researches++_progress']); //Progression
+			MM.addNewEl('td', h, null, MM.TEXT['preformat-researches++_important']); //Prioritaire ?
+			MM.addNewEl('td', h, null, MM.TEXT['preformat-researches++_relay']); //Relais nécessaire ?
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (i = 0; i < cards.length; i++)
 			{
 				var name = cards[i].firstElementChild.textContent.trim();
 				var progress = MM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] #p').textContent.trim();
 				researches.push([name, progress]);
-				var line = MM.addNewEl('tr', table, null, null, [['class', 'MMresearch']]);
-					MM.addNewEl('td', line, null, '<input type="checkbox" checked="true" />').className = 'MMcenter';
-					MM.addNewEl('td', line, null, name);
-					MM.addNewEl('td', line, null, progress);
-					MM.addNewEl('td', line, null, '<input type="checkbox" />').className = 'MMcenter';
-					MM.addNewEl('td', line, null, '<input type="checkbox" />').className = 'MMcenter';
+				var l = MM.addNewEl('tr', table, null, null, [['class', 'MMresearch']]);
+				MM.addNewEl('td', l, null, '<input type="checkbox" checked="true" />').className = 'MMcenter';
+				MM.addNewEl('td', l, null, name);
+				MM.addNewEl('td', l, null, progress);
+				MM.addNewEl('td', l, null, '<input type="checkbox" />').className = 'MMcenter';
+				MM.addNewEl('td', l, null, '<input type="checkbox" />').className = 'MMcenter';
 			}
 
 			//Création du message
@@ -1672,6 +1696,7 @@ MM.locale = function(forced) {
 	MM.TEXT['inventory_debug'] = "DEBUG : Afficher l'inventaire MushMobile";
 	MM.TEXT['show-flash-inventory'] = "DEBUG : Afficher l'inventaire Flash";
 	MM.TEXT['editor_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Éditeur de messages MushMobile</h1><p>Facilite la mise en forme des messages et permet leur prévisualisation.</p></div></div></div></div>";
+	MM.TEXT['editor-mush_smileys'] = "Smileys Mush";
 	MM.TEXT['paste'] = "Coller";
 	MM.TEXT['preview_refresh'] = "Rafraîchir";
 	MM.TEXT['preview_erase'] = "Effacer";
@@ -1787,6 +1812,7 @@ MM.locale = function(forced) {
 	MM.TEXT['inventory_debug'] = "DEBUG: Show MushMobile inventory";
 	MM.TEXT['show-flash-inventory'] = "DEBUG: Show Flash inventory";
 	MM.TEXT['editor_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>MushMobile Message editor</h1><p>Allows for message formatting and preview.</p></div></div></div></div>";
+	MM.TEXT['editor-mush_smileys'] = "Mush smileys";
 	MM.TEXT['paste'] = "Paste";
 	MM.TEXT['preview_refresh'] = "Refresh";
 	MM.TEXT['preview_erase'] = "Erase";
@@ -1868,7 +1894,7 @@ MM.locale = function(forced) {
 //MM.src = "http://labare.alwaysdata.net/MushMobile/";
 MM.src = "http://cdn.rawgit.com/LAbare/MushMobile/master/";
 
-MM.smileys_regex = [[/:(pa_pm):/g, 'pslots.png'], [/:(pa):/g, 'pa_slot1.png'], [/:(pm):/g, 'pa_slot2.png'], [/:(pv):/g, 'lp.png'], [/:(xp):/g, 'xp.png'], [/:(xpbig):/g, 'xpbig.png'], [/:(pa_heal):/g, 'pa_heal.png'], [/:(asocial):/g, 'status/unsociable.png'], [/:(disabled):/g, 'status/disabled.png'], [/:(hungry):/g, 'status/hungry.png'], [/:(hurt):/g, 'status/hurt.png'], [/:(ill):/g, 'status/disease.png'], [/:(psy_disease):/g, 'status/psy_disease.png'], [/:(commander):/g, 'title_01.png'], [/:(admin_neron):/g, 'title_02.png'], [/:(resp_comm):/g, 'title_03.png'], [/:(alert):/g, 'alert.png'], [/:(com):/g, 'comm.png'], [/:(door):/g, 'door.png'], [/:(plant_youngling):/g, 'plant_youngling.png'], [/:(plant_thirsty):/g, 'plant_thirsty.png'], [/:(plant_dry):/g, 'plant_dry.png'], [/:(plant_diseased):/g, 'plant_diseased.png'], [/:(bin):/g, 'bin.png'], [/:(next):/g, 'pageright.png'], [/:(ship_triumph):/g, 'daedalus_triumph.png'], [/:(pa_comp):/g, 'pa_comp.png'], [/:(pa_cook):/g, 'pa_cook.png'], [/:(pa_core):/g, 'pa_core.png'], [/:(pa_eng):/g, 'pa_eng.png'], [/:(pa_garden):/g, 'pa_garden.png'], [/:(pa_pilgred):/g, 'pa_pilgred.png'], [/:(pa_shoot):/g, 'pa_shoot.png'], [/:(laid):/g, 'status/laid.png'], [/:(mastered):/g, 'status/mastered.png'], [/:(mush):/g, 'mush.png'], [/:(stink):/g, 'status/stinky.png'], [/:(fuel):/g, 'fuel.png'], [/:(o2):/g, 'o2.png'], [/:(moral):/g, 'moral.png'], [/:(pmo):/g, 'moral.png'], [/:(hp):/g, 'lp.png'], [/:(eat):/g, 'sat.png'], [/:(pills):/g, 'demoralized2.png'], [/:(dead):/g, 'dead.png'], [/:(hunter):/g, 'hunter.png'], [/:(fire):/g, 'fire.png'], [/:(more):/g, 'more.png'], [/:(less):/g, 'less.png'], [/:(chut):/g, 'discrete.png'], [/:(talk):/g, 'talk.gif'], [/:(talky):/g, 'talkie.png'], [/:(cat):/g, 'cat.png'], [/:(eng):/g, 'pa_eng.png'], [/:(time):/g, 'casio.png'], [/:(tip):/g, 'tip.png'], [/:(triumph):/g, 'triumph.png']];
+MM.smileys = [['pa_pm', 'pslots.png'], ['pa', 'pa_slot1.png'], ['pm', 'pa_slot2.png'], ['pv|hp', 'lp.png'], ['xp', 'xp.png'], ['xpbig', 'xpbig.png'], ['pa_heal', 'pa_heal.png'], ['asocial', 'status/unsociable.png'], ['disabled', 'status/disabled.png'], ['hungry', 'status/hungry.png'], ['hurt', 'status/hurt.png'], ['ill', 'status/disease.png'], ['psy_disease', 'status/psy_disease.png'], ['commander', 'title_01.png'], ['admin_neron', 'title_02.png'], ['resp_comm', 'title_03.png'], ['alert', 'alert.png'], ['com', 'comm.png'], ['door', 'door.png'], ['plant_youngling', 'plant_youngling.png'], ['plant_thirsty', 'plant_thirsty.png'], ['plant_dry', 'plant_dry.png'], ['plant_diseased', 'plant_diseased.png'], ['bin', 'bin.png'], ['next', 'pageright.png'], ['ship_triumph', 'daedalus_triumph.png'], ['pa_comp', 'pa_comp.png'], ['pa_cook', 'pa_cook.png'], ['pa_core', 'pa_core.png'], ['pa_eng|eng', 'pa_eng.png'], ['pa_garden', 'pa_garden.png'], ['pa_pilgred', 'pa_pilgred.png'], ['pa_shoot', 'pa_shoot.png'], ['laid', 'status/laid.png'], ['mastered', 'status/mastered.png'], ['mush', 'mush.png'], ['stink', 'status/stinky.png'], ['fuel', 'fuel.png'], ['o2', 'o2.png'], ['moral|pmo', 'moral.png'], ['eat', 'sat.png'], ['pills', 'demoralized2.png'], ['dead', 'dead.png'], ['hunter', 'hunter.png'], ['fire', 'fire.png'], ['more', 'more.png'], ['less', 'less.png'], ['chut', 'discrete.png'], ['talk', 'talk.gif'], ['talky', 'talkie.png'], ['cat', 'cat.png'], ['time', 'casio.png'], ['tip', 'tip.png'], ['triumph', 'triumph.png']];
 
 MM.ME_NERON = false;
 MM.ME_ALONE = true;
@@ -1914,4 +1940,4 @@ if (MM.sel('#MMbar') == null) //Une seule initialisation suffit, sinon ça casse
 window.setInterval(function() {
 	if (!MM.sel('#MMenergybar'))
 		{ MM.reInit(); }
-	}, 250);
+}, 250);

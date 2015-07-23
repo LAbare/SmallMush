@@ -58,7 +58,7 @@
 
 ***** VARIABLES *****
 .src: (string) adresse du dossier source du script
-.smileys_regex: (list) expressions régulières des smileys Mush
+.smileys: (list) couple raccourci/image des smileys Mush
 .previewtext: (string) message actuel de l'éditeur de message
 .parameters: (object) paramètres de l'interface MushMobile
 .rooms: (list) nom des pièces du Daedalus dans la langue du serveur
