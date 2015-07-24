@@ -53,7 +53,10 @@
 .preformatPlanet(planet, *Schmanet, *Janet): crée un message de partage de planète préformaté
 
 *** Fonction de localisation : ***
-.locale(*forced): fonction de localisation de l'interface
+.locale(): fonction de localisation de l'interface
+
+*** Fonction d'initialisation : ***
+.init(): appelée après le chargement de la locale
 
 
 ***** VARIABLES *****
@@ -67,7 +70,6 @@
 .TEXT: (object) textes de l'interface MushMobile, générés par MM.locale()
 .ME_MODULING: (bool) le personnage est en train d'accéder à un terminal
 .ME_NERON: (bool) le personnage a le titre d'Administrateur NERON
-.ME_DISABLED: (bool) le personnage a le statut Handicapé
 .ME_ALONE: (bool) le personnage est seul dans la pièce
 .GUARDIAN: (bool) un Gardien est présent dans la pièce
 .GRAVITY: (bool) le Simulateur de gravité est fonctionnel

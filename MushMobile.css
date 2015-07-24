@@ -935,14 +935,8 @@ input.tid_withFriends, { color: black; }
 	stroke-width: 3;
 }
 
-.MMmapalertd {
-	position: absolute;
-	color: #FA0;
-}
+.MMmapalertd { color: #FA0; }
 
-.MMmapalerte {
-	position: absolute;
-	color: #0AF;
-}
+.MMmapalerte { color: #0AF; }
 
 #MMmapselected { fill: #0FA; }
