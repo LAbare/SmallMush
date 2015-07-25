@@ -979,7 +979,7 @@ MM.roomTab = function() {
 	var fireroom = MM.alertrooms[MM.rooms.indexOf(MM.sel('#input').getAttribute('d_name'))]; //Voir .alertrooms
 	if (MM.sel('[href^="?action=SIGNAL_FIRE"]') //Pas encore signalé
 		|| (document.querySelector('.alarm [src$="fire.png"]') //Signalé
-		   && RegExp(fireroom + '\\s\*.').test(MM.getTipContent(document.querySelector('.alarm [src$="fire.png"]').parentNode.onmouseover)))
+		   && RegExp(fireroom + '\\s\*\[\^2\]').test(MM.getTipContent(document.querySelector('.alarm [src$="fire.png"]').parentNode.onmouseover)))
 	)
 	{
 		infobar.className += ' MMfire'; //Changement du fond de la barre d'info
