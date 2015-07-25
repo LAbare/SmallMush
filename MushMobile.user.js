@@ -1,14 +1,21 @@
 // ==UserScript==
 // @name      MushMobile
-// @version   0.9
+// @version   0.9.5
+// @icon      http://labare.alwaysdata.net/MushMobile/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
 // @match     http://mush.twinoid.com/
 // @match     http://mush.twinoid.com/#
 // @match     http://mush.twinoid.es/
 // @match     http://mush.twinoid.es/#
+// @grant     unsafeWindow
 // @author    LAbare
 // ==/UserScript==
+
+
+var Main = unsafeWindow.Main || Main;
+var _tid = unsafeWindow._tid || _tid;
+var js = unsafeWindow.js || js;
 
 
 var MM = {};
@@ -1609,8 +1616,7 @@ MM.preformatPlanet = function(planet) {
 	}
 	if (unknown)
 		{ message += "//" + unknown + " " + MM.TEXT['preformat-planet_unknown'] + '//, '; }
-	message = message.slice(0, -2);
-	message += ".";
+	message = message.slice(0, -2) + '.';
 
 	return message;
 };

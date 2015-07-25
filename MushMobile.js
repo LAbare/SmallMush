@@ -1596,8 +1596,7 @@ MM.preformatPlanet = function(planet) {
 	}
 	if (unknown)
 		{ message += "//" + unknown + " " + MM.TEXT['preformat-planet_unknown'] + '//, '; }
-	message = message.slice(0, -2);
-	message += ".";
+	message = message.slice(0, -2) + '.';
 
 	return message;
 };

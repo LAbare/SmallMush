@@ -14,8 +14,12 @@ dest.write('// @match     http://mush.twinoid.com/\n')
 dest.write('// @match     http://mush.twinoid.com/#\n')
 dest.write('// @match     http://mush.twinoid.es/\n')
 dest.write('// @match     http://mush.twinoid.es/#\n')
+dest.write('// @grant     unsafeWindow\n')
 dest.write('// @author    LAbare\n')
 dest.write('// ==/UserScript==\n\n\n')
+dest.write('var Main = unsafeWindow.Main || Main;\n')
+dest.write('var _tid = unsafeWindow._tid || _tid;\n')
+dest.write('var js = unsafeWindow.js || js;\n\n\n')
 
 for line in source:
 	if 'BEGIN PYTHON REPLACE' in line:
