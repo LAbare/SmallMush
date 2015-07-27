@@ -269,13 +269,10 @@ MM.changeRoom = function(el) {
 		
 		if (confirm(MM.TEXT['move_confirm'] + roomname + " ?"))
 		{
-			//Tirés de Main.exitModule()
-			Main.firstLabDone = false;
-			Main.labPage = null;
 			el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + MM.TEXT['move_button'];
 			if (MM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
 			{
-				Main.ajax("/clearSessionMods", null, function() {
+				MM.MMexitModule(function() {
 					MM.sel('#MMloadscreen').style.display = 'block';
 					Main.ajax('/?fa=81&fp=' + select.value, null, function() {
 						MM.changeTab('room_tab');
@@ -497,14 +494,18 @@ MM.changeChatTab = function(el) {
 };
 
 
-MM.MMexitModule = function() {
+MM.MMexitModule = function(func) {
 	js.JQuery(".cdExitModuleButton").prepend("<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />");
-	new js.JQuery("#input").attr("isModule", "false");
+	js.JQuery("#input").attr("isModule", "false");
 	Main.firstLabDone = false;
 	Main.labPage = null;
 	Main.ajax("/clearSessionMods", null, function() { //Auparavant window.location, utilisation de Main.ajax() pour éviter le rechargement total
 		MM.reInit();
 		MM.changeTab('char_col');
+		MM.sel('#cdModuleContent').style.display = 'none';
+		MM.sel('.cdExitModuleButton').style.display = 'none';
+		MM.sel('#cdMainContent').style.display = 'block';
+		if (func) { func(); }
 	});
 };
 
@@ -1020,6 +1021,8 @@ MM.roomTab = function() {
 		var roomdoors = MM.addNewEl('select', room_tab, 'roomselect');
 		MM.addButton(room_tab, MM.TEXT['move_button']).addEventListener('click', function() { MM.changeRoom(this); });
 
+		console.log(doors.length);
+		console.log(room);
 		for (i = 0; i < doors[room].length; i++)
 		{
 			var door = doors[room][i];
@@ -1615,19 +1618,19 @@ MM.locale = function() {
 	{
 		case 'mush.vg':
 			MM.rooms = ['Pont', 'Baie Alpha', 'Baie Beta', 'Baie Alpha 2', 'Nexus', 'Infirmerie', 'Laboratoire', 'Réfectoire', 'Jardin Hydroponique', 'Salle des moteurs', 'Tourelle Alpha avant', 'Tourelle Alpha centre', 'Tourelle Alpha arrière', 'Tourelle Beta avant', 'Tourelle Beta centre', 'Tourelle Beta arrière', 'Patrouilleur Longane', 'Patrouilleur Jujube', 'Patrouilleur Tamarin', 'Patrouilleur Socrate', 'Patrouilleur Epicure', 'Patrouilleur Platon', 'Patrouilleur Wallis', 'Pasiphae', 'Couloir avant', 'Couloir central', 'Couloir arrière', 'Planète', 'Baie Icarus', 'Dortoir Alpha', 'Dortoir Beta', 'Stockage Avant', 'Stockage Alpha centre', 'Stockage Alpha arrière', 'Stockage Beta centre', 'Stockage Beta arrière', 'Espace infini', 'Les Limbes'];
-			MM.alertrooms = MM.rooms;
+			MM.alertrooms = MM.rooms.slice(0); //.slice nécessaire pour couper le lien
 			MM.alertrooms[8] = 'Jardin Hydoponique'; //hydRo
 			MM.alertrooms[28] = 'Icarus'; //Pas de Baie
 			break;
 
 		case 'mush.twinoid.es':
 			MM.rooms = ['Puente de mando', 'Plataforma Alpha', 'Plataforma Beta', 'Plataforma Alpha 2', 'Nexus', 'Enfermería', 'Laboratorio', 'Comedor', 'Jardín Hidropónico', 'Sala de motores', 'Cañón Alpha delantero', 'Cañón Alpha central', 'Cañón Alpha trasero', 'Cañón Beta delantero', 'Cañón Beta central', 'Cañón Beta trasero', 'Patrullero Longane', 'Patrullero Jujube', 'Patrullero Tamarindo', 'Patrullero Sócrates', 'Patrullero Epicuro', 'Patrullero Platón', 'Patrullero Wallis', 'Pasiphae', 'Pasillo delantero', 'Pasillo central', 'Pasillo trasero', 'Planeta', 'Icarus', 'Dormitorio Alpha', 'Dormitorio Beta', 'Almacén delantero', 'Almacén Alpha central', 'Almacén Alpha trasero', 'Almacén Beta central', 'Almacén Beta trasero', 'Espacio infinito', 'El limbo'];
-			MM.alertrooms = MM.rooms;
+			MM.alertrooms = MM.rooms.slice(0);
 			break;
 
 		default:
 			MM.rooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];
-			MM.alertrooms = MM.rooms;
+			MM.alertrooms = MM.rooms.slice(0);
 	}
 
 	/* BEGIN PYTHON REPLACE */
