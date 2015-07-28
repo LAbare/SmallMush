@@ -8,6 +8,7 @@ replacing = False;
 dest.write('// ==UserScript==\n')
 dest.write('// @name      MushMobile\n')
 dest.write('// @version   ' + input('Version : ') + '\n')
+dest.write('// @icon      http://labare.alwaysdata.net/MushMobile/ico.png\n')
 dest.write('// @match     http://mush.vg/\n')
 dest.write('// @match     http://mush.vg/#\n')
 dest.write('// @match     http://mush.twinoid.com/\n')
@@ -19,6 +20,7 @@ dest.write('// @author    LAbare\n')
 dest.write('// ==/UserScript==\n\n\n')
 dest.write('var Main = unsafeWindow.Main || Main;\n')
 dest.write('var _tid = unsafeWindow._tid || _tid;\n')
+dest.write('var ActionListMaintainer = unsafeWindow.ActionListMaintainer || ActionListMaintainer;\n')
 dest.write('var js = unsafeWindow.js || js;\n\n\n')
 
 for line in source:

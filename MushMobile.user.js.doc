@@ -8,6 +8,7 @@
 .moveEl(el, dest, *bef): déplace un élément dans un autre ; possibilité de préciser avant quel enfant
 .copyEl(el, dest, *bef): copie un élément dans un autre, en ajoutant le préfixe 'MM' à tous les ID de l'arbre ; possibilité de préciser avant quel enfant
 .getTipContent(tipFunction): retourne le contenu d'une infobulle
+.toArray(obj): retourne un array qui n'influence pas (si copie) et n'est pas influencé (si .querySelectorAll) par sa source (obj)
 
 *** Fonctions MushMobile : ***
 .generateMinimap(): génère une minimap du vaisseau avec les alertes des avaries signalées
@@ -18,7 +19,7 @@
 .displayRoomActions(type, serial): sélectionne le personnage/chat cliqué et remet les select à zéro
 .updateRoomActions(type, serial): affiche le cadre d'actions et de personnage
 .changeChatTab(el): change l'onglet de chat (remplace Main.chatTab pour inclure l'onglet Éditeur de messages)
-.MMexitModule(): remplace Main.exitModule() pour éviter le rechargement total de la page
+.MMexitModule(*func): remplace Main.exitModule() pour éviter le rechargement total de la page, peut exécuter une fonction ensuite (voir .changeRoom)
 .changeActionFunctions(): ajoute un appel à MM.beforeAction() avant chaque action
 .beforeAction(): appelée avant chaque action pour sauvegarder le message actuel de l'éditeur, demander confirmation de l'action si besoin et changer d'onglet MushMobile pour certaines actions
 .reInit(): reconstruit l'interface MushMobile après mise à jour de la page
