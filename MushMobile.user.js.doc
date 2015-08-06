@@ -43,7 +43,7 @@
 .shipTab(): remplit l'onglet Vaisseau
 .roomTab(): remplit l'onglet Pièce
 .chatTab(): ajoute les boutons Coller aux topics du chat
-.gameTab(): ajoute un bouton « Afficher la minimap MushMobile » sous le jeu Flash (+ easter egg)
+.gameTab(): ajoute un bouton « Afficher la minimap MushMobile » sous le jeu Flash
 
 *** Fonctions relatives à l'éditeur de messages : ***
 .messageEditor(): construit l'éditeur de message

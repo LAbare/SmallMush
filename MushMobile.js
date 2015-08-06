@@ -1071,7 +1071,7 @@ MM.roomTab = function() {
 			for (i = 0; i < actions.length; i++)
 			{
 				if (actions[i].innerHTML.indexOf('REPAIR_OBJECT') != -1 || actions[i].innerHTML.indexOf('REPAIR_PATROL_SHIP') != -1)
-					{ eqname += MM.TEXT['broken']; }
+					{ eqname += ((item.iid == 'DOOR') ? MM.TEXT['broken_door'] : MM.TEXT['broken']); }
 			}
 			MM.addNewEl('option', equipmentlist, null, eqname, [['value', item.serial]]);
 		}
@@ -1382,7 +1382,7 @@ MM.retrievePreview = function() {
 		var cookie = cookies[i].split('=');
 		if (cookie[0] == 'MMptext')
 		{
-			if (MM.sel('#tid_wallPost').value && !confirm(MM.TEXT['message-overwrite']))
+			if (MM.sel('#tid_wallPost').value && !confirm(MM.TEXT['message-overwrite_retrieve']))
 				{ return false; }
 			var saved = decodeURIComponent(cookie[1]);
 			MM.previewtext = saved;
@@ -1394,13 +1394,12 @@ MM.retrievePreview = function() {
 
 
 MM.buildMessage = function() {
-	if (MM.sel('#tid_wallPost').value)
-	{
-		if (!confirm(MM.TEXT['message-overwrite']))
-			{ return false; }
-	}
-	
-	var message = "";
+	var wallpost = MM.sel('#tid_wallPost');
+	if (wallpost.value && confirm(MM.TEXT['message-overwrite_build']))
+		{ var message = wallpost.value + "\n\n\n\n"; }
+	else
+		{ var message = ""; }
+
 	var popup = MM.sel('#MMpopup');
 	popup.innerHTML = '';
 
@@ -1434,11 +1433,11 @@ MM.buildMessage = function() {
 				message += ', ';
 			}
 
-			var items = Main.items.iterator();
-			while (items.hasNext())
+			var it = Main.items.iterator();
+			while (it.hasNext())
 			{
-				var e = items.next().iid;
-				if (e == 'HELP_DRONE' || e == 'CAMERA')
+				var e = it.next().iid;
+				if ((e == 'HELP_DRONE' || e == 'CAMERA') && !MM.sel('[serial="' + e.serial + '"]')) //Équipements seulement, pas en items (caméra installée)
 					{ message += "//" + MM.TEXT['preformat-inventory_' + e] + "//, "; }
 			}
 
@@ -1447,7 +1446,7 @@ MM.buildMessage = function() {
 				{ message += "//Schrödinger//, "; }
 
 			message = message.slice(0, -2) + ".";
-			MM.sel('#tid_wallPost').value = message;
+			wallpost.value = message;
 			MM.refreshPreview();
 			break;
 
@@ -1463,7 +1462,7 @@ MM.buildMessage = function() {
 				message += MM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] #p').textContent.trim() + "\n";
 			}
 
-			MM.sel('#tid_wallPost').value = message;
+			wallpost.value = message;
 			MM.refreshPreview();
 			break;
 
@@ -1514,7 +1513,7 @@ MM.buildMessage = function() {
 					}
 					MM.sel('#MMpopup').style.display = 'none';
 				}
-				MM.sel('#tid_wallPost').value = message;
+				wallpost.value = message;
 				MM.refreshPreview();
 			});
 			break;
@@ -1531,7 +1530,7 @@ MM.buildMessage = function() {
 				message += MM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] .desc').textContent.trim() + "\n";
 			}
 
-			MM.sel('#tid_wallPost').value = message;
+			wallpost.value = message;
 			MM.refreshPreview();
 			break;
 
@@ -1547,7 +1546,7 @@ MM.buildMessage = function() {
 					break;
 
 				case 1:
-					MM.sel('#tid_wallPost').value = MM.preformatPlanet(planets[0]);
+					wallpost.value = MM.preformatPlanet(planets[0]);
 					MM.refreshPreview();
 					break;
 

@@ -1092,7 +1092,7 @@ MM.roomTab = function() {
 			for (i = 0; i < actions.length; i++)
 			{
 				if (actions[i].innerHTML.indexOf('REPAIR_OBJECT') != -1 || actions[i].innerHTML.indexOf('REPAIR_PATROL_SHIP') != -1)
-					{ eqname += MM.TEXT['broken']; }
+					{ eqname += ((item.iid == 'DOOR') ? MM.TEXT['broken_door'] : MM.TEXT['broken']); }
 			}
 			MM.addNewEl('option', equipmentlist, null, eqname, [['value', item.serial]]);
 		}
@@ -1403,7 +1403,7 @@ MM.retrievePreview = function() {
 		var cookie = cookies[i].split('=');
 		if (cookie[0] == 'MMptext')
 		{
-			if (MM.sel('#tid_wallPost').value && !confirm(MM.TEXT['message-overwrite']))
+			if (MM.sel('#tid_wallPost').value && !confirm(MM.TEXT['message-overwrite_retrieve']))
 				{ return false; }
 			var saved = decodeURIComponent(cookie[1]);
 			MM.previewtext = saved;
@@ -1415,13 +1415,12 @@ MM.retrievePreview = function() {
 
 
 MM.buildMessage = function() {
-	if (MM.sel('#tid_wallPost').value)
-	{
-		if (!confirm(MM.TEXT['message-overwrite']))
-			{ return false; }
-	}
-	
-	var message = "";
+	var wallpost = MM.sel('#tid_wallPost');
+	if (wallpost.value && confirm(MM.TEXT['message-overwrite_build']))
+		{ var message = wallpost.value + "\n\n\n\n"; }
+	else
+		{ var message = ""; }
+
 	var popup = MM.sel('#MMpopup');
 	popup.innerHTML = '';
 
@@ -1455,11 +1454,11 @@ MM.buildMessage = function() {
 				message += ', ';
 			}
 
-			var items = Main.items.iterator();
-			while (items.hasNext())
+			var it = Main.items.iterator();
+			while (it.hasNext())
 			{
-				var e = items.next().iid;
-				if (e == 'HELP_DRONE' || e == 'CAMERA')
+				var e = it.next().iid;
+				if ((e == 'HELP_DRONE' || e == 'CAMERA') && !MM.sel('[serial="' + e.serial + '"]')) //Équipements seulement, pas en items (caméra installée)
 					{ message += "//" + MM.TEXT['preformat-inventory_' + e] + "//, "; }
 			}
 
@@ -1468,7 +1467,7 @@ MM.buildMessage = function() {
 				{ message += "//Schrödinger//, "; }
 
 			message = message.slice(0, -2) + ".";
-			MM.sel('#tid_wallPost').value = message;
+			wallpost.value = message;
 			MM.refreshPreview();
 			break;
 
@@ -1484,7 +1483,7 @@ MM.buildMessage = function() {
 				message += MM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] #p').textContent.trim() + "\n";
 			}
 
-			MM.sel('#tid_wallPost').value = message;
+			wallpost.value = message;
 			MM.refreshPreview();
 			break;
 
@@ -1535,7 +1534,7 @@ MM.buildMessage = function() {
 					}
 					MM.sel('#MMpopup').style.display = 'none';
 				}
-				MM.sel('#tid_wallPost').value = message;
+				wallpost.value = message;
 				MM.refreshPreview();
 			});
 			break;
@@ -1552,7 +1551,7 @@ MM.buildMessage = function() {
 				message += MM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] .desc').textContent.trim() + "\n";
 			}
 
-			MM.sel('#tid_wallPost').value = message;
+			wallpost.value = message;
 			MM.refreshPreview();
 			break;
 
@@ -1568,7 +1567,7 @@ MM.buildMessage = function() {
 					break;
 
 				case 1:
-					MM.sel('#tid_wallPost').value = MM.preformatPlanet(planets[0]);
+					wallpost.value = MM.preformatPlanet(planets[0]);
 					MM.refreshPreview();
 					break;
 
@@ -1730,7 +1729,8 @@ MM.locale = function() {
 		MM.TEXT['premessages_researches++'] = "Lister les recherches (mode avancé)";
 		MM.TEXT['premessages_projects'] = "Lister les projets";
 		MM.TEXT['premessages_planet'] = "Partager une planète";
-		MM.TEXT['message-overwrite'] = "Attention : ceci va effacer votre message actuel. Continuer ?";
+		MM.TEXT['message-overwrite_retrieve'] = "Attention : ceci va effacer votre message actuel. Continuer ?";
+		MM.TEXT['message-overwrite_build'] = "Voulez-vous effacer le message actuel (Annuler) ou écrire à sa suite (OK) ?";
 		MM.TEXT['preformat-researches_nomodule'] = "Veuillez accéder au laboratoire pour activer cette fonction.";
 		MM.TEXT['preformat-researches_title'] = "Recherches :";
 		MM.TEXT['preformat-researches++_title'] = "<img src='" + MM.src + "ico.png' /> Recherches préformatées — mode avancé";
@@ -1842,7 +1842,8 @@ MM.locale = function() {
 		MM.TEXT['premessages_researches++'] = "Share researches (advanced mode)";
 		MM.TEXT['premessages_projects'] = "Share projects";
 		MM.TEXT['premessages_planet'] = "Share a planet";
-		MM.TEXT['message-overwrite'] = "Warning: this will overwrite your current message. Continue?";
+		MM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
+		MM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
 		MM.TEXT['preformat-researches_nomodule'] = "Please access the laboratory in order to activate research preformatting.";
 		MM.TEXT['preformat-researches_title'] = "Researches:";
 		MM.TEXT['preformat-researches++_title'] = "<img src='" + MM.src + "ico.png' /> Sharing researches — advanced mode";
@@ -1954,7 +1955,8 @@ MM.locale = function() {
 		MM.TEXT['premessages_researches++'] = "Share researches (advanced mode)";
 		MM.TEXT['premessages_projects'] = "Share projects";
 		MM.TEXT['premessages_planet'] = "Share a planet";
-		MM.TEXT['message-overwrite'] = "Warning: this will overwrite your current message. Continue?";
+		MM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
+		MM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
 		MM.TEXT['preformat-researches_nomodule'] = "Please access the laboratory in order to activate research preformatting.";
 		MM.TEXT['preformat-researches_title'] = "Researches:";
 		MM.TEXT['preformat-researches++_title'] = "<img src='" + MM.src + "ico.png' /> Sharing researches — advanced mode";
