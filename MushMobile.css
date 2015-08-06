@@ -468,11 +468,16 @@ p.MMfire {
 
 .MMandie    { margin-top: -170px; }
 
-.who { /* Nom */
+.MMwho { /* Nom */
 	position: absolute;
 	top: 5px;
 	left: 5px;
 	margin: 0;
+}
+
+.title li { /* Titre */
+	display: block;
+	margin-left: 15px;
 }
 
 #triumph {

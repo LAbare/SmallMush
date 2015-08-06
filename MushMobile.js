@@ -852,7 +852,7 @@ MM.charTab = function() {
 	// PERSONNAGE //
 	//Bloc comprenant le portrait en fond (.avatar), le nom (.who) en haut à gauche, le triomphe (triumphLi) en haut à droite, le niveau (.level) en bas à droite et le message de promo (.gogold) en bas
 	var characterdiv = MM.moveEl(MM.addNewEl('div', null, 'MMcharacterdiv'), sheetmain, sheetmain.firstChild);
-	MM.copyEl(MM.sel('.who'), characterdiv);
+	MM.addNewEl('div', characterdiv, '', MM.sel('.who').parentNode.innerHTML).className = 'MMwho';
 	var triumphLi = MM.sel('[src$="triumph.png"]').parentNode;
 	MM.moveEl(MM.addNewEl('div', null, 'triumph', triumphLi.innerHTML.trim(), MM.getAttributesList(triumphLi)), characterdiv);
 	MM.copyEl(MM.sel('.level'), characterdiv);
