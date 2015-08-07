@@ -58,7 +58,7 @@
 	<h3>Autres (activation manuelle)</h3>
 	<p><b>Attention :</b> cette technique peut ne pas fonctionner selon les navigateurs.</p>
 	<p><ol>
-		<li>Ajoutez <a href='#javascript:(function(){var%20MM=document.createElement("script");MM.src="http://labare.alwaysdata.net/MushMobile/MushMobile.js";document.head.appendChild(MM);})();'>cette</a> page en favoris / marques-pages / <i>bookmarks</i>.</li>
+		<li>Ajoutez <a href='#javascript:(function(){var%20MM=document.createElement("script");MM.src="http://labare.github.io/MushMobile/MushMobile.js";document.head.appendChild(MM);})();'>cette</a> page en favoris / marques-pages / <i>bookmarks</i>.</li>
 		<li>Ouvrez le menu des favoris et modifiez celui que vous venez d'ajouter (faites un appui long dessus).</li>
 		<li>Dans le champ Adresse / URL, effacez le hash (#) et tout ce qui est avant.</li>
 		<li>Lorsque vous allez sur Mush, une fois la page chargée, entrez « MushMobile » dans la barre d'adresse de votre navigateur. Celui-ci devrait, pendant votre frappe, proposer quelques liens, et parmi eux le favori que vous avez ajouté. Cliquez dessus : si rien ne se passe… changez de navigateur.</li>
@@ -74,15 +74,5 @@
 		<li>Installez <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.115.81/install_flash_player_ics.apk">Flash Player pour Android 4.0+</a> ou <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.111.73/install_flash_player_pre_ics.apk">Flash Player pour Android 2 et 3</a> (une fois le téléchargement terminé, ouvrez la barre de notifications et cliquez sur le fichier pour lancer directement l'installation) ;</li>
 		<li>Installez un navigateur qui sait gérer le Flash (Firefox, Dolphin Browser).</li>
 	</ol>
-	
-	<script>
-	function sel(el) {
-		var s = window.getSelection();
-		var r = document.createRange();
-		r.selectNodeContents(el);
-		s.removeAllRanges();
-		s.addRange(r);
-	};
-	</script>
 </body>
 </html>

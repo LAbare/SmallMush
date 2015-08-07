@@ -238,8 +238,8 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 /* Fenêtre d'alerte (« Vous vous êtes sali… ») */
 .poptop {
 	position: absolute;
-	top: 100px;
-	left: 12px;
+	top: 100px !important;
+	left: 12px !important;
 	width: 400px;
 }
 
