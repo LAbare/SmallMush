@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      MushMobile
-// @version   0.9.6
+// @version   0.9.7
 // @icon      http://labare.alwaysdata.net/MushMobile/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -871,7 +871,7 @@ MM.charTab = function() {
 	MM.moveEl(MM.sel('[class="skills"]'), sheetmain, sheetmain.firstChild);
 
 	// PERSONNAGE //
-	//Bloc comprenant le portrait en fond (.avatar), le nom (.who) en haut à gauche, le triomphe (triumphLi) en haut à droite, le niveau (.level) en bas à droite et le message de promo (.gogold) en bas
+	//Bloc comprenant le portrait en fond (.avatar), le nom et les titres (.MMwho) en haut à gauche, le triomphe (triumphLi) en haut à droite, le niveau (.level) en bas à droite et le message de promo (.gogold) en bas, afin de pouvoir placer tous ces éléments en position:absolute
 	var characterdiv = MM.moveEl(MM.addNewEl('div', null, 'MMcharacterdiv'), sheetmain, sheetmain.firstChild);
 	MM.addNewEl('div', characterdiv, '', MM.sel('.who').parentNode.innerHTML).className = 'MMwho';
 	var triumphLi = MM.sel('[src$="triumph.png"]').parentNode;
@@ -882,7 +882,7 @@ MM.charTab = function() {
 		{ MM.moveEl(MM.sel('.gogold'), characterdiv); }
 
 	// ÉNERGIE //
-	//Copie des barres d'énergie pour les intégrer au tableau des barres de santé (plus léger et plus sûr niveau CSS)
+	//Copie des barres d'énergie pour les intégrer au tableau des barres de santé (plus léger et plus sûr niveau CSS que des position: dans tous les sens…)
 	var MMenergybar = MM.addNewEl('tr', MM.sel('.pvsm').firstElementChild, 'MMenergybar');
 	var oldPa = MM.sel('#cdPaBloc');
 	var APbar = oldPa.children[2];
@@ -1132,7 +1132,7 @@ MM.roomTab = function() {
 			else if (status.img == ('mastered' || 'guardian'))
 				{ MM.GUARDIAN = true; }
 				
-			if (hero.me == 'true' && status.img == 'moduling')
+			if (hero.me && status.img == 'moduling')
 				{ MM.ME_MODULING = true; }
 		}
 
