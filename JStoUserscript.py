@@ -44,7 +44,8 @@ for line in source:
 			dest.write('\t\t' + l)
 		dest.write('\n\t\tbreak;\n')
 
-		dest.write('\t}\n')
+		dest.write('\t}\n\n')
+		dest.write('\tMM.init();\n')
 
 	elif 'END PYTHON REPLACE' in line:
 		replacing = False;

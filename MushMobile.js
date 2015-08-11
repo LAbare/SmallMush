@@ -277,6 +277,7 @@ MM.changeRoom = function(el) {
 			el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + MM.TEXT['move_button'];
 			if (MM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
 			{
+				MM.sel('#MMloadscreen').style.display = 'block';
 				MM.MMexitModule(function() {
 					MM.sel('#MMloadscreen').style.display = 'block';
 					Main.ajax('/?fa=81&fp=' + select.value, null, function() {
@@ -499,7 +500,7 @@ MM.MMexitModule = function(func) {
 	Main.firstLabDone = false;
 	Main.labPage = null;
 	//Auparavant window.location, utilisation de Main.ajax() pour éviter le rechargement total
-	var updtFunc = function(func) {
+	var updtFunc = function() {
 		MM.reInit();
 		if (func) { func(); }
 	};
@@ -546,16 +547,28 @@ MM.beforeAction = function(el) {
 	var action = Main.extractAction(el.getAttribute('href'));
 	//Accéder à un terminal ou au Bloc de post-it, Envoyer une mission
 	if (['ACCESS', 'COMMANDER_ORDER'].indexOf(action) != -1)
-		{ MM.changeTab('room_col'); }
+	{
+		MM.changeTab('room_col');
+		MM.sel('#MMloadscreen').style.display = 'block';
+	}
 	//Examiner, Lire, Vérifier son niveau pré-fongique, Lister l'équipage, Lire le niveau de fuel dans la Chambre de combustion
 	else if (['INSPECT', 'CONSULT_DOC', 'CHECK_FOR_INFECTION', 'CHECK_CREW_LIST', 'CHECK_LEVEL'].indexOf(action) != -1)
-		{ MM.changeTab('chat_col'); }
+	{
+		MM.changeTab('chat_col');
+		MM.sel('#MMloadscreen').style.display = 'block';
+	}
 
 	return true;
 };
 
 
 MM.reInit = function() {
+	MM.ME_NERON = false;
+	MM.ME_ALONE = true;
+	MM.ME_MODULING = false;
+	MM.GUARDIAN = false;
+	MM.GRAVITY = true;
+
 	MM.sel('#ship_tab').innerHTML = '';
 	MM.sel('#room_tab').innerHTML = '';
 	MM.charTab();
@@ -566,12 +579,7 @@ MM.reInit = function() {
 	MM.messageEditor();
 	MM.changeActionFunctions();
 	MM.sel("#MMbar .cycletime").textContent = MM.sel("#chat_col .cycletime").textContent;
-
-	MM.ME_NERON = false;
-	MM.ME_ALONE = true;
-	MM.ME_MODULING = false;
-	MM.GUARDIAN = false;
-	MM.GRAVITY = true;
+	MM.sel('#MMloadscreen').style.display = 'none';
 };
 
 
@@ -721,8 +729,7 @@ MM.buildParamsMenu = function() {
 	MM.addNewEl('option', langs, null, "English", ((MM.parameters['locale'] == 2) ? [['value', '2'], ['selected', 'selected']] : [['value', '2']]));
 	langs.addEventListener('change', function() { MM.parameters['locale'] = this.value; MM.locale(); MM.setMMParameters(); });
 
-	//Boutons DEBUG pour l'affichage des inventaires
-	MM.addButton(popup, MM.TEXT['inventory_debug']).addEventListener('click', function() { MM.sel('#MMcdInventory').firstElementChild.style.display = 'block'; });
+	//Affichage de l'inventaire dans l'onglet Module
 	MM.addButton(popup, MM.TEXT['show-flash-inventory']).addEventListener('click', function() {
 		MM.changeTab('room_col');
 		MM.sel('#cdInventory').style.visibility = 'visible';
@@ -1148,9 +1155,9 @@ MM.roomTab = function() {
 	}
 
 	// INVENTAIRE (COPIÉ) //
-	var invblock = MM.copyEl(MM.sel('#cdInventory'), MM.sel('#room_tab'));
+	MM.addButton(room_tab, MM.TEXT['show_inventory']).addEventListener('click', function() { MM.sel('#MMcdInventory').firstElementChild.style.display = 'block'; });
+	var invblock = MM.copyEl(MM.sel('#cdInventory'), room_tab);
 	invblock.style.visibility = 'visible';
-	invblock.firstElementChild.style.display = 'block';
 	MM.sel('#MMroomActionList1').style.opacity = 1;
 	MM.sel('#MMroomActionList2').style.opacity = 1;
 

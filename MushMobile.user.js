@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      MushMobile
-// @version   0.9.7
+// @version   0.9
 // @icon      http://labare.alwaysdata.net/MushMobile/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -298,6 +298,7 @@ MM.changeRoom = function(el) {
 			el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + MM.TEXT['move_button'];
 			if (MM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
 			{
+				MM.sel('#MMloadscreen').style.display = 'block';
 				MM.MMexitModule(function() {
 					MM.sel('#MMloadscreen').style.display = 'block';
 					Main.ajax('/?fa=81&fp=' + select.value, null, function() {
@@ -520,7 +521,7 @@ MM.MMexitModule = function(func) {
 	Main.firstLabDone = false;
 	Main.labPage = null;
 	//Auparavant window.location, utilisation de Main.ajax() pour éviter le rechargement total
-	var updtFunc = function(func) {
+	var updtFunc = function() {
 		MM.reInit();
 		if (func) { func(); }
 	};
@@ -567,16 +568,28 @@ MM.beforeAction = function(el) {
 	var action = Main.extractAction(el.getAttribute('href'));
 	//Accéder à un terminal ou au Bloc de post-it, Envoyer une mission
 	if (['ACCESS', 'COMMANDER_ORDER'].indexOf(action) != -1)
-		{ MM.changeTab('room_col'); }
+	{
+		MM.changeTab('room_col');
+		MM.sel('#MMloadscreen').style.display = 'block';
+	}
 	//Examiner, Lire, Vérifier son niveau pré-fongique, Lister l'équipage, Lire le niveau de fuel dans la Chambre de combustion
 	else if (['INSPECT', 'CONSULT_DOC', 'CHECK_FOR_INFECTION', 'CHECK_CREW_LIST', 'CHECK_LEVEL'].indexOf(action) != -1)
-		{ MM.changeTab('chat_col'); }
+	{
+		MM.changeTab('chat_col');
+		MM.sel('#MMloadscreen').style.display = 'block';
+	}
 
 	return true;
 };
 
 
 MM.reInit = function() {
+	MM.ME_NERON = false;
+	MM.ME_ALONE = true;
+	MM.ME_MODULING = false;
+	MM.GUARDIAN = false;
+	MM.GRAVITY = true;
+
 	MM.sel('#ship_tab').innerHTML = '';
 	MM.sel('#room_tab').innerHTML = '';
 	MM.charTab();
@@ -587,12 +600,7 @@ MM.reInit = function() {
 	MM.messageEditor();
 	MM.changeActionFunctions();
 	MM.sel("#MMbar .cycletime").textContent = MM.sel("#chat_col .cycletime").textContent;
-
-	MM.ME_NERON = false;
-	MM.ME_ALONE = true;
-	MM.ME_MODULING = false;
-	MM.GUARDIAN = false;
-	MM.GRAVITY = true;
+	MM.sel('#MMloadscreen').style.display = 'none';
 };
 
 
@@ -742,8 +750,7 @@ MM.buildParamsMenu = function() {
 	MM.addNewEl('option', langs, null, "English", ((MM.parameters['locale'] == 2) ? [['value', '2'], ['selected', 'selected']] : [['value', '2']]));
 	langs.addEventListener('change', function() { MM.parameters['locale'] = this.value; MM.locale(); MM.setMMParameters(); });
 
-	//Boutons DEBUG pour l'affichage des inventaires
-	MM.addButton(popup, MM.TEXT['inventory_debug']).addEventListener('click', function() { MM.sel('#MMcdInventory').firstElementChild.style.display = 'block'; });
+	//Affichage de l'inventaire dans l'onglet Module
 	MM.addButton(popup, MM.TEXT['show-flash-inventory']).addEventListener('click', function() {
 		MM.changeTab('room_col');
 		MM.sel('#cdInventory').style.visibility = 'visible';
@@ -1169,9 +1176,9 @@ MM.roomTab = function() {
 	}
 
 	// INVENTAIRE (COPIÉ) //
-	var invblock = MM.copyEl(MM.sel('#cdInventory'), MM.sel('#room_tab'));
+	MM.addButton(room_tab, MM.TEXT['show_inventory']).addEventListener('click', function() { MM.sel('#MMcdInventory').firstElementChild.style.display = 'block'; });
+	var invblock = MM.copyEl(MM.sel('#cdInventory'), room_tab);
 	invblock.style.visibility = 'visible';
-	invblock.firstElementChild.style.display = 'block';
 	MM.sel('#MMroomActionList1').style.opacity = 1;
 	MM.sel('#MMroomActionList2').style.opacity = 1;
 
@@ -1711,7 +1718,7 @@ MM.locale = function() {
 		MM.TEXT['license'] = "<h4><img src='" + MM.src + "ico.png' /> MushMobile : Licence MIT</h4><p>Copyright (c) 2015 LAbare</p><p>L'autorisation est accordée, gracieusement, à toute personne acquérant une copie de ce script et des fichiers de documentation associés (le « Script »), de commercialiser le Script sans restriction, notamment les droits d'utiliser, de copier, de modifier, de fusionner, de publier, de distribuer, de sous-licencier et/ou de vendre des copies du Script, ainsi que d'autoriser les personnes auxquelles le Script est fourni à le faire, sous réserve des conditions suivantes :</p><p>La déclaration de copyright ci-dessus et la présente autorisation doivent être incluses dans toute copie ou partie substantielle du Script.</p><p>Le Script est fourni « tel quel », sans garantie d'aucune sorte, explicite ou implicite, notamment sans garantie de qualité marchande, d’adéquation à un usage particulier et d'absence de contrefaçon. En aucun cas les auteurs ou titulaires du droit d'auteur ne seront responsables de tout dommage, réclamation ou autre responsabilité, que ce soit dans le cadre d'un contrat, d'un délit ou autre, en provenance de, consécutif à ou en relation avec le Script ou son utilisation, ou avec d'autres éléments du Script. Bref, si ça casse, c'est pas ma faute. Mais ça va pas casser, normalement. À peine. Moi, j'y crois.</p>";
 		MM.TEXT['help_screen_A'] = "Cliquez pour afficher une infobulle.<br />Aucune action ne sera faite.";
 		MM.TEXT['help_screen_B'] = "Cliquez pour cacher l'infobulle.";
-		MM.TEXT['inventory_debug'] = "DEBUG : Afficher l'inventaire MushMobile";
+		MM.TEXT['show_inventory'] = "Afficher l'inventaire";
 		MM.TEXT['show-flash-inventory'] = "DEBUG : Afficher l'inventaire Flash";
 		MM.TEXT['editor_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Éditeur de messages MushMobile</h1><p>Facilite la mise en forme des messages et permet leur prévisualisation.</p></div></div></div></div>";
 		MM.TEXT['editor-mush_smileys'] = "Smileys Mush";
@@ -1824,7 +1831,7 @@ MM.locale = function() {
 		MM.TEXT['license'] = "<h4><img src='" + MM.src + "ico.png' /> MushMobile — MIT License</h4><p>Copyright (c) 2015 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I'm not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
 		MM.TEXT['help_screen_A'] = "Click on an element to show its tooltip.<br />This won't make you do any action.";
 		MM.TEXT['help_screen_B'] = "Click again to hide the tooltip.";
-		MM.TEXT['inventory_debug'] = "DEBUG: Show MushMobile inventory";
+		MM.TEXT['show_inventory'] = "Show inventory";
 		MM.TEXT['show-flash-inventory'] = "DEBUG: Show Flash inventory";
 		MM.TEXT['editor_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>MushMobile Message editor</h1><p>Allows for message formatting and preview.</p></div></div></div></div>";
 		MM.TEXT['editor-mush_smileys'] = "Mush smileys";
@@ -1937,7 +1944,7 @@ MM.locale = function() {
 		MM.TEXT['license'] = "<h4><img src='" + MM.src + "ico.png' /> MushMobile — MIT License</h4><p>Copyright (c) 2015 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I'm not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
 		MM.TEXT['help_screen_A'] = "Click on an element to show its tooltip.<br />This won't make you do any action.";
 		MM.TEXT['help_screen_B'] = "Click again to hide the tooltip.";
-		MM.TEXT['inventory_debug'] = "DEBUG: Show MushMobile inventory";
+		MM.TEXT['show_inventory'] = "Show inventory";
 		MM.TEXT['show-flash-inventory'] = "DEBUG: Show Flash inventory";
 		MM.TEXT['editor_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>MushMobile Message editor</h1><p>Allows for message formatting and preview.</p></div></div></div></div>";
 		MM.TEXT['editor-mush_smileys'] = "Mush smileys";
@@ -1991,6 +1998,8 @@ MM.locale = function() {
 		MM.localerooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];
 		break;
 	}
+
+	MM.init();
 };
 
 
