@@ -1,5 +1,5 @@
 /**——————————————————————————————————————————————**\
- *                MUSHMOBILE - CSS                *
+ *                SMALL(MUSH) - CSS               *
  *                                                *
  *     Catégories :                               *
  *         - ajustements ;                        *
@@ -9,10 +9,10 @@
  *         - onglet Personnage ;                  *
  *         - onglet Vaisseau ;                    *
  *         - onglet Pièce ;                       *
- *         - éditeur de messages MushMobile ;     *
- *         - minimap MushMobile.                  *
+ *         - éditeur de messages Small(Mush) ;    *
+ *         - minimap Small(Mush).                 *
  *                                                *
- * Les éléments MushMobile ont tous le préfixe MM *
+ * Les éléments Small(Mush) ont le préfixe SM     *
  * pour les distinguer des éléments de base.      *
  * Les éléments de base sont modifiés au minimum  *
  * (tant que faire se peut pour que ça marche…).  *
@@ -33,7 +33,7 @@
   AJUSTEMENTS
 \*--------------------*/
 
-/* Le viewport et certains éléments sont réglés à 424 pixels de large : il s'agit de la largeur du jeu Flash, autour duquel est basé l'interface MushMobile. */
+/* Le viewport et certains éléments sont réglés à 424 pixels de large : il s'agit de la largeur du jeu Flash, autour duquel est basé l'interface Small(Mush). */
 /* Retrait de nombreuses marges internes et externes pour éviter les trous et avoir une interface propre. */
 
 /* Canaux privés invisibles : pas encore corrigé sur les serveurs anglais et espagnol */
@@ -68,7 +68,7 @@
 	font-variant: small-caps;
 }
 
-/* Logo en arrière-plan, visible derrière la barre MushMobile et les liens qui ont un fond transparent */
+/* Logo en arrière-plan, visible derrière la barre Small(Mush) et les liens qui ont un fond transparent */
 .logo {
 	top: -10px;
 	z-index: -1;
@@ -76,7 +76,7 @@
 
 .mxhead, #container_inside, #container_topright, #container_bg { padding: 0; }
 
-/* Conteneur du logo, des liens, de la barre MushMobile et des onglets */
+/* Conteneur du logo, des liens, de la barre Small(Mush) et des onglets */
 .mxhead {
 	position: relative;
 	background-color: rgba(15, 52, 119, 0.2);
@@ -157,10 +157,10 @@ table.genstatus td.spaceshipstatus ul li {
 	width: 424px !important;
 }
 
-/* Barre d'onglets MushMobile */
-#MMtabs { height: 30px; }
+/* Barre d'onglets Small(Mush) */
+#SMtabs { height: 30px; }
 
-#MMtabs li {
+#SMtabs li {
 	display: inline-block;
 	vertical-align: top;
 	box-sizing: border-box;
@@ -176,14 +176,14 @@ table.genstatus td.spaceshipstatus ul li {
 	text-align: center;
 }
 
-#MMtabs img {
+#SMtabs img {
 	margin: 3px 2px;
 	float: left;
 }
 
-#MMtabs li * { vertical-align: middle; }
+#SMtabs li * { vertical-align: middle; }
 
-.MMtabwarning {
+.SMtabwarning {
 	box-sizing: border-box;
 	width: 100%;
 	padding: 3px 10px;
@@ -191,7 +191,7 @@ table.genstatus td.spaceshipstatus ul li {
 	text-align: center;
 }
 
-p.MMtabwarning { border-bottom: 2px solid navy; }
+p.SMtabwarning { border-bottom: 2px solid navy; }
 
 
 
@@ -201,14 +201,14 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
   DIVERS
 \*--------------------*/
 
-#MMicon { /* Icône MushMobile */
+#SMicon { /* Icône Small(Mush) */
 	position: fixed;
 	bottom: 0px;
 	right: 0px;
 }
 
 /* Écrans couvrant la page entière pour afficher une infobulle/l'icône de chargement */
-#MMhelpscreenA, #MMhelpscreenB, #MMloadscreen {
+#SMhelpscreenA, #SMhelpscreenB, #SMloadscreen {
 	display: none;
 	position: fixed;
 	top: 0px;
@@ -226,12 +226,12 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	color: #5F5;
 }
 
-#MMloadscreen {
+#SMloadscreen {
 	padding: 0;
 	text-align: center;
 }
 
-#MMloadscreen img { margin-top: 50px; }
+#SMloadscreen img { margin-top: 50px; }
 
 #content .but { margin-bottom: 30px; }
 
@@ -243,11 +243,11 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	width: 400px;
 }
 
-/* Fenêtre d'alerte MushMobile, copiée depuis #dialog */
-#MMdialog_body { font-size: 10pt; }
+/* Fenêtre d'alerte Small(Mush), copiée depuis #dialog */
+#SMdialog_body { font-size: 10pt; }
 
 /* Barre de liens */
-#MMlinks {
+#SMlinks {
 	height: 27px;
 	padding: 0;
 	padding-top: 5px;
@@ -257,13 +257,13 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	font-variant: small-caps;
 }
 
-#MMlinks a {
+#SMlinks a {
 	vertical-align: middle;
 	margin-right: 20px;
 }
 
-/* Paramètres MushMobile */
-#MMparams { /* Bouton Paramètres */
+/* Paramètres Small(Mush) */
+#SMparams { /* Bouton Paramètres */
 	position: absolute;
 	top: 5px;
 	right: 5px;
@@ -273,13 +273,13 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	background-color: navy;
 }
 
-.MMparamsdiv { /* Paramètre */
+.SMparamsdiv { /* Paramètre */
 	margin-bottom: 25px;
 	margin-left: 25px;
 }
 
-/* Popup MushMobile (pour messages préformatés, paramètres et minimap) */
-#MMpopup {
+/* Popup Small(Mush) (pour messages préformatés, paramètres et minimap) */
+#SMpopup {
 	display: none;
 	position: absolute;
 	top: 100px;
@@ -294,46 +294,46 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	background-color: #338;
 }
 
-#MMpopup h3 {
+#SMpopup h3 {
 	margin-bottom: 20px;
 	text-align: center;
 	font-size: 1.1em;
 }
 
-#MMpopup h4 {
+#SMpopup h4 {
 	margin-bottom: 30px;
 	text-align: center;
 	font-variant: small-caps;
 }
 
-#MMpopupclose {
+#SMpopupclose {
 	position: absolute;
 	top: 5px;
 	right: 5px;
 }
 
-#MMpopup p {
+#SMpopup p {
 	margin-top: 30px;
 	font-size: 10pt;
 }
 
-#MMpopup p.nospace { margin-top: 5px; }
+#SMpopup p.nospace { margin-top: 5px; }
 
-#MMpopup thead { font-size: 0.8em; }
+#SMpopup thead { font-size: 0.8em; }
 
-#MMpopup thead td { padding: 15px 5px; }
+#SMpopup thead td { padding: 15px 5px; }
 
-#MMpopup .but { margin-bottom: 20px; }
+#SMpopup .but { margin-bottom: 20px; }
 
-.MMcenter { text-align: center; }
+.SMcenter { text-align: center; }
 
-#MMlangselect {
+#SMlangselect {
 	margin-bottom: 20px;
 	color: #000;
 }
 
 /* Incendie */
-.MMfire {
+.SMfire {
 	background-color: #811;
 	background: -moz-linear-gradient(bottom, #811 0%, #D71 42%, #EE4 100%);
 	background: -webkit-linear-gradient(bottom, #811 0%, #D71 42%, #EE4 100%);
@@ -341,7 +341,7 @@ p.MMtabwarning { border-bottom: 2px solid navy; }
 	background: linear-gradient(to top, #811 0%, #D71 42%, #EE4 100%);
 }
 
-p.MMfire {
+p.SMfire {
 	padding: 5px;
 	margin-bottom: 5px;
 	border-top: 2px black solid;
@@ -349,7 +349,7 @@ p.MMfire {
 	text-align: center;
 }
 
-/* Bouton « Afficher la minimap MushMobile » */
+/* Bouton « Afficher la minimap Small(Mush) » */
 #room_col .but { margin-top: 25px; }
 
 
@@ -360,7 +360,7 @@ p.MMfire {
   BARRE MUSHMOBILE
 \*--------------------*/
 
-#MMbar {
+#SMbar {
 	position: relative;
 	width: 100%;
 	height: 34px;
@@ -369,17 +369,17 @@ p.MMfire {
 	font-size: 9pt;
 }
 
-#MMbar > * {
+#SMbar > * {
 	display: inline-block;
 	vertical-align: middle;
 	padding: 1px;
 }
 
-#MMbar .but, .cycletime, .cdShipCasio { margin-left: 4px; }
+#SMbar .but, .cycletime, .cdShipCasio { margin-left: 4px; }
 
-#MMbar .but { margin-bottom: 0; }
+#SMbar .but { margin-bottom: 0; }
 
-#MMbar .butbg { padding: 0 10px; }
+#SMbar .butbg { padding: 0 10px; }
 
 
 /*-- HORLOGE --*/
@@ -417,14 +417,14 @@ p.MMfire {
 
 /*-- PORTRAIT --*/
 
-#MMcharacterdiv {
+#SMcharacterdiv {
 	position: relative;
 	height: 100px;
 	overflow: hidden;
 	border-bottom: navy 2px solid;
 }
 
-#MMcharacterdiv img.avatar {
+#SMcharacterdiv img.avatar {
 	width: 424px;
 	height: auto;
 	background-position: initial !important;
@@ -432,43 +432,43 @@ p.MMfire {
 
 /* Ajustement du portrait dans un cadre de hauteur 100px */
 
-.MMchun     { margin-top: -95px; }
+.SMchun     { margin-top: -95px; }
 
-.MMterrence { margin-top: -125px; }
+.SMterrence { margin-top: -125px; }
 
-.MMeleesha  { margin-top: -164px; }
+.SMeleesha  { margin-top: -164px; }
 
-.MMfrieda   { margin-top: -164px; }
+.SMfrieda   { margin-top: -164px; }
 
-.MMjin_su   { margin-top: -95px; }
+.SMjin_su   { margin-top: -95px; }
 
-.MMkuan_ti  { margin-top: -77px; }
+.SMkuan_ti  { margin-top: -77px; }
 
-.MMchao     { margin-top: -123px; }
+.SMchao     { margin-top: -123px; }
 
-.MMpaola    { margin-top: -182px; }
+.SMpaola    { margin-top: -182px; }
 
-.MMgioele   { margin-top: -105px; }
+.SMgioele   { margin-top: -105px; }
 
-.MMstephen  { margin-top: -115px; }
+.SMstephen  { margin-top: -115px; }
 
-.MMhua      { margin-top: -128px; }
+.SMhua      { margin-top: -128px; }
 
-.MMroland   { margin-top: -128px; }
+.SMroland   { margin-top: -128px; }
 
-.MMfinola   { margin-top: -136px; }
+.SMfinola   { margin-top: -136px; }
 
-.MMraluca   { margin-top: -93px; }
+.SMraluca   { margin-top: -93px; }
 
-.MMjanice   { margin-top: -169px; }
+.SMjanice   { margin-top: -169px; }
 
-.MMian      { margin-top: -112px; }
+.SMian      { margin-top: -112px; }
 
-.MMderek    { margin-top: -110px; }
+.SMderek    { margin-top: -110px; }
 
-.MMandie    { margin-top: -170px; }
+.SMandie    { margin-top: -170px; }
 
-.MMwho { /* Nom */
+.SMwho { /* Nom */
 	position: absolute;
 	top: 5px;
 	left: 5px;
@@ -490,7 +490,7 @@ p.MMfire {
 	top: 4px;
 }
 
-#MMcharacterdiv .level {
+#SMcharacterdiv .level {
 	position: absolute;
 	bottom: -1px;
 	right: 0;
@@ -498,7 +498,7 @@ p.MMfire {
 	margin: 0;
 }
 
-#MMcharacterdiv .gogold {
+#SMcharacterdiv .gogold {
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -606,9 +606,9 @@ table.pvsm {
 }
 
 /* Énergie */
-#MMenergybar { margin-top: 5px; }
+#SMenergybar { margin-top: 5px; }
 
-#MMenergybar td {
+#SMenergybar td {
 	position: relative;
 	top: 3px;
 	left: 3px;
@@ -617,14 +617,14 @@ table.pvsm {
 	padding-top: 3px;
 }
 
-#MMenergybar img {
+#SMenergybar img {
 	float: left;
 	margin-right: 1px;
 	transform: rotate(90deg);
 }
 
 /* Points d'action spéciaux */
-#MMextratd { text-align: center; }
+#SMextratd { text-align: center; }
 
 .extrapa {
 	margin-right: 10px;
@@ -673,14 +673,14 @@ table.pvsm {
 
 /*-- ALERTES --*/
 
-#MMalerts {
+#SMalerts {
 	width: 350px;
 	padding: 2px;
 	margin: 10px auto;
 	border-radius: 5px;
 }
 
-.MMnoalert {
+.SMnoalert {
 	background-color: rgba(0, 255, 0, 0.5);
 	font-variant: small-caps;
 	font-size: 12pt;
@@ -690,7 +690,7 @@ table.pvsm {
 	-webkit-animation: alertoff 2s infinite;
 }
 
-.MMalerton {
+.SMalerton {
 	background-color: rgba(255, 0, 0, 0.5);
 	
 	animation: alerton 2s infinite;
@@ -714,35 +714,35 @@ table.pvsm {
 	100% { background-color: rgba(0, 255, 0, 0.5); }
 }
 
-#MMalerts > li:first-child { /* « ALERTES : » */
+#SMalerts > li:first-child { /* « ALERTES : » */
 	text-align: center;
 	font-size: 12pt;
 	font-variant: small-caps;
 }
 
-#MMalerts > li:not(:first-child) { margin-bottom: 5px; }
+#SMalerts > li:not(:first-child) { margin-bottom: 5px; }
 
-#MMalerts h1 { font-size: 12pt; }
+#SMalerts h1 { font-size: 12pt; }
 
-#MMalerts h1 img { margin-right: 5px; }
+#SMalerts h1 img { margin-right: 5px; }
 
-#MMalerts .char { /* Équipier perdu */
+#SMalerts .char { /* Équipier perdu */
 	height: 15px;
 	width: 24px;
 	margin-left: -5px;
 	background: url("http://mush.vg/img/art/char.png");
 }
 
-.MMhidden_alerts, .MMshown_alerts { position: relative; }
+.SMhidden_alerts, .SMshown_alerts { position: relative; }
 
-.MMalertexpand {
+.SMalertexpand {
 	margin-left: 10px;
 	color: black;
 	font-size: 8pt;
 }
 
 /* Rapports d'alerte, montrés par clic */
-.MMhidden_alerts ul { display: none; }
+.SMhidden_alerts ul { display: none; }
 
 
 /*-- CADRE D'EXPÉDITION --*/
@@ -757,7 +757,7 @@ table.pvsm {
 /*-- PROJETS, RECHERCHES & PILGRED --*/
 
 /* Deux blocs séparant les projets, les recherches et le PILGRED sur trois lignes */
-.MMcardsbreak { display: block !important; }
+.SMcardsbreak { display: block !important; }
 
 /* Ancien bloc de cartes projets/recherches */
 #cdBottomBlock { display: none; }
@@ -772,7 +772,7 @@ table.pvsm {
 
 /*-- DÉPLACEMENT --*/
 
-.MMbrokendoor { background-color: red; }
+.SMbrokendoor { background-color: red; }
 
 #room_tab select { color: black; }
 
@@ -780,35 +780,35 @@ table.pvsm {
 /*-- ÉQUIPEMENTS ET CAMARADES --*/
 
 /* Bloc de camarades */
-#MMheroes { margin: 10px 5px; }
+#SMheroes { margin: 10px 5px; }
 
-.MMheroblock { /* Camarade */
+.SMheroblock { /* Camarade */
 	position: relative;
 	display: inline-block;
 	margin-right: 5px;
 }
 
-.MMheroblock img:not(:first-of-type) {
+.SMheroblock img:not(:first-of-type) {
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 
 /* Camarade couché */
-.MMlaid:not(:first-of-type) { margin-left: -22px; }
+.SMlaid:not(:first-of-type) { margin-left: -22px; }
 
 
 /*-- INVENTAIRE MUSHMOBILE --*/
 
 /* Inventaire */
-#MMcdInventory {
+#SMcdInventory {
 	visibility: visible !important; /* Parfois invisible pour des raisons inconnues */
 	margin-top: 10px;
 }
 
-#MMroom { width: 5000px; }
+#SMroom { width: 5000px; }
 
-.MMselected { /* Halo de sélection d'item */
+.SMselected { /* Halo de sélection d'item */
 	position: absolute;
 	width: 50px;
 	height: 50px;
@@ -820,16 +820,16 @@ table.pvsm {
 }
 
 /* Titre d'item / équipement / camarade */
-#MMitemdesc {
+#SMitemdesc {
 	width: 90%;
 	margin: 5px auto;
 }
 
-#MMitemdesc > div { margin-left: 50px; }
+#SMitemdesc > div { margin-left: 50px; }
 
 /*-- ACTIONS --*/
 
-#MMcdInventory .itemactionstop { margin-top: 25px; }
+#SMcdInventory .itemactionstop { margin-top: 25px; }
 
 /* Cadre de présentation d'un camarade */
 .inv .selectplayer { margin-top: 0; }
@@ -842,20 +842,20 @@ table.pvsm {
   ÉDITEUR DE MESSAGES
 \*--------------------*/
 
-#MMeditortext {
+#SMeditortext {
 	width: 100%;
 	height: 200px;
 	margin-top: 20px;
 	color: black;
 }
 
-#MMeditor #tid_wallPost { /* textarea */
+#SMeditor #tid_wallPost { /* textarea */
 	width: 100%;
 	min-height: 100px;
 	color: black;
 }
 
-#MMeditor #tid_wallPost_preview { /* Prévisualisation */
+#SMeditor #tid_wallPost_preview { /* Prévisualisation */
 	max-height: 200px;
 	overflow: auto;
 	margin: 10px 0;
@@ -865,9 +865,9 @@ table.pvsm {
 	background-color: #BBF;
 }
 
-#MMeditor .tid_smileyPanel { margin-bottom: 20px; }
+#SMeditor .tid_smileyPanel { margin-bottom: 20px; }
 
-#MMeditor .but { margin-bottom: 20px; }
+#SMeditor .but { margin-bottom: 20px; }
 
 /* Boutons rajoutés */
 .tid_editorButtons .but {
@@ -882,25 +882,25 @@ table.pvsm {
 input.tid_withFriends, { color: black; }
 
 /* Smileys Mush */
-#MMsmileysblock {
+#SMsmileysblock {
 	box-sizing: border-box;
 	width: 100%;
 	padding: 5px;
 	border: 1px black solid;
 }
 
-#MMsmileysblock img { margin: 5px; }
+#SMsmileysblock img { margin: 5px; }
 
 /* Messages préformatés */
-#MMpremessages {
+#SMpremessages {
 	margin-bottom: 20px;
 	color: black;
 }
 
 /* Boutons « Coller » dans l'onglet Chat */
-.MMhidepaste .MMpastebutton { display: none; }
+.SMhidepaste .SMpastebutton { display: none; }
 
-.MMshowpaste .MMpastebutton { display: block; }
+.SMshowpaste .SMpastebutton { display: block; }
 
 
 
@@ -910,19 +910,19 @@ input.tid_withFriends, { color: black; }
   MINIMAP
 \*--------------------*/
 
-#MMminimapbloc {
+#SMminimapbloc {
 	position: relative;
 	margin: 5px 28px;
 	padding: 0;
 }
 
-.MMmaproom {
+.SMmaproom {
 	fill: #FFF;
 	stroke: #000;
 	stroke-width: 1;
 }
 
-.MMmapfire {
+.SMmapfire {
 	fill: #F00;
 	background-color: #F00;
 	padding: 0 2px;
@@ -930,18 +930,18 @@ input.tid_withFriends, { color: black; }
 	stroke-width: 1;
 }
 
-.MMmapdoor {
+.SMmapdoor {
 	stroke: #11F;
 	stroke-width: 3;
 }
 
-.MMmapdoorbroken {
+.SMmapdoorbroken {
 	stroke: #F55;
 	stroke-width: 3;
 }
 
-.MMmapalertd { color: #FA0; }
+.SMmapalertd { color: #FA0; }
 
-.MMmapalerte { color: #0AF; }
+.SMmapalerte { color: #0AF; }
 
-#MMmapselected { fill: #0FA; }
+#SMmapselected { fill: #0FA; }

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=424px">
-	<title>MushMobile</title>
+	<title>Small(Mush)</title>
 	<style>
 		html { margin: 0; padding: 0; }
 		body { margin: 0; padding: 5px; background-color: #AAF; }
@@ -12,6 +12,8 @@
 		h3 { font-variant: small-caps; color: #003; }
 		p { text-align: justify; }
 		li { margin-bottom: 5px; }
+		em, i { color: #CF1830; }
+		strong, b { color: #090A61; }
 		.but { background-image: url("ui/butbg.png"); background-repeat: repeat-x; height: 21px; display: inline-block; vertical-align: middle; }
 		.but:before { content: url("ui/butleft.png"); }
 		.but:after { content: url("ui/butright.png"); }
@@ -21,17 +23,17 @@
 </head>
 
 <body>
-	<h1><img src='ico.png' /> MushMobile <img src='ico.png' /></h1>
+	<h1><img src='ico.png' /> Small(Mush) <img src='ico.png' /></h1>
 
 	<p style='text-align: center;'><a href='#Present'>Présentation</a> — <a href='#Use'>Utilisation</a> — <a href='#Install'>Installation</a> — <a href='#Flash'>Installer Flash</a></p>
 
 	<h2 id='Present'>Présentation</h2>
-	<p>MushMobile est un <em>script pour Mush</em> développé par un joueur grand, beau et magnifique (<a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>), grâce auquel vous allez pouvoir profiter d'un confort exceptionnel de votre jeu préféré sur mobile. Oui oui. Et en plus, pour les écrans réfractaires au Flash, les fonctions essentielles du jeu sont émulées pour vous permettre de jouer entre deux stations de métro. C'est pas trop la classe ? Essayez quand même d'<a href='#Flash'>installer Flash</a> pour avoir un jeu complètement fonctionnel.</p>
+	<p>Small(Mush) est un <em>script pour Mush</em> développé par un joueur grand, beau et magnifique (<a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>), grâce auquel vous allez pouvoir profiter d'un confort exceptionnel de votre jeu préféré sur mobile. Oui oui. Et en plus, pour les écrans réfractaires au Flash, les fonctions essentielles du jeu sont émulées pour vous permettre de jouer entre deux stations de métro. C'est pas trop la classe ? Essayez quand même d'<a href='#Flash'>installer Flash</a> pour avoir un jeu complètement fonctionnel.</p>
 	<p>Par contre, j'insiste sur le fait qu'il s'agit d'un <strong>script</strong>. Ce n'est <strong>pas</strong> une adaptation mobile de Mush. C'est-à-dire qu'il est développé par un joueur, que la Motion Twin n'a rien à voir avec, que l'interface du jeu subit quelques modifications (pas trop déroutantes non plus), et que les éventuels bugs qui pourraient survenir ne sont pas à remonter sur le forum, mais à moi. Le script se contente principalement d'essayer de faire rentrer l'interface assez large de Mush dans l'espace réduit d'un écran portable. Toutes les questions, les suggestions, les chocolats et l'amour que vous voudriez envoyer, c'est <a href='http://twinoid.com/user/8412516' target='_blank'>par là</a> et pas vraiment ailleurs.</p>
 
 	
 	<h2 id='Use'>Utilisation</h2>
-	<p>Pour tout faire rentrer dans un petit écran, MushMobile divise le jeu en cinq onglets. Regardez donc ces quelques images pour en avoir un aperçu, ça sera plus parlant que vingt lignes.</p>
+	<p>Pour tout faire rentrer dans un petit écran, Small(Mush) divise le jeu en cinq onglets. Regardez donc ces quelques images pour en avoir un aperçu, ça sera plus parlant que vingt lignes.</p>
 	[GALLERIE D'IMAGES]
 	<p>Vous pouvez recharger la page en interne en utilisant le bouton <span class="but"><img src="ui/reload_Mush.png" alt="Recharger Mush" /></span>. L'émulation (onglet Pièce) permet d'avoir accès aux équipements, aux coéquipiers et à l'inventaire, ainsi que de se déplacer. Elle ne permet <b>pas</b> de voir la minimap du vaisseau, ni les hunters lorsque vous êtes en tourelle ou en patrouilleur, ni de les viser. Vous pouvez tout de même tirer au hasard en patrouilleur en sélectionnant l'équipement <b>Poste de tir</b>, ça peut toujours dépanner.</p>
 
@@ -41,24 +43,24 @@
 
 	<h3>Firefox (Android)</h3>
 	<p><ol>
-		<li>Installez <a href='FirefoxAddon/mushmobile.xpi'>l'addon MushMobile</a>.</li>
+		<li>Installez <a href='FirefoxAddon/smallmush.xpi'>l'addon Small(Mush)</a>.</li>
 		<li>C'est tout. Sortez le champagne.</li>
 	</ol></p>
 
 	<h3>Dolphin Browser (Android)</h3>
 	<p><ol>
 		<li>Installez l'addon <a href='market://details?id=net.tampermonkey.dolphin'>Tampermonkey pour Dolphin Browser</a> depuis le Play Store.</li>
-		<li>Installez le script en cliquant sur <a href='MushMobile.user.js'>ce lien</a>, puis sur « Install » dans la fenêtre qui s'ouvre.</li>
+		<li>Installez le script en cliquant sur <a href='SmallMush.user.js'>ce lien</a>, puis sur « Install » dans la fenêtre qui s'ouvre.</li>
 		<li>Débouchez la bouteille en visant l'œil de belle-mère. Servez frais.</li>
 	</ol></p>
 
 	<h3>Autres (activation manuelle)</h3>
 	<p><b>Attention :</b> cette technique peut ne pas fonctionner selon les navigateurs.</p>
 	<p><ol>
-		<li>Ajoutez <a href='#javascript:(function(){var%20MM=document.createElement("script");MM.src="http://labare.github.io/MushMobile/MushMobile.js";document.head.appendChild(MM);})();'>cette</a> page en favoris / marques-pages / <i>bookmarks</i>.</li>
+		<li>Ajoutez <a href='#javascript:(function(){var%20MM=document.createElement("script");MM.src="http://labare.github.io/SmallMush/SmallMush.js";document.head.appendChild(MM);})();'>cette</a> page en favoris / marques-pages / <i>bookmarks</i>.</li>
 		<li>Ouvrez le menu des favoris et modifiez celui que vous venez d'ajouter (faites un appui long dessus).</li>
 		<li>Dans le champ Adresse / URL, effacez le hash (#) et tout ce qui est avant.</li>
-		<li>Lorsque vous allez sur Mush, une fois la page chargée, entrez « MushMobile » dans la barre d'adresse de votre navigateur. Celui-ci devrait, pendant votre frappe, proposer quelques liens, et parmi eux le favori que vous avez ajouté. Cliquez dessus : si rien ne se passe… changez de navigateur.</li>
+		<li>Lorsque vous allez sur Mush, une fois la page chargée, entrez « Small(Mush) » dans la barre d'adresse de votre navigateur. Celui-ci devrait, pendant votre frappe, proposer quelques liens, et parmi eux le favori que vous avez ajouté. Cliquez dessus : si rien ne se passe… changez de navigateur.</li>
 	</ol></p>
 	<p>Cette technique fonctionne bien sous Chrome, et apparemment <a href='http://m.youtube.com/watch?v=Jm1j9-lfw98' target='_blank'>sous Safari</a> pour les possesseurs d'iPhones. Ces quelques images pourraient vous guider.</p>
 	[GALLERIE D'IMAGES]
