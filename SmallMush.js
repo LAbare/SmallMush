@@ -1,4 +1,4 @@
-SM = {};
+var SM = {};
 
 
 /* FONCTIONS DÉVELOPPEUR */
