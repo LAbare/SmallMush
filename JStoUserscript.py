@@ -20,7 +20,6 @@ dest.write('// @author    LAbare\n')
 dest.write('// ==/UserScript==\n\n\n')
 dest.write('var Main = unsafeWindow.Main || Main;\n')
 dest.write('var _tid = unsafeWindow._tid || _tid;\n')
-dest.write('var ActionListMaintainer = unsafeWindow.ActionListMaintainer || ActionListMaintainer;\n')
 dest.write('var js = unsafeWindow.js || js;\n\n\n')
 
 for line in source:
@@ -45,7 +44,7 @@ for line in source:
 		dest.write('\n\t\tbreak;\n')
 
 		dest.write('\t}\n\n')
-		dest.write('\tMM.init();\n')
+		dest.write('\tSM.init();\n')
 
 	elif 'END PYTHON REPLACE' in line:
 		replacing = False;

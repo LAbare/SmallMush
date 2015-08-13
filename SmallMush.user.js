@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9
+// @version   0.9.1
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -15,7 +15,6 @@
 
 var Main = unsafeWindow.Main || Main;
 var _tid = unsafeWindow._tid || _tid;
-var ActionListMaintainer = unsafeWindow.ActionListMaintainer || ActionListMaintainer;
 var js = unsafeWindow.js || js;
 
 
@@ -493,6 +492,7 @@ SM.changeChatTab = function(el) {
 		SM.sel('#SMeditortab').className = 'tab taboff';
 		SM.sel('#SMeditor').style.display = 'none';
 		Main.selChat(parseInt(el.getAttribute('data-tab')));
+		SM.sel('#chatBlock').style.height = '500px';
     }
     
     else //Onglet Éditeur de messages
@@ -511,6 +511,8 @@ SM.changeChatTab = function(el) {
 		//Entrées de texte
 		SM.sel('#wall').style.display = 'none';
 		SM.sel('#privateform').style.display = 'none';
+
+		SM.sel('#chatBlock').style.height = 'auto';
 	}
 };
 
@@ -869,7 +871,9 @@ SM.initTabs = function() {
 SM.charTab = function() {
 	var sheetmain = SM.sel('.sheetmain');
 	//Affiche les actions joueur, qui sont normalement cachées jusqu'au chargement du jeu Flash
-	ActionListMaintainer.prototype.changeHeroListState2(["DisplayHeroActions", 0]);
+	var a = SM.sel('.cdActionRepository .heroRoomActions').children;
+	for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
+		{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
 
 	if (SM.sel('#SMenergybar')) //Si l'onglet n'a pas déjà été adapté
 		{ return; }
@@ -1999,7 +2003,7 @@ SM.locale = function() {
 		break;
 	}
 
-	MM.init();
+	SM.init();
 };
 
 
