@@ -26,6 +26,7 @@ SM.TEXT['SM-added_tab'] = "<img src='" + SM.src + "ico.png' /> <b>Warning:</b> S
 SM.TEXT['SM-added_tab_text'] = "This tab is an addition of the Small(Mush) interface. If a bug happens here, it would definitely be a <em>script bug</em> and should be reported only to the author of this script.";
 SM.TEXT['plasma-onmouseover'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Plasma shield</h1>The plasma shield is active.</div></div></div></div>";
 SM.TEXT['cards-title'] = "Projects and researches:";
+SM.TEXT['roomtab-focused'] = "You are currently Focused on a terminal, which means you cannot see what's in the room. The room will be displayed as soon as you exit your terminal. (If stuck with the Focused status, access then exit the vending machine to get rid of it.)";
 SM.TEXT['fire'] = "There is a fire in the room. Quick, grab an extinguisher!";
 SM.TEXT['equipments'] = "Equipments";
 SM.TEXT['broken'] = " — BROKEN";

@@ -26,6 +26,7 @@ SM.TEXT['SM-added_tab'] = "<img src='" + SM.src + "ico.png' /> <b>Attention :</
 SM.TEXT['SM-added_tab_text'] = "Cet onglet est un ajout de l'interface Small(Mush). Si un bug venait à se produire ici, il ne pourrait s'agir que d'un bug de <em>script</em> : il ne faudrait alors en avertir que son auteur.";
 SM.TEXT['plasma-onmouseover'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Bouclier plasma</h1>Le bouclier plasma est activé.</div></div></div></div>";
 SM.TEXT['cards-title'] = "Projets et recherches :";
+SM.TEXT['roomtab-focused'] = "Vous êtes Concentré sur un terminal, ce qui signifie que vous ne voyez pas ce qu'il y a autour de vous. Quittez le terminal pour voir la pièce. (Si vous n'arrivez pas à vous débarrasser du statut Concentré, accédez au distributeur puis quittez-le.)";
 SM.TEXT['fire'] = "La pièce est dévorée par les flammes. Faites quelque chose !";
 SM.TEXT['equipments'] = "Équipements";
 SM.TEXT['broken'] = " — CASSÉ";

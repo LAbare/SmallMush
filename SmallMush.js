@@ -851,9 +851,7 @@ SM.initTabs = function() {
 SM.charTab = function() {
 	var sheetmain = SM.sel('.sheetmain');
 	//Affiche les actions joueur, qui sont normalement cachées jusqu'au chargement du jeu Flash
-	var a = SM.sel('.cdActionRepository .heroRoomActions').children;
-	for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
-		{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
+	ActionListMaintainer.prototype.changeHeroListState2(["DisplayHeroActions", 0]);
 
 	if (SM.sel('#SMenergybar')) //Si l'onglet n'a pas déjà été adapté
 		{ return; }
@@ -985,6 +983,12 @@ SM.roomTab = function() {
 	var room_tab = SM.sel('#room_tab');
 	SM.addNewEl('h4', room_tab, null, SM.TEXT['SM-added_tab']).className = 'SMtabwarning';
 	SM.addNewEl('p', room_tab, null, SM.TEXT['SM-added_tab_text']).className = 'SMtabwarning';
+
+	if (SM.sel('.statuses [src$="moduling.png"]'))
+	{
+		SM.addNewEl('p', room_tab, null, SM.TEXT['roomtab-focused']).className = 'SMcenter';
+		return;
+	}
 
 	// INCENDIE DANS LA PIÈCE //
 	var infobar = SM.sel('#topinfo_bar');
