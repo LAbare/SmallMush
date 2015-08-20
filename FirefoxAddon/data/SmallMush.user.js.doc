@@ -1,0 +1,76 @@
+***** FONCTIONS *****
+ 
+*** Fonctions développeur : ***
+.sel(name): sélectionne un élément par ID, par classe ou par sélecteur CSS
+.getAttributesList(el): retourne un tableau d'attributs d'un élément [[nom, valeur]]
+.addNewEl(type, *parent, *id, *content, *attrs): retourne un nouvel élément
+.addButton(parent, text, *attrs): retourne un bouton Mush, avec d'éventuels attributs
+.moveEl(el, dest, *bef): déplace un élément dans un autre ; possibilité de préciser avant quel enfant
+.copyEl(el, dest, *bef): copie un élément dans un autre, en ajoutant le préfixe 'SM' à tous les ID de l'arbre ; possibilité de préciser avant quel enfant
+.getTipContent(tipFunction): retourne le contenu d'une infobulle
+.toArray(obj): retourne un array qui n'influence pas (si copie) et n'est pas influencé (si .querySelectorAll) par sa source (obj)
+
+*** Fonctions Small(Mush) : ***
+.generateMinimap(): génère une minimap du vaisseau avec les alertes des avaries signalées
+.changeTab(newtab): change d'onglet Small(Mush)
+.SMhelp(e): affiche l'infobulle d'un élément
+.toggleAlertList(expand): affiche ou cache les rapports d'alertes
+.changeRoom(): déplace le personnage dans une autre salle
+.displayRoomActions(type, serial): sélectionne le personnage/chat cliqué et remet les select à zéro
+.updateRoomActions(type, serial): affiche le cadre d'actions et de personnage
+.changeChatTab(el): change l'onglet de chat (remplace Main.chatTab pour inclure l'onglet Éditeur de messages)
+.SMexitModule(*func): remplace Main.exitModule() pour éviter le rechargement total de la page, peut exécuter une fonction ensuite (voir .changeRoom)
+.changeActionFunctions(): ajoute un appel à SM.beforeAction() avant chaque action
+.beforeAction(): appelée avant chaque action pour sauvegarder le message actuel de l'éditeur, demander confirmation de l'action si besoin et changer d'onglet Small(Mush) pour certaines actions
+.reInit(): reconstruit l'interface Small(Mush) après mise à jour de la page
+.showLicense(): affiche la licence MIT
+
+*** Fonctions relatives à l'inventaire Small(Mush) (inventaire copié dans l'onglet Pièce) : ***
+.selectItem(item): remplace Main.selectItem
+.itemLeft(): remplace Main.itemLeft
+.itemRight(): remplace Main.itemRight
+
+*** Fonctions relatives aux paramètres Small(Mush) : ***
+.getSMParameters(): lit les paramètres depuis document.cookie
+.setSMParameters(): enregistre les paramètres dans un cookie
+.buildParamsMenu(): reconstruit le menu des paramètres
+
+*** Fonctions d'adaptation de l'interface et d'ajouts : ***
+.initCss(): charge le CSS et modifie le viewport
+.initMenubar(): crée la barre de menu Small(Mush)
+.initTabs(): crée les onglets Small(Mush)
+.charTab(): adapte l'onglet Personnage (#char_col)
+.shipTab(): remplit l'onglet Vaisseau
+.roomTab(): remplit l'onglet Pièce
+.chatTab(): ajoute les boutons Coller aux topics du chat
+.gameTab(): ajoute un bouton « Afficher la minimap Small(Mush) » sous le jeu Flash
+
+*** Fonctions relatives à l'éditeur de messages : ***
+.messageEditor(): construit l'éditeur de message
+.refreshPreview(): rafraîchit la prévisualisation en ajoutant le formatage Mush
+.savePreview(): enregistre le message actuel dans un cookie
+.retrievePreview(): récupère le message enregistré depuis document.cookie
+.buildMessage(): crée un message préformaté
+.preformatPlanet(planet, *Schmanet, *Janet): crée un message de partage de planète préformaté
+
+*** Fonction de localisation : ***
+.locale(): fonction de localisation de l'interface
+
+*** Fonction d'initialisation : ***
+.init(): appelée après le chargement de la locale
+
+
+***** VARIABLES *****
+.src: (string) adresse du dossier source du script
+.smileys: (list) couple raccourci/image des smileys Mush
+.previewtext: (string) message actuel de l'éditeur de message
+.parameters: (object) paramètres de l'interface Small(Mush)
+.rooms: (list) nom des pièces du Daedalus dans la langue du serveur
+.alertrooms: (list) nom des pièces du Daedalus telles qu'elles apparaissent dans les alertes (certaines sont mal écrites : « Jardin Hydoponique »)
+.localerooms: (list) nom des pièces du Daedalus dans la langue choisie par le joueur
+.TEXT: (object) textes de l'interface Small(Mush), générés par SM.locale()
+.ME_MODULING: (bool) le personnage est en train d'accéder à un terminal
+.ME_NERON: (bool) le personnage a le titre d'Administrateur NERON
+.ME_ALONE: (bool) le personnage est seul dans la pièce
+.GUARDIAN: (bool) un Gardien est présent dans la pièce
+.GRAVITY: (bool) le Simulateur de gravité est fonctionnel

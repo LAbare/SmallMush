@@ -1,6 +1,8 @@
-var pageMod = require("sdk/page-mod");
+var data = require('sdk/self').data;
+var pageMod = require('sdk/page-mod');
  
 pageMod.PageMod({
 	include: /https?:\/\/mush\.(vg|twinoid\.(com|es))\/?#?$/,
-	contentScript: 'var MM = document.createElement("script"); MM.src = "http://labare.github.io/SmallMush/SmallMush.js"; document.head.appendChild(MM);',
+	contentScriptFile: data.url('SmallMush.user.js'),
+	contentScriptOptions: { baseUrl: data.url('ico.png').slice(0, -7) }
 });

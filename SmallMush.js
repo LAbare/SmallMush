@@ -216,6 +216,12 @@ SM.SMhelp = function(e) {
 			SM.sel('#SMhelpscreenB').style.display = 'block';
 			break;
 		}
+		else if (el.getAttribute('data-SMtip'))
+		{
+			Main.showTip(el, "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'>" + el.getAttribute('data-SMtip') + "</div></div></div></div>");
+			SM.sel('#SMhelpscreenB').style.display = 'block';
+			break;
+		}
 		else
 			{ el = el.parentNode; }
 	}
@@ -255,7 +261,8 @@ SM.changeRoom = function(el) {
 		var disabled = SM.sel('.statuses [src$="disabled.png"]');
 		/* Soit :
 		- on n'est pas handicapé et on n'a pas d'énergie ;
-		- on est handicapé, on est seul, et soit on n'a pas d'énergie, soit le Simulateur de gravité est en panne et ni compétence Sprinter, ni Trottinette ni Monture rocheuse fonctionnelle sur soi. */
+		- on est handicapé, on est seul, et soit on n'a pas d'énergie, soit le Simulateur de gravité est en panne et ni compétence Sprinter, ni Trottinette ni Monture rocheuse fonctionnelle sur soi.
+		Ne prend pas en compte les blessures ni les objets lourds. */
 		if
 		(
 			(!disabled && !energy)
@@ -498,8 +505,9 @@ SM.changeChatTab = function(el) {
 
 
 SM.SMexitModule = function(func) {
-	js.JQuery(".cdExitModuleButton").prepend("<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />");
-	js.JQuery("#input").attr("isModule", "false");
+	SM.sel('#SMloadscreen').style.display = 'block';
+	SM.sel(".cdExitModuleButton").innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />" + SM.sel(".cdExitModuleButton").innerHTML;
+	SM.sel("#input").setAttribute('isModule', 'false');
 	Main.firstLabDone = false;
 	Main.labPage = null;
 	//Auparavant window.location, utilisation de Main.ajax() pour éviter le rechargement total
@@ -572,6 +580,8 @@ SM.reInit = function() {
 	SM.GUARDIAN = false;
 	SM.GRAVITY = true;
 
+	Main.onLoad(1);
+	Main.enableClock = true;
 	SM.sel('#ship_tab').innerHTML = '';
 	SM.sel('#room_tab').innerHTML = '';
 	SM.charTab();
@@ -808,16 +818,28 @@ SM.initMenubar = function() {
 
 	//Onglets Small(Mush)
 	var menu = SM.addNewEl('ul', SM.sel('.mxhead'), 'SMtabs');
-	SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char']).addEventListener('click', function() { SM.changeTab('char_col'); });
-	SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship']).addEventListener('click', function() { SM.changeTab('ship_tab'); });
-	SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room']).addEventListener('click', function() { SM.changeTab('room_tab'); });
-	SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat']).addEventListener('click', function() { SM.changeTab('chat_col'); });
-	SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game']).addEventListener('click', function() { SM.changeTab('room_col'); });
-	SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop']).addEventListener('click', function() {
+	var chartab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char']);
+	chartab.addEventListener('click', function() { SM.changeTab('char_col'); });
+	chartab.setAttribute('data-SMtip', SM.TEXT['tabtip-chartab']);
+	var shiptab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship']);
+	shiptab.addEventListener('click', function() { SM.changeTab('ship_tab'); });
+	shiptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shiptab']);
+	var roomtab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room']);
+	roomtab.addEventListener('click', function() { SM.changeTab('room_tab'); });
+	roomtab.setAttribute('data-SMtip', SM.TEXT['tabtip-roomtab']);
+	var chattab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat']);
+	chattab.addEventListener('click', function() { SM.changeTab('chat_col'); });
+	chattab.setAttribute('data-SMtip', SM.TEXT['tabtip-chattab']);
+	var gametab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game']);
+	gametab.addEventListener('click', function() { SM.changeTab('room_col'); });
+	gametab.setAttribute('data-SMtip', SM.TEXT['tabtip-gametab']);
+	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'])
+	shoptab.addEventListener('click', function() {
 		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs_shop']; Main.ajax('/vending', null, function() {
 			SM.reInit(); SM.changeTab('room_col'); SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'];
 		});
 	});
+	shoptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shoptab']);
 
 	SM.addNewEl('div', document.body, 'SMpopup').style.display = 'none';
 	SM.buildParamsMenu();
@@ -851,7 +873,9 @@ SM.initTabs = function() {
 SM.charTab = function() {
 	var sheetmain = SM.sel('.sheetmain');
 	//Affiche les actions joueur, qui sont normalement cachées jusqu'au chargement du jeu Flash
-	ActionListMaintainer.prototype.changeHeroListState2(["DisplayHeroActions", 0]);
+	var a = SM.sel('.cdActionRepository .heroRoomActions').children;
+	for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
+		{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
 
 	if (SM.sel('#SMenergybar')) //Si l'onglet n'a pas déjà été adapté
 		{ return; }
@@ -1275,10 +1299,13 @@ SM.messageEditor = function() {
 	var editor = SM.addNewEl('div', SM.sel('#chatBlock'), 'SMeditor');
 	SM.addNewEl('h4', editor, null, SM.TEXT['SM-added_tab']).className = 'SMtabwarning';
 	SM.addNewEl('p', editor, null, SM.TEXT['SM-added_tab_text']).className = 'SMtabwarning';
+	SM.addNewEl('p', editor, null, SM.TEXT['preview-tags-warning']).className = 'SMcenter';
 	editor.style.display = 'none';
 
 	//On récupère le formulaire de post de message sur le Nexus de Twinoid pour avoir la prévisualisation Twinoid et les smileys
-	var src = _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' });
+	var getsrc = "SM.sel('#SMeditor').setAttribute('data-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' }));";
+	SM.addNewEl('script', document.head, null, getsrc); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible
+	var src = SM.sel('#SMeditor').getAttribute('data-src');
 	SM.addNewEl('div', editor, 'tabreply_content');
 	SM.addNewEl('script', document.body, null, null, [['src', src], ['async', 'true']]).onload = function() {
 		var form = SM.sel('[action="/mod/wall/post?submit=1"]');
@@ -1698,6 +1725,8 @@ SM.init = function() {
 
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
+try { SM.src = self.options.baseUrl; } //Addon Firefox
+catch(e) { console.log('Small(Mush) & FF addon: ' + e); }
 
 SM.smileys = [['pa_pm', 'pslots.png'], ['pa', 'pa_slot1.png'], ['pm', 'pa_slot2.png'], ['pv|hp', 'lp.png'], ['xp', 'xp.png'], ['xpbig', 'xpbig.png'], ['pa_heal', 'pa_heal.png'], ['asocial', 'status/unsociable.png'], ['disabled', 'status/disabled.png'], ['hungry', 'status/hungry.png'], ['hurt', 'status/hurt.png'], ['ill', 'status/disease.png'], ['psy_disease', 'status/psy_disease.png'], ['commander', 'title_01.png'], ['admin_neron', 'title_02.png'], ['resp_comm', 'title_03.png'], ['alert', 'alert.png'], ['com', 'comm.png'], ['door', 'door.png'], ['plant_youngling', 'plant_youngling.png'], ['plant_thirsty', 'plant_thirsty.png'], ['plant_dry', 'plant_dry.png'], ['plant_diseased', 'plant_diseased.png'], ['bin', 'bin.png'], ['next', 'pageright.png'], ['ship_triumph', 'daedalus_triumph.png'], ['pa_comp', 'pa_comp.png'], ['pa_cook', 'pa_cook.png'], ['pa_core', 'pa_core.png'], ['pa_eng|eng', 'pa_eng.png'], ['pa_garden', 'pa_garden.png'], ['pa_pilgred', 'pa_pilgred.png'], ['pa_shoot', 'pa_shoot.png'], ['laid', 'status/laid.png'], ['mastered', 'status/mastered.png'], ['mush', 'mush.png'], ['stink', 'status/stinky.png'], ['fuel', 'fuel.png'], ['o2', 'o2.png'], ['moral|pmo', 'moral.png'], ['eat', 'sat.png'], ['pills', 'demoralized2.png'], ['dead', 'dead.png'], ['hunter', 'hunter.png'], ['fire', 'fire.png'], ['more', 'more.png'], ['less', 'less.png'], ['chut', 'discrete.png'], ['talk', 'talk.gif'], ['talky', 'talkie.png'], ['cat', 'cat.png'], ['time', 'casio.png'], ['tip', 'tip.png'], ['triumph', 'triumph.png']];
 
@@ -1707,6 +1736,7 @@ SM.ME_MODULING = false;
 SM.GUARDIAN = false;
 SM.GRAVITY = true;
 
+// PYTHON USERSCRIPT //
 
 
 /** INITIALISATION **/
