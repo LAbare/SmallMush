@@ -593,6 +593,28 @@ SM.reInit = function() {
 	SM.changeActionFunctions();
 	SM.sel("#SMbar .cycletime").textContent = SM.sel("#chat_col .cycletime").textContent;
 	SM.sel('#SMloadscreen').style.display = 'none';
+
+	//Mise à jour Jour - Cycle
+	var curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
+	if (curcycle != SM.curcycle)
+	{
+		SM.curcycle = curcycle;
+		curcycle += 1; //Commence à 0, +1 pour les calculs
+		var j = Math.floor(curcycle / 8) + 1; //Jours complets + jour commencé
+		var c = curcycle % 8;
+		switch (document.domain)
+		{
+			case 'mush.twinoid.es':
+				var t = "Día " + j + " - Ciclo " + c;
+				break;
+			case 'mush.vg':
+				var t = "Jour " + j + " - Cycle " + c;
+				break;
+			default:
+				var t = "Day " + j + " - Cycle " + c;
+		}
+		SM.sel('.cycletime').textContent = t;
+	}	
 };
 
 
@@ -873,9 +895,12 @@ SM.initTabs = function() {
 SM.charTab = function() {
 	var sheetmain = SM.sel('.sheetmain');
 	//Affiche les actions joueur, qui sont normalement cachées jusqu'au chargement du jeu Flash
-	var a = SM.sel('.cdActionRepository .heroRoomActions').children;
-	for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
-		{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
+	if (SM.sel('.cdActionList').children.length == 0)
+	{
+		var a = SM.sel('.cdActionRepository .heroRoomActions').children;
+		for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
+			{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
+	}
 
 	if (SM.sel('#SMenergybar')) //Si l'onglet n'a pas déjà été adapté
 		{ return; }
@@ -1188,11 +1213,13 @@ SM.roomTab = function() {
 	}
 
 	// INVENTAIRE (COPIÉ) //
-	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() { SM.sel('#SMcdInventory').firstElementChild.style.display = 'block'; });
+	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() { SM.sel('.exceed').style.display = 'block'; });
 	var invblock = SM.copyEl(SM.sel('#cdInventory'), room_tab);
 	invblock.style.visibility = 'visible';
+	SM.sel('.invcolorbg').style.display = 'block';
 	SM.sel('#SMroomActionList1').style.opacity = 1;
 	SM.sel('#SMroomActionList2').style.opacity = 1;
+	SM.sel('.exceed').style.display = 'none';
 
 	//Changement des fonctions Main par les fonctions SM
 	SM.sel('#SMtt_itemname').previousElementSibling.setAttribute('onclick', 'SM.itemLeft();');
@@ -1696,7 +1723,6 @@ SM.init = function() {
 	SM.gameTab();
 	SM.messageEditor();
 	SM.changeActionFunctions();
-	Main.selUpdtArr.push('chat_col'); //Pour que .cycletime puisse être mis à jour en interne
 	SM.sel('#content').scrollLeft = 0;
 
 	//Première fois : alerte à lire
@@ -1720,6 +1746,8 @@ SM.init = function() {
 };
 
 
+// PYTHON USERSCRIPT //
+
 
 /* VARIABLES */
 
@@ -1735,8 +1763,8 @@ SM.ME_ALONE = true;
 SM.ME_MODULING = false;
 SM.GUARDIAN = false;
 SM.GRAVITY = true;
+SM.curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
 
-// PYTHON USERSCRIPT //
 
 
 /** INITIALISATION **/

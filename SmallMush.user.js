@@ -613,6 +613,28 @@ SM.reInit = function() {
 	SM.changeActionFunctions();
 	SM.sel("#SMbar .cycletime").textContent = SM.sel("#chat_col .cycletime").textContent;
 	SM.sel('#SMloadscreen').style.display = 'none';
+
+	//Mise à jour Jour - Cycle
+	var curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
+	if (curcycle != SM.curcycle)
+	{
+		SM.curcycle = curcycle;
+		curcycle += 1; //Commence à 0, +1 pour les calculs
+		var j = Math.floor(curcycle / 8) + 1; //Jours complets + jour commencé
+		var c = curcycle % 8;
+		switch (document.domain)
+		{
+			case 'mush.twinoid.es':
+				var t = "Día " + j + " - Ciclo " + c;
+				break;
+			case 'mush.vg':
+				var t = "Jour " + j + " - Cycle " + c;
+				break;
+			default:
+				var t = "Day " + j + " - Cycle " + c;
+		}
+		SM.sel('.cycletime').textContent = t;
+	}	
 };
 
 
@@ -893,9 +915,12 @@ SM.initTabs = function() {
 SM.charTab = function() {
 	var sheetmain = SM.sel('.sheetmain');
 	//Affiche les actions joueur, qui sont normalement cachées jusqu'au chargement du jeu Flash
-	var a = SM.sel('.cdActionRepository .heroRoomActions').children;
-	for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
-		{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
+	if (SM.sel('.cdActionList').children.length == 0)
+	{
+		var a = SM.sel('.cdActionRepository .heroRoomActions').children;
+		for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
+			{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
+	}
 
 	if (SM.sel('#SMenergybar')) //Si l'onglet n'a pas déjà été adapté
 		{ return; }
@@ -1208,11 +1233,13 @@ SM.roomTab = function() {
 	}
 
 	// INVENTAIRE (COPIÉ) //
-	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() { SM.sel('#SMcdInventory').firstElementChild.style.display = 'block'; });
+	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() { SM.sel('.exceed').style.display = 'block'; });
 	var invblock = SM.copyEl(SM.sel('#cdInventory'), room_tab);
 	invblock.style.visibility = 'visible';
+	SM.sel('.invcolorbg').style.display = 'block';
 	SM.sel('#SMroomActionList1').style.opacity = 1;
 	SM.sel('#SMroomActionList2').style.opacity = 1;
+	SM.sel('.exceed').style.display = 'none';
 
 	//Changement des fonctions Main par les fonctions SM
 	SM.sel('#SMtt_itemname').previousElementSibling.setAttribute('onclick', 'SM.itemLeft();');
@@ -2079,7 +2106,6 @@ SM.init = function() {
 	SM.gameTab();
 	SM.messageEditor();
 	SM.changeActionFunctions();
-	Main.selUpdtArr.push('chat_col'); //Pour que .cycletime puisse être mis à jour en interne
 	SM.sel('#content').scrollLeft = 0;
 
 	//Première fois : alerte à lire
@@ -2102,22 +2128,6 @@ SM.init = function() {
 	}, 250);
 };
 
-
-
-/* VARIABLES */
-
-//SM.src = "http://labare.alwaysdata.net/SmallMush/";
-SM.src = "http://labare.github.io/SmallMush/";
-try { SM.src = self.options.baseUrl; } //Addon Firefox
-catch(e) { console.log('Small(Mush) & FF addon: ' + e); }
-
-SM.smileys = [['pa_pm', 'pslots.png'], ['pa', 'pa_slot1.png'], ['pm', 'pa_slot2.png'], ['pv|hp', 'lp.png'], ['xp', 'xp.png'], ['xpbig', 'xpbig.png'], ['pa_heal', 'pa_heal.png'], ['asocial', 'status/unsociable.png'], ['disabled', 'status/disabled.png'], ['hungry', 'status/hungry.png'], ['hurt', 'status/hurt.png'], ['ill', 'status/disease.png'], ['psy_disease', 'status/psy_disease.png'], ['commander', 'title_01.png'], ['admin_neron', 'title_02.png'], ['resp_comm', 'title_03.png'], ['alert', 'alert.png'], ['com', 'comm.png'], ['door', 'door.png'], ['plant_youngling', 'plant_youngling.png'], ['plant_thirsty', 'plant_thirsty.png'], ['plant_dry', 'plant_dry.png'], ['plant_diseased', 'plant_diseased.png'], ['bin', 'bin.png'], ['next', 'pageright.png'], ['ship_triumph', 'daedalus_triumph.png'], ['pa_comp', 'pa_comp.png'], ['pa_cook', 'pa_cook.png'], ['pa_core', 'pa_core.png'], ['pa_eng|eng', 'pa_eng.png'], ['pa_garden', 'pa_garden.png'], ['pa_pilgred', 'pa_pilgred.png'], ['pa_shoot', 'pa_shoot.png'], ['laid', 'status/laid.png'], ['mastered', 'status/mastered.png'], ['mush', 'mush.png'], ['stink', 'status/stinky.png'], ['fuel', 'fuel.png'], ['o2', 'o2.png'], ['moral|pmo', 'moral.png'], ['eat', 'sat.png'], ['pills', 'demoralized2.png'], ['dead', 'dead.png'], ['hunter', 'hunter.png'], ['fire', 'fire.png'], ['more', 'more.png'], ['less', 'less.png'], ['chut', 'discrete.png'], ['talk', 'talk.gif'], ['talky', 'talkie.png'], ['cat', 'cat.png'], ['time', 'casio.png'], ['tip', 'tip.png'], ['triumph', 'triumph.png']];
-
-SM.ME_NERON = false;
-SM.ME_ALONE = true;
-SM.ME_MODULING = false;
-SM.GUARDIAN = false;
-SM.GRAVITY = true;
 
 exportFunction(SM.sel, unsafeSM, {defineAs:"sel"});
 exportFunction(SM.getAttributesList, unsafeSM, {defineAs:"getAttributesList"});
@@ -2163,6 +2173,24 @@ exportFunction(SM.preformatPlanet, unsafeSM, {defineAs:"preformatPlanet"});
 exportFunction(SM.locale, unsafeSM, {defineAs:"locale"});
 exportFunction(SM.init, unsafeSM, {defineAs:"init"});
 
+
+
+
+/* VARIABLES */
+
+//SM.src = "http://labare.alwaysdata.net/SmallMush/";
+SM.src = "http://labare.github.io/SmallMush/";
+try { SM.src = self.options.baseUrl; } //Addon Firefox
+catch(e) { console.log('Small(Mush) & FF addon: ' + e); }
+
+SM.smileys = [['pa_pm', 'pslots.png'], ['pa', 'pa_slot1.png'], ['pm', 'pa_slot2.png'], ['pv|hp', 'lp.png'], ['xp', 'xp.png'], ['xpbig', 'xpbig.png'], ['pa_heal', 'pa_heal.png'], ['asocial', 'status/unsociable.png'], ['disabled', 'status/disabled.png'], ['hungry', 'status/hungry.png'], ['hurt', 'status/hurt.png'], ['ill', 'status/disease.png'], ['psy_disease', 'status/psy_disease.png'], ['commander', 'title_01.png'], ['admin_neron', 'title_02.png'], ['resp_comm', 'title_03.png'], ['alert', 'alert.png'], ['com', 'comm.png'], ['door', 'door.png'], ['plant_youngling', 'plant_youngling.png'], ['plant_thirsty', 'plant_thirsty.png'], ['plant_dry', 'plant_dry.png'], ['plant_diseased', 'plant_diseased.png'], ['bin', 'bin.png'], ['next', 'pageright.png'], ['ship_triumph', 'daedalus_triumph.png'], ['pa_comp', 'pa_comp.png'], ['pa_cook', 'pa_cook.png'], ['pa_core', 'pa_core.png'], ['pa_eng|eng', 'pa_eng.png'], ['pa_garden', 'pa_garden.png'], ['pa_pilgred', 'pa_pilgred.png'], ['pa_shoot', 'pa_shoot.png'], ['laid', 'status/laid.png'], ['mastered', 'status/mastered.png'], ['mush', 'mush.png'], ['stink', 'status/stinky.png'], ['fuel', 'fuel.png'], ['o2', 'o2.png'], ['moral|pmo', 'moral.png'], ['eat', 'sat.png'], ['pills', 'demoralized2.png'], ['dead', 'dead.png'], ['hunter', 'hunter.png'], ['fire', 'fire.png'], ['more', 'more.png'], ['less', 'less.png'], ['chut', 'discrete.png'], ['talk', 'talk.gif'], ['talky', 'talkie.png'], ['cat', 'cat.png'], ['time', 'casio.png'], ['tip', 'tip.png'], ['triumph', 'triumph.png']];
+
+SM.ME_NERON = false;
+SM.ME_ALONE = true;
+SM.ME_MODULING = false;
+SM.GUARDIAN = false;
+SM.GRAVITY = true;
+SM.curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
 
 
 
