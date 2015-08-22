@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9
+// @version   0.9.05
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -620,8 +620,16 @@ SM.reInit = function() {
 	{
 		SM.curcycle = curcycle;
 		curcycle += 1; //Commence à 0, +1 pour les calculs
-		var j = Math.floor(curcycle / 8) + 1; //Jours complets + jour commencé
-		var c = curcycle % 8;
+		if (curcycle % 8 == 0)
+		{
+			var j = curcycle / 8; //Jours complets, nouveau C1
+			var c = 1;
+		}
+		else
+		{
+			var j = Math.floor(curcycle / 8) + 1; //Jours complets + jour commencé
+			var c = curcycle % 8;
+		}
 		switch (document.domain)
 		{
 			case 'mush.twinoid.es':
