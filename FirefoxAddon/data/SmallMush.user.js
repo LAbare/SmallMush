@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.05
+// @version   0.9.5
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -215,6 +215,8 @@ SM.changeTab = function(newtab) {
 		SM.sel('#' + newtab).style.display = 'block';
 	}
 	char.parentNode.setAttribute('data-visible-tab', newtab);
+	SM.sel('.SMtabselected').className = '';
+	SM.sel('#SMtab-' + newtab).className = 'SMtabselected';
 };
 
 
@@ -276,7 +278,7 @@ SM.changeRoom = function(el) {
 			{ energy = true; }
 		//Monture non fonctionnelle aux cycles impairs
 		var boulder = false;
-		if (SM.sel('#myInventory [style*="rolling_boulder.jpg"]') && !(parseInt(SM.sel('.cycletime').textContent.match(/([0-9]+)/g)[1]) % 2))
+		if (SM.sel('#myInventory [style*="rolling_boulder.jpg"]') && parseInt(SM.sel('#input').getAttribute('curcycle')) % 2 == 1) //0 = J1C1
 			{ boulder = true; }
 		var disabled = SM.sel('.statuses [src$="disabled.png"]');
 		/* Soit :
@@ -304,9 +306,9 @@ SM.changeRoom = function(el) {
 			el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + SM.TEXT['move_button'];
 			if (SM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
 			{
-				SM.sel('#SMloadscreen').style.display = 'block';
+				SM.loadingScreen();
 				SM.SMexitModule(function() {
-					SM.sel('#SMloadscreen').style.display = 'block';
+					SM.loadingScreen();
 					Main.ajax('/?fa=81&fp=' + select.value, null, function() {
 						SM.changeTab('room_tab');
 						SM.sel('#SMloadscreen').style.display = 'none';
@@ -480,8 +482,14 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 			break;
 
 		case 3: //Chat
-			var action = document.querySelector('.cdActionRepository [webdata="' + serial + '"]'); //Une seule action, Prendre
-			SM.copyEl(action, actionListA);
+			var actions = SM.toArray(document.querySelectorAll('.cdActionRepository [webdata="' + serial + '"]'));
+			for (j = 0; j < actions.length; j++)
+			{
+				if (j % 2)
+					{ SM.copyEl(actions[j], actionListB); }
+				else
+					{ SM.copyEl(actions[j], actionListA); }
+			}
 
 			SM.sel('#SMtt_itemname').textContent = 'Schrödinger';
 			break;
@@ -525,8 +533,15 @@ SM.changeChatTab = function(el) {
 
 
 SM.SMexitModule = function(func) {
-	SM.sel('#SMloadscreen').style.display = 'block';
-	SM.sel(".cdExitModuleButton").innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />" + SM.sel(".cdExitModuleButton").innerHTML;
+	var button = SM.sel(".cdExitModuleButton");
+	//Confirmation d'action
+	if (SM.parameters['confirm-action'])
+	{
+		if (!confirm(SM.TEXT['confirm_action'] + button.textContent.trim() + "' ?"))
+			{ return false; }
+	}
+	SM.loadingScreen();
+	button.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />" + button.innerHTML;
 	SM.sel("#input").setAttribute('isModule', 'false');
 	Main.firstLabDone = false;
 	Main.labPage = null;
@@ -538,15 +553,15 @@ SM.SMexitModule = function(func) {
 	Main.ajax("/clearSessionMods", null, updtFunc);
 	SM.changeTab('room_tab');
 	SM.sel('#cdModuleContent').style.display = 'none';
-	SM.sel('.cdExitModuleButton').style.display = 'none';
+	button.style.display = 'none';
 	SM.sel('#cdMainContent').style.display = 'block';
 };
 
 
 SM.changeActionFunctions = function() {
 	//Boutons Nouveau cycle et Nouvelle étape
-	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'Main.ajax("/", null, function() { SM.reInit(); Main.onLoad(1); Main.enableClock = true; }); return false;');
-	SM.sel('#txt_new_step a').setAttribute('onclick', 'Main.ajax("/", null, function() { SM.reInit(); Main.onLoad(1); Main.enableClock = true; }); return false;');
+	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'Main.ajax("/", ["maincontainer"], function() { SM.initTabs(); SM.reInit(); }); return false;');
+	SM.sel('#txt_new_step a').setAttribute('onclick', 'Main.ajax("/", ["maincontainer"], function() { SM.initTabs(); SM.reInit(); }); return false;');
 	//Boutons d'action
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
 	for (i = 0; i < actions.length; i++)
@@ -570,26 +585,29 @@ SM.beforeAction = function(el) {
 	//Confirmation d'action
 	if (SM.parameters['confirm-action'])
 	{
-		if (!confirm(SM.TEXT['confirm_action'] + el.innerHTML.trim().replace(/ ?<img(?:.*)\/?>/g, SM.TEXT['ap']).replace(/<\/?span>/g, '').replace(/\s+/g, ' ') + "' ?"))
+		var name = el.innerHTML.trim().replace(/ ?<img(?:.*)\/?>/g, SM.TEXT['ap']).replace(/<\/?span>/g, '').replace(/\s+/g, ' ').replace(/&nbsp;/g, ' ');
+		if (!confirm(SM.TEXT['confirm_action'] + name + "' ?"))
 			{ return false; }
 	}
+	SM.loadingScreen();
 
 	//Changement d'onglet Small(Mush)
 	var action = Main.extractAction(el.getAttribute('href'));
-	//Accéder à un terminal ou au Bloc de post-it, Envoyer une mission
-	if (['ACCESS', 'COMMANDER_ORDER'].indexOf(action) != -1)
-	{
-		SM.changeTab('room_col');
-		SM.sel('#SMloadscreen').style.display = 'block';
-	}
+	//Accéder à un terminal ou au Bloc de post-it, Envoyer une mission, Annonce générale
+	if (['ACCESS', 'COMMANDER_ORDER', 'DAILY_ORDER'].indexOf(action) != -1)
+		{ SM.changeTab('room_col'); }
 	//Examiner, Lire, Vérifier son niveau pré-fongique, Lister l'équipage, Lire le niveau de fuel dans la Chambre de combustion
 	else if (['INSPECT', 'CONSULT_DOC', 'CHECK_FOR_INFECTION', 'CHECK_CREW_LIST', 'CHECK_LEVEL'].indexOf(action) != -1)
-	{
-		SM.changeTab('chat_col');
-		SM.sel('#SMloadscreen').style.display = 'block';
-	}
+		{ SM.changeTab('chat_col'); }
 
 	return true;
+};
+
+
+SM.loadingScreen = function() {
+	var screen = SM.sel('#SMloadscreen');
+	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br />' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
+	screen.style.display = 'block';
 };
 
 
@@ -613,36 +631,6 @@ SM.reInit = function() {
 	SM.changeActionFunctions();
 	SM.sel("#SMbar .cycletime").textContent = SM.sel("#chat_col .cycletime").textContent;
 	SM.sel('#SMloadscreen').style.display = 'none';
-
-	//Mise à jour Jour - Cycle
-	var curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
-	if (curcycle != SM.curcycle)
-	{
-		SM.curcycle = curcycle;
-		curcycle += 1; //Commence à 0, +1 pour les calculs
-		if (curcycle % 8 == 0)
-		{
-			var j = curcycle / 8; //Jours complets, nouveau C1
-			var c = 1;
-		}
-		else
-		{
-			var j = Math.floor(curcycle / 8) + 1; //Jours complets + jour commencé
-			var c = curcycle % 8;
-		}
-		switch (document.domain)
-		{
-			case 'mush.twinoid.es':
-				var t = "Día " + j + " - Ciclo " + c;
-				break;
-			case 'mush.vg':
-				var t = "Jour " + j + " - Cycle " + c;
-				break;
-			default:
-				var t = "Day " + j + " - Cycle " + c;
-		}
-		SM.sel('.cycletime').textContent = t;
-	}	
 };
 
 
@@ -839,14 +827,26 @@ SM.initMenubar = function() {
 
 	// BARRE SMALL(MUSH) //
 	//Rechargement interne de la page
-	SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />").addEventListener('click', function() {
-		SM.sel('#SMloadscreen').style.display = 'block';
+	var butreload = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />");
+	butreload.addEventListener('click', function() {
+		SM.loadingScreen();
 		Main.ajax('/', null, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
+	butreload.setAttribute('data-SMtip', SM.TEXT['buttontip-reload']);
+
+	var butreloadall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />");
+	butreloadall.addEventListener('click', function() {
+		SM.loadingScreen();
+		Main.ajax('/', ['maincontainer'], function() { SM.initTabs(); SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
+	});
+	butreloadall.setAttribute('data-SMtip', SM.TEXT['buttontip-reloadall']);
+
 	SM.addNewEl('div', document.body, 'SMloadscreen', "<img src='/img/icons/ui/loading1.gif' />").addEventListener('click', function() { this.style.display = 'none'; });
 
 	//Aide
-	SM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?").addEventListener('click', function() { SM.sel('#SMhelpscreenA').style.display = 'block'; });
+	var buthelp = SM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?");
+	buthelp.addEventListener('click', function() { SM.sel('#SMhelpscreenA').style.display = 'block'; });
+	buthelp.setAttribute('data-SMtip', SM.TEXT['buttontip-help']);
 	//Premier écran noir : sélectionner l'élément ; second écran noir : cacher l'infobulle (sinon elle reste)
 	SM.addNewEl('div', document.body, 'SMhelpscreenA', SM.TEXT['help_screen_A']).addEventListener('click', function(e) { this.style.display = 'none'; SM.SMhelp(e); });
 	SM.addNewEl('div', document.body, 'SMhelpscreenB', SM.TEXT['help_screen_B']).addEventListener('click', function(e) { this.style.display = 'none'; Main.hideTip(); });
@@ -868,19 +868,20 @@ SM.initMenubar = function() {
 
 	//Onglets Small(Mush)
 	var menu = SM.addNewEl('ul', SM.sel('.mxhead'), 'SMtabs');
-	var chartab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char']);
+	var chartab = SM.addNewEl('li', menu, 'SMtab-char_col', "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char']);
 	chartab.addEventListener('click', function() { SM.changeTab('char_col'); });
 	chartab.setAttribute('data-SMtip', SM.TEXT['tabtip-chartab']);
-	var shiptab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship']);
+	chartab.className = 'SMtabselected';
+	var shiptab = SM.addNewEl('li', menu, 'SMtab-ship_tab', "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship']);
 	shiptab.addEventListener('click', function() { SM.changeTab('ship_tab'); });
 	shiptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shiptab']);
-	var roomtab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room']);
+	var roomtab = SM.addNewEl('li', menu, 'SMtab-room_tab', "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room']);
 	roomtab.addEventListener('click', function() { SM.changeTab('room_tab'); });
 	roomtab.setAttribute('data-SMtip', SM.TEXT['tabtip-roomtab']);
-	var chattab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat']);
+	var chattab = SM.addNewEl('li', menu, 'SMtab-chat_col', "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat']);
 	chattab.addEventListener('click', function() { SM.changeTab('chat_col'); });
 	chattab.setAttribute('data-SMtip', SM.TEXT['tabtip-chattab']);
-	var gametab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game']);
+	var gametab = SM.addNewEl('li', menu, 'SMtab-room_col', "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game']);
 	gametab.addEventListener('click', function() { SM.changeTab('room_col'); });
 	gametab.setAttribute('data-SMtip', SM.TEXT['tabtip-gametab']);
 	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'])
@@ -940,8 +941,8 @@ SM.charTab = function() {
 	//Bloc comprenant le portrait en fond (.avatar), le nom et les titres (.SMwho) en haut à gauche, le triomphe (triumphLi) en haut à droite, le niveau (.level) en bas à droite et le message de promo (.gogold) en bas, afin de pouvoir placer tous ces éléments en position:absolute
 	var characterdiv = SM.moveEl(SM.addNewEl('div', null, 'SMcharacterdiv'), sheetmain, sheetmain.firstChild);
 	SM.addNewEl('div', characterdiv, '', SM.sel('.who').parentNode.innerHTML).className = 'SMwho';
-	var triumphLi = SM.sel('[src$="triumph.png"]').parentNode;
-	SM.moveEl(SM.addNewEl('div', null, 'triumph', triumphLi.innerHTML.trim(), SM.getAttributesList(triumphLi)), characterdiv);
+	var triumphLi = SM.sel('.spaceshipstatus [src$="triumph.png"]').parentNode;
+	SM.moveEl(SM.addNewEl('div', null, 'SMtriumph', triumphLi.innerHTML.trim(), SM.getAttributesList(triumphLi)), characterdiv);
 	SM.copyEl(SM.sel('.level'), characterdiv);
 	SM.moveEl(SM.sel('.avatar'), characterdiv).className = 'avatar SM' + SM.sel('.who').textContent.trim().replace(" ", "_").toLowerCase();
 	if (SM.sel('.gogold')) //Message « Achetez du mode Or »
@@ -1241,13 +1242,16 @@ SM.roomTab = function() {
 	}
 
 	// INVENTAIRE (COPIÉ) //
-	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() { SM.sel('.exceed').style.display = 'block'; });
+	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() {
+		SM.sel('#SMcdInventory .invcolorbg').style.display = 'block'; //Parfois caché par le jeu Flash
+		SM.sel('#SMcdInventory .exceed').style.display = 'block';
+	});
 	var invblock = SM.copyEl(SM.sel('#cdInventory'), room_tab);
 	invblock.style.visibility = 'visible';
-	SM.sel('.invcolorbg').style.display = 'block';
+	SM.sel('#SMcdInventory .invcolorbg').style.display = 'block';
 	SM.sel('#SMroomActionList1').style.opacity = 1;
 	SM.sel('#SMroomActionList2').style.opacity = 1;
-	SM.sel('.exceed').style.display = 'none';
+	SM.sel('#SMcdInventory .exceed').style.display = 'none';
 
 	//Changement des fonctions Main par les fonctions SM
 	SM.sel('#SMtt_itemname').previousElementSibling.setAttribute('onclick', 'SM.itemLeft();');
@@ -1358,9 +1362,7 @@ SM.messageEditor = function() {
 	editor.style.display = 'none';
 
 	//On récupère le formulaire de post de message sur le Nexus de Twinoid pour avoir la prévisualisation Twinoid et les smileys
-	var getsrc = "SM.sel('#SMeditor').setAttribute('data-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' }));";
-	SM.addNewEl('script', document.head, null, getsrc); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible
-	var src = SM.sel('#SMeditor').getAttribute('data-src');
+	var src = document.body.getAttribute('data-SM-src');
 	SM.addNewEl('div', editor, 'tabreply_content');
 	SM.addNewEl('script', document.body, null, null, [['src', src], ['async', 'true']]).onload = function() {
 		var form = SM.sel('[action="/mod/wall/post?submit=1"]');
@@ -1417,7 +1419,7 @@ SM.messageEditor = function() {
 		SM.addNewEl('p', form, null, SM.TEXT['premessages_title'], [['style', 'color: black; margin-top: 20px;']]);
 		var premessages = SM.addNewEl('select', form, 'SMpremessages');
 		premessages.addEventListener('change', function() { SM.buildMessage(); });
-		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet'];
+		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms'];
 		for (i = 0; i < options.length; i++)
 			{ SM.addNewEl('option', premessages, null, SM.TEXT['premessages_' + options[i]], [['value', options[i]]]); }
 
@@ -1513,6 +1515,8 @@ SM.buildMessage = function() {
 					{ break; }
 				if (/hidden\.png/.test(item.getAttribute('data-name'))) //On ne liste pas les objets cachés
 					{ continue; }
+				if (/(tracker|talky_walky|super_talky)\.jpg/.test(item.innerHTML))
+					{ continue; }
 				var n = (
 					(item.getAttribute('data-id') == 'BOOK')
 					? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour avoir la compétence en cas d'apprenton
@@ -1552,7 +1556,7 @@ SM.buildMessage = function() {
 			if (!SM.sel('#research_module'))
 				{ alert(SM.TEXT['preformat-researches_nomodule']); break; }
 
-			message += "**//" + SM.TEXT['preformat-researches_title'] + " //**\n\n\n\n";
+			message += ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (i = 0; i < cards.length; i++)
 			{
@@ -1594,7 +1598,7 @@ SM.buildMessage = function() {
 
 			//Création du message
 			SM.addButton(popup, SM.TEXT['preformat-researches++_submit']).addEventListener('click', function() {
-				var message = "**//" + SM.TEXT['preformat-researches_title'] + " //**\n\n\n\n";
+				var message = ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
 				var researches = document.getElementsByClassName('SMresearch');
 				for (i = 0; i < researches.length; i++)
 				{
@@ -1620,7 +1624,7 @@ SM.buildMessage = function() {
 			if (!/img\/cards\/projects/.test(SM.sel('#cdModuleContent').innerHTML)) //Pas d'ID spécifique au Cœur de NERON :-/
 				{ alert(SM.TEXT['preformat-projects_nomodule']); break; }
 
-			message += "**//" + SM.TEXT['preformat-projects_title'] + " //**\n\n\n\n";
+			message += ":pa_core: **//" + SM.TEXT['preformat-projects_title'] + " //**:pa_core:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (i = 0; i < cards.length; i++)
 			{
@@ -1652,22 +1656,84 @@ SM.buildMessage = function() {
 					popup.style.display = 'block';
 					SM.addNewEl('h3', popup, null, SM.TEXT['preformat-planet_title']);
 					SM.addButton(popup, planets[0].firstElementChild.textContent).addEventListener('click', function() {
-						SM.sel('#tid_wallPost').value = SM.preformatPlanet(planets[0]);
+						message += SM.preformatPlanet(planets[0]);
+						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
 					}); //Première planète
 					SM.addButton(popup, planets[1].firstElementChild.textContent).addEventListener('click', function() {
-						SM.sel('#tid_wallPost').value = SM.preformatPlanet(planets[1]);
+						message += SM.preformatPlanet(planets[1]);
+						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
 					}); //Seconde planète
 					SM.addButton(popup, SM.TEXT['preformat-planet_both']).addEventListener('click', function() {
-						SM.sel('#tid_wallPost').value = SM.preformatPlanet(planets[0]) + "\n\n\n\n" + SM.preformatPlanet(planets[1]);
+						message += SM.preformatPlanet(planets[0]) + "\n\n\n\n" + SM.preformatPlanet(planets[1]);
+						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
 					}); //Les deux planètes
 					break;
 			}
+			break;
+
+		case 'comms':
+			if (!SM.sel('#trackerModule'))
+				{ alert(SM.TEXT['preformat-comms_nomodule']); break; }
+
+			message += ":com: " + SM.TEXT['preformat-comms_title'] + ":com:\n\n\n\n";
+
+			//Qualité du signal
+			message += SM.TEXT['preformat-comms_signal'] + SM.sel('#trackerModule .sensors p:first-of-type em').textContent.match(/[0-9]+\s*%/)[0] + "\n";
+
+			//Xyloph
+			message += SM.TEXT['preformat-comms_Xyloph'];
+			var dbs = SM.toArray(document.querySelectorAll('#trackerModule .perfor li:not(.undone)'));
+			if (dbs.length)
+			{
+				message += "\n";
+				for (i in dbs)
+					{ message += "- " + SM.getTipContent(dbs[i].onmouseover).match(/<h1>(.*)<\/h1>/)[1] + "\n"; }
+			}
+			else
+				{ message += SM.TEXT['preformat-comms_Xylophnone'] + "\n"; }
+
+			//Bases rebelles
+			message += SM.TEXT['preformat-comms_bases'];
+			var bases = SM.toArray(document.querySelectorAll('#trackerModule .bases [data-id]')).reverse();
+			var anysignal = false;
+			for (i in bases)
+			{
+				var id = bases[i].getAttribute('data-id');
+				var span = SM.sel('#trackerModule [data-id="' + id + '"] span');
+				var decoded = ((SM.sel('#trackerModule [data-id="' + id + '"] h3').textContent.trim() != "???") ? true : false);
+				if (!span && !decoded)
+					{ continue; } //Signal pas encore envoyé
+				if (!anysignal)
+				{
+					message += "\n";
+					anysignal = true;
+				}
+
+				message += "- //" + id.toLowerCase().replace(/_/, ' ').replace( /\b\w/g, function (l) { return l.toUpperCase(); }) + " : //"; //Nom de la base
+				if (decoded) //Décodée
+					{ message += SM.TEXT['preformat-comms_basedecoded'] + "\n"; }
+				else
+				{
+					if (span.className == 'percent') //En décodage
+						{ message += span.textContent.trim() + "\n"; }
+					else //Perdue
+						{ message += SM.TEXT['preformat-comms_baselost'] + "\n"; }
+				}
+			}
+			if (!anysignal) //Aucun signal pour le moment
+				{ message += SM.TEXT['preformat-comms_basesnone'] + "\n"; }
+
+			//MAJ NERON
+			message += SM.TEXT['preformat-comms_neron'] + SM.sel('#trackerModule .neron h2').textContent.match(/[0-9]+\.[0-9]+/)[0] + "\n\n\n\n//Over.//";
+
+			wallpost.value = message;
+			SM.refreshPreview();
 			break;
 	}
 
@@ -1681,7 +1747,7 @@ SM.preformatPlanet = function(planet) {
 	var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 	var zones = planet.lastElementChild.firstElementChild.innerHTML.match(/<h1>(.*)<\/h1>/g);
 
-	var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
+	var message = ":mush_planet_scanned_1: **" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
 	var unknown = 0;
 	for (i = 0; i < zones.length; i++)
 	{
@@ -1755,7 +1821,7 @@ SM.locale = function() {
 		SM.TEXT['tabs_game'] = "Module";
 		SM.TEXT['tabs_shop'] = "Achats";
 		SM.TEXT['SM-added_tab'] = "<img src='" + SM.src + "ico.png' /> <b>Attention :</b> Onglet Small(Mush) <img src='" + SM.src + "ico.png' />";
-		SM.TEXT['SM-added_tab_text'] = "Cet onglet est un ajout de l'interface Small(Mush). Si un bug venait à se produire ici, il ne pourrait s'agir que d'un bug de <em>script</em> : il ne faudrait alors en avertir que son auteur.";
+		SM.TEXT['SM-added_tab_text'] = "Cet onglet est un ajout du script Small(Mush). Si un bug venait à se produire ici, il ne pourrait s'agir que d'un bug de <em>script</em> : il ne faudrait alors en avertir que son auteur.";
 		SM.TEXT['plasma-onmouseover'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Bouclier plasma</h1>Le bouclier plasma est activé.</div></div></div></div>";
 		SM.TEXT['cards-title'] = "Projets et recherches :";
 		SM.TEXT['roomtab-focused'] = "Vous êtes Concentré sur un terminal, ce qui signifie que vous ne voyez pas ce qu'il y a autour de vous. Quittez le terminal pour voir la pièce. (Si vous n'arrivez pas à vous débarrasser du statut Concentré, accédez au distributeur puis quittez-le.)";
@@ -1808,6 +1874,7 @@ SM.locale = function() {
 		SM.TEXT['premessages_researches++'] = "Lister les recherches (mode avancé)";
 		SM.TEXT['premessages_projects'] = "Lister les projets";
 		SM.TEXT['premessages_planet'] = "Partager une planète";
+		SM.TEXT['premessages_comms'] = "Partager l'avancement des communications";
 		SM.TEXT['message-overwrite_retrieve'] = "Attention : ceci va effacer votre message actuel. Continuer ?";
 		SM.TEXT['message-overwrite_build'] = "Voulez-vous effacer le message actuel (Annuler) ou écrire à sa suite (OK) ?";
 		SM.TEXT['preformat-researches_nomodule'] = "Veuillez accéder au laboratoire pour activer cette fonction.";
@@ -1835,6 +1902,16 @@ SM.locale = function() {
 		SM.TEXT['preformat-planet_unknown'] = "zone(s) inconnue(s)";
 		SM.TEXT['preformat-projects_nomodule'] = "Veuillez accéder au Cœur de NERON pour activer cette fonction.";
 		SM.TEXT['preformat-projects_title'] = "Nouveaux projets :";
+		SM.TEXT['preformat-comms_nomodule'] = "Veuillez accéder au Centre de communications pour activer cette fonction.";
+		SM.TEXT['preformat-comms_title'] = "**//Avancement des communications : //**";
+		SM.TEXT['preformat-comms_signal'] = "**Qualité du signal :** ";
+		SM.TEXT['preformat-comms_Xyloph'] = "**Données Xyloph décodées :** ";
+		SM.TEXT['preformat-comms_Xylophnone'] = "aucune";
+		SM.TEXT['preformat-comms_bases'] = "**Décodage des bases rebelles :** ";
+		SM.TEXT['preformat-comms_basedecoded'] = "décodée";
+		SM.TEXT['preformat-comms_baselost'] = "signal perdu";
+		SM.TEXT['preformat-comms_basesnone'] = "aucune";
+		SM.TEXT['preformat-comms_neron'] = "**Version de NERON :** ";
 		SM.TEXT['minimap-button'] = "Afficher la minimap Small(Mush)";
 		SM.TEXT['minimap-title'] = "Minimap Small(Mush)";
 		SM.TEXT['minimap-warning'] = "<b>ATTENTION :</b> cette minimap n'est pas celle du jeu Flash ; elle ne sert que de repère avec quelques indications. Il se peut que certaines avaries signalées n'y apparaissent pas.";
@@ -1846,6 +1923,11 @@ SM.locale = function() {
 		SM.TEXT['tabtip-chattab'] = "<h1>Onglet Chat</h1>Cet onglet comprend le chat et les logs et l'éditeur de messages Small(Mush).";
 		SM.TEXT['tabtip-gametab'] = "<h1>Onglet Module/Flash</h1>Cet onglet contient le jeu Flash et les terminaux auxquels vous accédez, ainsi que la minimap Small(Mush).";
 		SM.TEXT['tabtip-shoptab'] = "<h1>Onglet Distributeur</h1>Cet onglet vous permet d'accéder au distributeur.";
+		SM.TEXT['buttontip-reload'] = "<h1>Rafraîchir</h1>Rafraîchit le jeu pour les actions courantes.";
+		SM.TEXT['buttontip-reloadall'] = "<h1>Rechargement complet</h1>Rafraîchit tout le cadre de jeu (plus lent). Utile lors d'un nouveau cycle ou d'une nouvelle étape d'exploration.";
+		SM.TEXT['buttontip-help'] = "<h1>Aide</h1>Affiche les infobulles (dont certaines récalcitrantes sur mobile) ainsi que de l'aide pour les éléments ajoutés par le script Small(Mush).";
+		
+		SM.loadingTexts = ["Photobirouillage des métaplores…", "Test chat / micro-ondes en cours…", "Recherche de signal TF1…", "Vidange des comptes en Suisse…", "Inscription au registre des rechargeurs de page…", "Recherche de Charlie…", "Enroulage du corps dans un tapis persan…", "Affichage d'un texte d'attente prétendument drôle…", "Transfert d'arrays de bool…", "Rechargement des blasters à la confiture…", "Salutations au monde…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du module des annonces vocodées…", "Localisation des drones…", "Schématisation des transistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Nettoyage plancher par microperforation…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Mise à jour module perso…", "Détartrage du matou…"];
 		
 		SM.localerooms = ['Pont', 'Baie Alpha', 'Baie Beta', 'Baie Alpha 2', 'Nexus', 'Infirmerie', 'Laboratoire', 'Réfectoire', 'Jardin Hydroponique', 'Salle des moteurs', 'Tourelle Alpha avant', 'Tourelle Alpha centre', 'Tourelle Alpha arrière', 'Tourelle Beta avant', 'Tourelle Beta centre', 'Tourelle Beta arrière', 'Patrouilleur Longane', 'Patrouilleur Jujube', 'Patrouilleur Tamarin', 'Patrouilleur Socrate', 'Patrouilleur Epicure', 'Patrouilleur Platon', 'Patrouilleur Wallis', 'Pasiphae', 'Couloir avant', 'Couloir central', 'Couloir arrière', 'Planète', 'Baie Icarus', 'Dortoir Alpha', 'Dortoir Beta', 'Stockage Avant', 'Stockage Alpha centre', 'Stockage Alpha arrière', 'Stockage Beta centre', 'Stockage Beta arrière', 'Espace infini', 'Les Limbes'];
 		break;
@@ -1876,7 +1958,7 @@ SM.locale = function() {
 		SM.TEXT['tabs_game'] = "Module";
 		SM.TEXT['tabs_shop'] = "Shop";
 		SM.TEXT['SM-added_tab'] = "<img src='" + SM.src + "ico.png' /> <b>Warning:</b> Small(Mush) tab <img src='" + SM.src + "ico.png' />";
-		SM.TEXT['SM-added_tab_text'] = "This tab is an addition of the Small(Mush) interface. If a bug happens here, it would definitely be a <em>script bug</em> and should be reported only to the author of this script.";
+		SM.TEXT['SM-added_tab_text'] = "This tab is an addition of the Small(Mush) script. If a bug happens here, it would definitely be a <em>script bug</em> and should be reported only to the author of this script.";
 		SM.TEXT['plasma-onmouseover'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Plasma shield</h1>The plasma shield is active.</div></div></div></div>";
 		SM.TEXT['cards-title'] = "Projects and researches:";
 		SM.TEXT['roomtab-focused'] = "You are currently Focused on a terminal, which means you cannot see what's in the room. The room will be displayed as soon as you exit your terminal. (If stuck with the Focused status, access then exit the vending machine to get rid of it.)";
@@ -1929,6 +2011,7 @@ SM.locale = function() {
 		SM.TEXT['premessages_researches++'] = "Share researches (advanced mode)";
 		SM.TEXT['premessages_projects'] = "Share projects";
 		SM.TEXT['premessages_planet'] = "Share a planet";
+		SM.TEXT['premessages_comms'] = "Communications progress:";
 		SM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
 		SM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
 		SM.TEXT['preformat-researches_nomodule'] = "Please access the laboratory in order to activate research preformatting.";
@@ -1956,6 +2039,16 @@ SM.locale = function() {
 		SM.TEXT['preformat-planet_unknown'] = "unknown zone(s)";
 		SM.TEXT['preformat-projects_nomodule'] = "Please access the NERON Core in order to activate research preformatting.";
 		SM.TEXT['preformat-projects_title'] = "New projects:";
+		SM.TEXT['preformat-comms_nomodule'] = "Please access the Communications center in order to activate communications preformatting.";
+		SM.TEXT['preformat-comms_title'] = "**//Communications progress: //**";
+		SM.TEXT['preformat-comms_signal'] = "**Signal quality:** ";
+		SM.TEXT['preformat-comms_Xyloph'] = "**Xyloph databases decoded:** ";
+		SM.TEXT['preformat-comms_Xylophnone'] = "none";
+		SM.TEXT['preformat-comms_bases'] = "**Rebel bases progress:** ";
+		SM.TEXT['preformat-comms_basedecoded'] = "decoded";
+		SM.TEXT['preformat-comms_baselost'] = "signal lost";
+		SM.TEXT['preformat-comms_basesnone'] = "none";
+		SM.TEXT['preformat-comms_neron'] = "**NERON version:** ";
 		SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 		SM.TEXT['minimap-title'] = "Small(Mush) minimap";
 		SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
@@ -1967,6 +2060,11 @@ SM.locale = function() {
 		SM.TEXT['tabtip-chattab'] = "<h1>Chat tab</h1>This tab is for the chat and logs and the Small(Mush) message editor.";
 		SM.TEXT['tabtip-gametab'] = "<h1>Game/Terminal tab</h1>This tab contains the Flash game and the terminals you access.";
 		SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
+		SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
+		SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
+		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
+		
+		SM.loadingTexts = ["Photoscamping the scransons…", "Cat / microwave experiment in progress…", "Scanning for BBC signal…", "Emptying Swiss bank accounts…", "Creating file in page reloaders register…", "Looking for Waldo…", "Hiding body in a persian rug…", "Displaying supposedly funny waiting text…", "Creating array D-bool…", "Reloading blasters with jam…", "Hello worlding…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements module…", "Locating drones…", "Mapping PILGRED transistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Microperforation floor cleaning…", "Saving Private Ryan…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Updating PDA…", "Scaling the kitty's teeth…"];
 		
 		SM.localerooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];
 		break;
@@ -1997,7 +2095,7 @@ SM.locale = function() {
 		SM.TEXT['tabs_game'] = "Module";
 		SM.TEXT['tabs_shop'] = "Shop";
 		SM.TEXT['SM-added_tab'] = "<img src='" + SM.src + "ico.png' /> <b>Warning:</b> Small(Mush) tab <img src='" + SM.src + "ico.png' />";
-		SM.TEXT['SM-added_tab_text'] = "This tab is an addition of the Small(Mush) interface. If a bug happens here, it would definitely be a <em>script bug</em> and should be reported only to the author of this script.";
+		SM.TEXT['SM-added_tab_text'] = "This tab is an addition of the Small(Mush) script. If a bug happens here, it would definitely be a <em>script bug</em> and should be reported only to the author of this script.";
 		SM.TEXT['plasma-onmouseover'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Plasma shield</h1>The plasma shield is active.</div></div></div></div>";
 		SM.TEXT['cards-title'] = "Projects and researches:";
 		SM.TEXT['roomtab-focused'] = "You are currently Focused on a terminal, which means you cannot see what's in the room. The room will be displayed as soon as you exit your terminal. (If stuck with the Focused status, access then exit the vending machine to get rid of it.)";
@@ -2050,6 +2148,7 @@ SM.locale = function() {
 		SM.TEXT['premessages_researches++'] = "Share researches (advanced mode)";
 		SM.TEXT['premessages_projects'] = "Share projects";
 		SM.TEXT['premessages_planet'] = "Share a planet";
+		SM.TEXT['premessages_comms'] = "Communications progress:";
 		SM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
 		SM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
 		SM.TEXT['preformat-researches_nomodule'] = "Please access the laboratory in order to activate research preformatting.";
@@ -2077,6 +2176,16 @@ SM.locale = function() {
 		SM.TEXT['preformat-planet_unknown'] = "unknown zone(s)";
 		SM.TEXT['preformat-projects_nomodule'] = "Please access the NERON Core in order to activate research preformatting.";
 		SM.TEXT['preformat-projects_title'] = "New projects:";
+		SM.TEXT['preformat-comms_nomodule'] = "Please access the Communications center in order to activate communications preformatting.";
+		SM.TEXT['preformat-comms_title'] = "**//Communications progress: //**";
+		SM.TEXT['preformat-comms_signal'] = "**Signal quality:** ";
+		SM.TEXT['preformat-comms_Xyloph'] = "**Xyloph databases decoded:** ";
+		SM.TEXT['preformat-comms_Xylophnone'] = "none";
+		SM.TEXT['preformat-comms_bases'] = "**Rebel bases progress:** ";
+		SM.TEXT['preformat-comms_basedecoded'] = "decoded";
+		SM.TEXT['preformat-comms_baselost'] = "signal lost";
+		SM.TEXT['preformat-comms_basesnone'] = "none";
+		SM.TEXT['preformat-comms_neron'] = "**NERON version:** ";
 		SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 		SM.TEXT['minimap-title'] = "Small(Mush) minimap";
 		SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
@@ -2088,6 +2197,11 @@ SM.locale = function() {
 		SM.TEXT['tabtip-chattab'] = "<h1>Chat tab</h1>This tab is for the chat and logs and the Small(Mush) message editor.";
 		SM.TEXT['tabtip-gametab'] = "<h1>Game/Terminal tab</h1>This tab contains the Flash game and the terminals you access.";
 		SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
+		SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
+		SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
+		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
+		
+		SM.loadingTexts = ["Photoscamping the scransons…", "Cat / microwave experiment in progress…", "Scanning for BBC signal…", "Emptying Swiss bank accounts…", "Creating file in page reloaders register…", "Looking for Waldo…", "Hiding body in a persian rug…", "Displaying supposedly funny waiting text…", "Creating array D-bool…", "Reloading blasters with jam…", "Hello worlding…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements module…", "Locating drones…", "Mapping PILGRED transistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Microperforation floor cleaning…", "Saving Private Ryan…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Updating PDA…", "Scaling the kitty's teeth…"];
 		
 		SM.localerooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];
 		break;
@@ -2101,6 +2215,9 @@ SM.locale = function() {
 /* FONCTION D'INITIALISATION */
 
 SM.init = function() {
+	var getsrc = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' }));";
+	SM.addNewEl('script', document.head, null, getsrc); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible
+
 	if (SM.sel('#SMbar') == null)
 	{
 		SM.initCss();
@@ -2133,53 +2250,54 @@ SM.init = function() {
 	window.setInterval(function() {
 		if (!SM.sel('#SMenergybar'))
 			{ SM.reInit(); }
-	}, 250);
+	}, 500);
 };
 
 
-exportFunction(SM.sel, unsafeSM, {defineAs:"sel"});
-exportFunction(SM.getAttributesList, unsafeSM, {defineAs:"getAttributesList"});
-exportFunction(SM.addNewEl, unsafeSM, {defineAs:"addNewEl"});
-exportFunction(SM.addButton, unsafeSM, {defineAs:"addButton"});
-exportFunction(SM.moveEl, unsafeSM, {defineAs:"moveEl"});
-exportFunction(SM.copyEl, unsafeSM, {defineAs:"copyEl"});
-exportFunction(SM.getTipContent, unsafeSM, {defineAs:"getTipContent"});
-exportFunction(SM.toArray, unsafeSM, {defineAs:"toArray"});
-exportFunction(SM.generateMinimap, unsafeSM, {defineAs:"generateMinimap"});
-exportFunction(SM.changeTab, unsafeSM, {defineAs:"changeTab"});
-exportFunction(SM.SMhelp, unsafeSM, {defineAs:"SMhelp"});
-exportFunction(SM.toggleAlertList, unsafeSM, {defineAs:"toggleAlertList"});
-exportFunction(SM.changeRoom, unsafeSM, {defineAs:"changeRoom"});
-exportFunction(SM.displayRoomActions, unsafeSM, {defineAs:"displayRoomActions"});
-exportFunction(SM.updateRoomActions, unsafeSM, {defineAs:"updateRoomActions"});
-exportFunction(SM.changeChatTab, unsafeSM, {defineAs:"changeChatTab"});
-exportFunction(SM.SMexitModule, unsafeSM, {defineAs:"SMexitModule"});
-exportFunction(SM.changeActionFunctions, unsafeSM, {defineAs:"changeActionFunctions"});
-exportFunction(SM.beforeAction, unsafeSM, {defineAs:"beforeAction"});
-exportFunction(SM.reInit, unsafeSM, {defineAs:"reInit"});
-exportFunction(SM.showLicense, unsafeSM, {defineAs:"showLicense"});
-exportFunction(SM.selectItem, unsafeSM, {defineAs:"selectItem"});
-exportFunction(SM.itemLeft, unsafeSM, {defineAs:"itemLeft"});
-exportFunction(SM.itemRight, unsafeSM, {defineAs:"itemRight"});
-exportFunction(SM.getSMParameters, unsafeSM, {defineAs:"getSMParameters"});
-exportFunction(SM.setSMParameters, unsafeSM, {defineAs:"setSMParameters"});
-exportFunction(SM.buildParamsMenu, unsafeSM, {defineAs:"buildParamsMenu"});
-exportFunction(SM.initCss, unsafeSM, {defineAs:"initCss"});
-exportFunction(SM.initMenubar, unsafeSM, {defineAs:"initMenubar"});
-exportFunction(SM.initTabs, unsafeSM, {defineAs:"initTabs"});
-exportFunction(SM.charTab, unsafeSM, {defineAs:"charTab"});
-exportFunction(SM.shipTab, unsafeSM, {defineAs:"shipTab"});
-exportFunction(SM.roomTab, unsafeSM, {defineAs:"roomTab"});
-exportFunction(SM.chatTab, unsafeSM, {defineAs:"chatTab"});
-exportFunction(SM.gameTab, unsafeSM, {defineAs:"gameTab"});
-exportFunction(SM.messageEditor, unsafeSM, {defineAs:"messageEditor"});
-exportFunction(SM.refreshPreview, unsafeSM, {defineAs:"refreshPreview"});
-exportFunction(SM.savePreview, unsafeSM, {defineAs:"savePreview"});
-exportFunction(SM.retrievePreview, unsafeSM, {defineAs:"retrievePreview"});
-exportFunction(SM.buildMessage, unsafeSM, {defineAs:"buildMessage"});
-exportFunction(SM.preformatPlanet, unsafeSM, {defineAs:"preformatPlanet"});
-exportFunction(SM.locale, unsafeSM, {defineAs:"locale"});
-exportFunction(SM.init, unsafeSM, {defineAs:"init"});
+exportFunction(SM.sel, unsafeSM, {defineAs: "sel"});
+exportFunction(SM.getAttributesList, unsafeSM, {defineAs: "getAttributesList"});
+exportFunction(SM.addNewEl, unsafeSM, {defineAs: "addNewEl"});
+exportFunction(SM.addButton, unsafeSM, {defineAs: "addButton"});
+exportFunction(SM.moveEl, unsafeSM, {defineAs: "moveEl"});
+exportFunction(SM.copyEl, unsafeSM, {defineAs: "copyEl"});
+exportFunction(SM.getTipContent, unsafeSM, {defineAs: "getTipContent"});
+exportFunction(SM.toArray, unsafeSM, {defineAs: "toArray"});
+exportFunction(SM.generateMinimap, unsafeSM, {defineAs: "generateMinimap"});
+exportFunction(SM.changeTab, unsafeSM, {defineAs: "changeTab"});
+exportFunction(SM.SMhelp, unsafeSM, {defineAs: "SMhelp"});
+exportFunction(SM.toggleAlertList, unsafeSM, {defineAs: "toggleAlertList"});
+exportFunction(SM.changeRoom, unsafeSM, {defineAs: "changeRoom"});
+exportFunction(SM.displayRoomActions, unsafeSM, {defineAs: "displayRoomActions"});
+exportFunction(SM.updateRoomActions, unsafeSM, {defineAs: "updateRoomActions"});
+exportFunction(SM.changeChatTab, unsafeSM, {defineAs: "changeChatTab"});
+exportFunction(SM.SMexitModule, unsafeSM, {defineAs: "SMexitModule"});
+exportFunction(SM.changeActionFunctions, unsafeSM, {defineAs: "changeActionFunctions"});
+exportFunction(SM.beforeAction, unsafeSM, {defineAs: "beforeAction"});
+exportFunction(SM.loadingScreen, unsafeSM, {defineAs: "loadingScreen"});
+exportFunction(SM.reInit, unsafeSM, {defineAs: "reInit"});
+exportFunction(SM.showLicense, unsafeSM, {defineAs: "showLicense"});
+exportFunction(SM.selectItem, unsafeSM, {defineAs: "selectItem"});
+exportFunction(SM.itemLeft, unsafeSM, {defineAs: "itemLeft"});
+exportFunction(SM.itemRight, unsafeSM, {defineAs: "itemRight"});
+exportFunction(SM.getSMParameters, unsafeSM, {defineAs: "getSMParameters"});
+exportFunction(SM.setSMParameters, unsafeSM, {defineAs: "setSMParameters"});
+exportFunction(SM.buildParamsMenu, unsafeSM, {defineAs: "buildParamsMenu"});
+exportFunction(SM.initCss, unsafeSM, {defineAs: "initCss"});
+exportFunction(SM.initMenubar, unsafeSM, {defineAs: "initMenubar"});
+exportFunction(SM.initTabs, unsafeSM, {defineAs: "initTabs"});
+exportFunction(SM.charTab, unsafeSM, {defineAs: "charTab"});
+exportFunction(SM.shipTab, unsafeSM, {defineAs: "shipTab"});
+exportFunction(SM.roomTab, unsafeSM, {defineAs: "roomTab"});
+exportFunction(SM.chatTab, unsafeSM, {defineAs: "chatTab"});
+exportFunction(SM.gameTab, unsafeSM, {defineAs: "gameTab"});
+exportFunction(SM.messageEditor, unsafeSM, {defineAs: "messageEditor"});
+exportFunction(SM.refreshPreview, unsafeSM, {defineAs: "refreshPreview"});
+exportFunction(SM.savePreview, unsafeSM, {defineAs: "savePreview"});
+exportFunction(SM.retrievePreview, unsafeSM, {defineAs: "retrievePreview"});
+exportFunction(SM.buildMessage, unsafeSM, {defineAs: "buildMessage"});
+exportFunction(SM.preformatPlanet, unsafeSM, {defineAs: "preformatPlanet"});
+exportFunction(SM.locale, unsafeSM, {defineAs: "locale"});
+exportFunction(SM.init, unsafeSM, {defineAs: "init"});
 
 
 
@@ -2198,7 +2316,6 @@ SM.ME_ALONE = true;
 SM.ME_MODULING = false;
 SM.GUARDIAN = false;
 SM.GRAVITY = true;
-SM.curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
 
 
 

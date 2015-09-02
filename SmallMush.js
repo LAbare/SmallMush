@@ -195,6 +195,8 @@ SM.changeTab = function(newtab) {
 		SM.sel('#' + newtab).style.display = 'block';
 	}
 	char.parentNode.setAttribute('data-visible-tab', newtab);
+	SM.sel('.SMtabselected').className = '';
+	SM.sel('#SMtab-' + newtab).className = 'SMtabselected';
 };
 
 
@@ -256,7 +258,7 @@ SM.changeRoom = function(el) {
 			{ energy = true; }
 		//Monture non fonctionnelle aux cycles impairs
 		var boulder = false;
-		if (SM.sel('#myInventory [style*="rolling_boulder.jpg"]') && !(parseInt(SM.sel('.cycletime').textContent.match(/([0-9]+)/g)[1]) % 2))
+		if (SM.sel('#myInventory [style*="rolling_boulder.jpg"]') && parseInt(SM.sel('#input').getAttribute('curcycle')) % 2 == 1) //0 = J1C1
 			{ boulder = true; }
 		var disabled = SM.sel('.statuses [src$="disabled.png"]');
 		/* Soit :
@@ -284,9 +286,9 @@ SM.changeRoom = function(el) {
 			el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + SM.TEXT['move_button'];
 			if (SM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
 			{
-				SM.sel('#SMloadscreen').style.display = 'block';
+				SM.loadingScreen();
 				SM.SMexitModule(function() {
-					SM.sel('#SMloadscreen').style.display = 'block';
+					SM.loadingScreen();
 					Main.ajax('/?fa=81&fp=' + select.value, null, function() {
 						SM.changeTab('room_tab');
 						SM.sel('#SMloadscreen').style.display = 'none';
@@ -460,8 +462,14 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 			break;
 
 		case 3: //Chat
-			var action = document.querySelector('.cdActionRepository [webdata="' + serial + '"]'); //Une seule action, Prendre
-			SM.copyEl(action, actionListA);
+			var actions = SM.toArray(document.querySelectorAll('.cdActionRepository [webdata="' + serial + '"]'));
+			for (j = 0; j < actions.length; j++)
+			{
+				if (j % 2)
+					{ SM.copyEl(actions[j], actionListB); }
+				else
+					{ SM.copyEl(actions[j], actionListA); }
+			}
 
 			SM.sel('#SMtt_itemname').textContent = 'Schrödinger';
 			break;
@@ -505,8 +513,15 @@ SM.changeChatTab = function(el) {
 
 
 SM.SMexitModule = function(func) {
-	SM.sel('#SMloadscreen').style.display = 'block';
-	SM.sel(".cdExitModuleButton").innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />" + SM.sel(".cdExitModuleButton").innerHTML;
+	var button = SM.sel(".cdExitModuleButton");
+	//Confirmation d'action
+	if (SM.parameters['confirm-action'])
+	{
+		if (!confirm(SM.TEXT['confirm_action'] + button.textContent.trim() + "' ?"))
+			{ return false; }
+	}
+	SM.loadingScreen();
+	button.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' />" + button.innerHTML;
 	SM.sel("#input").setAttribute('isModule', 'false');
 	Main.firstLabDone = false;
 	Main.labPage = null;
@@ -518,15 +533,15 @@ SM.SMexitModule = function(func) {
 	Main.ajax("/clearSessionMods", null, updtFunc);
 	SM.changeTab('room_tab');
 	SM.sel('#cdModuleContent').style.display = 'none';
-	SM.sel('.cdExitModuleButton').style.display = 'none';
+	button.style.display = 'none';
 	SM.sel('#cdMainContent').style.display = 'block';
 };
 
 
 SM.changeActionFunctions = function() {
 	//Boutons Nouveau cycle et Nouvelle étape
-	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'Main.ajax("/", null, function() { SM.reInit(); Main.onLoad(1); Main.enableClock = true; }); return false;');
-	SM.sel('#txt_new_step a').setAttribute('onclick', 'Main.ajax("/", null, function() { SM.reInit(); Main.onLoad(1); Main.enableClock = true; }); return false;');
+	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'Main.ajax("/", ["maincontainer"], function() { SM.initTabs(); SM.reInit(); }); return false;');
+	SM.sel('#txt_new_step a').setAttribute('onclick', 'Main.ajax("/", ["maincontainer"], function() { SM.initTabs(); SM.reInit(); }); return false;');
 	//Boutons d'action
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
 	for (i = 0; i < actions.length; i++)
@@ -550,26 +565,29 @@ SM.beforeAction = function(el) {
 	//Confirmation d'action
 	if (SM.parameters['confirm-action'])
 	{
-		if (!confirm(SM.TEXT['confirm_action'] + el.innerHTML.trim().replace(/ ?<img(?:.*)\/?>/g, SM.TEXT['ap']).replace(/<\/?span>/g, '').replace(/\s+/g, ' ') + "' ?"))
+		var name = el.innerHTML.trim().replace(/ ?<img(?:.*)\/?>/g, SM.TEXT['ap']).replace(/<\/?span>/g, '').replace(/\s+/g, ' ').replace(/&nbsp;/g, ' ');
+		if (!confirm(SM.TEXT['confirm_action'] + name + "' ?"))
 			{ return false; }
 	}
+	SM.loadingScreen();
 
 	//Changement d'onglet Small(Mush)
 	var action = Main.extractAction(el.getAttribute('href'));
-	//Accéder à un terminal ou au Bloc de post-it, Envoyer une mission
-	if (['ACCESS', 'COMMANDER_ORDER'].indexOf(action) != -1)
-	{
-		SM.changeTab('room_col');
-		SM.sel('#SMloadscreen').style.display = 'block';
-	}
+	//Accéder à un terminal ou au Bloc de post-it, Envoyer une mission, Annonce générale
+	if (['ACCESS', 'COMMANDER_ORDER', 'DAILY_ORDER'].indexOf(action) != -1)
+		{ SM.changeTab('room_col'); }
 	//Examiner, Lire, Vérifier son niveau pré-fongique, Lister l'équipage, Lire le niveau de fuel dans la Chambre de combustion
 	else if (['INSPECT', 'CONSULT_DOC', 'CHECK_FOR_INFECTION', 'CHECK_CREW_LIST', 'CHECK_LEVEL'].indexOf(action) != -1)
-	{
-		SM.changeTab('chat_col');
-		SM.sel('#SMloadscreen').style.display = 'block';
-	}
+		{ SM.changeTab('chat_col'); }
 
 	return true;
+};
+
+
+SM.loadingScreen = function() {
+	var screen = SM.sel('#SMloadscreen');
+	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br />' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
+	screen.style.display = 'block';
 };
 
 
@@ -593,36 +611,6 @@ SM.reInit = function() {
 	SM.changeActionFunctions();
 	SM.sel("#SMbar .cycletime").textContent = SM.sel("#chat_col .cycletime").textContent;
 	SM.sel('#SMloadscreen').style.display = 'none';
-
-	//Mise à jour Jour - Cycle
-	var curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
-	if (curcycle != SM.curcycle)
-	{
-		SM.curcycle = curcycle;
-		curcycle += 1; //Commence à 0, +1 pour les calculs
-		if (curcycle % 8 == 0)
-		{
-			var j = curcycle / 8; //Jours complets, nouveau C1
-			var c = 1;
-		}
-		else
-		{
-			var j = Math.floor(curcycle / 8) + 1; //Jours complets + jour commencé
-			var c = curcycle % 8;
-		}
-		switch (document.domain)
-		{
-			case 'mush.twinoid.es':
-				var t = "Día " + j + " - Ciclo " + c;
-				break;
-			case 'mush.vg':
-				var t = "Jour " + j + " - Cycle " + c;
-				break;
-			default:
-				var t = "Day " + j + " - Cycle " + c;
-		}
-		SM.sel('.cycletime').textContent = t;
-	}	
 };
 
 
@@ -819,14 +807,26 @@ SM.initMenubar = function() {
 
 	// BARRE SMALL(MUSH) //
 	//Rechargement interne de la page
-	SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />").addEventListener('click', function() {
-		SM.sel('#SMloadscreen').style.display = 'block';
+	var butreload = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />");
+	butreload.addEventListener('click', function() {
+		SM.loadingScreen();
 		Main.ajax('/', null, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
+	butreload.setAttribute('data-SMtip', SM.TEXT['buttontip-reload']);
+
+	var butreloadall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />");
+	butreloadall.addEventListener('click', function() {
+		SM.loadingScreen();
+		Main.ajax('/', ['maincontainer'], function() { SM.initTabs(); SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
+	});
+	butreloadall.setAttribute('data-SMtip', SM.TEXT['buttontip-reloadall']);
+
 	SM.addNewEl('div', document.body, 'SMloadscreen', "<img src='/img/icons/ui/loading1.gif' />").addEventListener('click', function() { this.style.display = 'none'; });
 
 	//Aide
-	SM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?").addEventListener('click', function() { SM.sel('#SMhelpscreenA').style.display = 'block'; });
+	var buthelp = SM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?");
+	buthelp.addEventListener('click', function() { SM.sel('#SMhelpscreenA').style.display = 'block'; });
+	buthelp.setAttribute('data-SMtip', SM.TEXT['buttontip-help']);
 	//Premier écran noir : sélectionner l'élément ; second écran noir : cacher l'infobulle (sinon elle reste)
 	SM.addNewEl('div', document.body, 'SMhelpscreenA', SM.TEXT['help_screen_A']).addEventListener('click', function(e) { this.style.display = 'none'; SM.SMhelp(e); });
 	SM.addNewEl('div', document.body, 'SMhelpscreenB', SM.TEXT['help_screen_B']).addEventListener('click', function(e) { this.style.display = 'none'; Main.hideTip(); });
@@ -848,19 +848,20 @@ SM.initMenubar = function() {
 
 	//Onglets Small(Mush)
 	var menu = SM.addNewEl('ul', SM.sel('.mxhead'), 'SMtabs');
-	var chartab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char']);
+	var chartab = SM.addNewEl('li', menu, 'SMtab-char_col', "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char']);
 	chartab.addEventListener('click', function() { SM.changeTab('char_col'); });
 	chartab.setAttribute('data-SMtip', SM.TEXT['tabtip-chartab']);
-	var shiptab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship']);
+	chartab.className = 'SMtabselected';
+	var shiptab = SM.addNewEl('li', menu, 'SMtab-ship_tab', "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship']);
 	shiptab.addEventListener('click', function() { SM.changeTab('ship_tab'); });
 	shiptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shiptab']);
-	var roomtab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room']);
+	var roomtab = SM.addNewEl('li', menu, 'SMtab-room_tab', "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room']);
 	roomtab.addEventListener('click', function() { SM.changeTab('room_tab'); });
 	roomtab.setAttribute('data-SMtip', SM.TEXT['tabtip-roomtab']);
-	var chattab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat']);
+	var chattab = SM.addNewEl('li', menu, 'SMtab-chat_col', "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat']);
 	chattab.addEventListener('click', function() { SM.changeTab('chat_col'); });
 	chattab.setAttribute('data-SMtip', SM.TEXT['tabtip-chattab']);
-	var gametab = SM.addNewEl('li', menu, null, "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game']);
+	var gametab = SM.addNewEl('li', menu, 'SMtab-room_col', "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game']);
 	gametab.addEventListener('click', function() { SM.changeTab('room_col'); });
 	gametab.setAttribute('data-SMtip', SM.TEXT['tabtip-gametab']);
 	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'])
@@ -920,8 +921,8 @@ SM.charTab = function() {
 	//Bloc comprenant le portrait en fond (.avatar), le nom et les titres (.SMwho) en haut à gauche, le triomphe (triumphLi) en haut à droite, le niveau (.level) en bas à droite et le message de promo (.gogold) en bas, afin de pouvoir placer tous ces éléments en position:absolute
 	var characterdiv = SM.moveEl(SM.addNewEl('div', null, 'SMcharacterdiv'), sheetmain, sheetmain.firstChild);
 	SM.addNewEl('div', characterdiv, '', SM.sel('.who').parentNode.innerHTML).className = 'SMwho';
-	var triumphLi = SM.sel('[src$="triumph.png"]').parentNode;
-	SM.moveEl(SM.addNewEl('div', null, 'triumph', triumphLi.innerHTML.trim(), SM.getAttributesList(triumphLi)), characterdiv);
+	var triumphLi = SM.sel('.spaceshipstatus [src$="triumph.png"]').parentNode;
+	SM.moveEl(SM.addNewEl('div', null, 'SMtriumph', triumphLi.innerHTML.trim(), SM.getAttributesList(triumphLi)), characterdiv);
 	SM.copyEl(SM.sel('.level'), characterdiv);
 	SM.moveEl(SM.sel('.avatar'), characterdiv).className = 'avatar SM' + SM.sel('.who').textContent.trim().replace(" ", "_").toLowerCase();
 	if (SM.sel('.gogold')) //Message « Achetez du mode Or »
@@ -1221,13 +1222,16 @@ SM.roomTab = function() {
 	}
 
 	// INVENTAIRE (COPIÉ) //
-	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() { SM.sel('.exceed').style.display = 'block'; });
+	SM.addButton(room_tab, SM.TEXT['show_inventory']).addEventListener('click', function() {
+		SM.sel('#SMcdInventory .invcolorbg').style.display = 'block'; //Parfois caché par le jeu Flash
+		SM.sel('#SMcdInventory .exceed').style.display = 'block';
+	});
 	var invblock = SM.copyEl(SM.sel('#cdInventory'), room_tab);
 	invblock.style.visibility = 'visible';
-	SM.sel('.invcolorbg').style.display = 'block';
+	SM.sel('#SMcdInventory .invcolorbg').style.display = 'block';
 	SM.sel('#SMroomActionList1').style.opacity = 1;
 	SM.sel('#SMroomActionList2').style.opacity = 1;
-	SM.sel('.exceed').style.display = 'none';
+	SM.sel('#SMcdInventory .exceed').style.display = 'none';
 
 	//Changement des fonctions Main par les fonctions SM
 	SM.sel('#SMtt_itemname').previousElementSibling.setAttribute('onclick', 'SM.itemLeft();');
@@ -1338,9 +1342,7 @@ SM.messageEditor = function() {
 	editor.style.display = 'none';
 
 	//On récupère le formulaire de post de message sur le Nexus de Twinoid pour avoir la prévisualisation Twinoid et les smileys
-	var getsrc = "SM.sel('#SMeditor').setAttribute('data-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' }));";
-	SM.addNewEl('script', document.head, null, getsrc); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible
-	var src = SM.sel('#SMeditor').getAttribute('data-src');
+	var src = document.body.getAttribute('data-SM-src');
 	SM.addNewEl('div', editor, 'tabreply_content');
 	SM.addNewEl('script', document.body, null, null, [['src', src], ['async', 'true']]).onload = function() {
 		var form = SM.sel('[action="/mod/wall/post?submit=1"]');
@@ -1397,7 +1399,7 @@ SM.messageEditor = function() {
 		SM.addNewEl('p', form, null, SM.TEXT['premessages_title'], [['style', 'color: black; margin-top: 20px;']]);
 		var premessages = SM.addNewEl('select', form, 'SMpremessages');
 		premessages.addEventListener('change', function() { SM.buildMessage(); });
-		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet'];
+		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms'];
 		for (i = 0; i < options.length; i++)
 			{ SM.addNewEl('option', premessages, null, SM.TEXT['premessages_' + options[i]], [['value', options[i]]]); }
 
@@ -1493,6 +1495,8 @@ SM.buildMessage = function() {
 					{ break; }
 				if (/hidden\.png/.test(item.getAttribute('data-name'))) //On ne liste pas les objets cachés
 					{ continue; }
+				if (/(tracker|talky_walky|super_talky)\.jpg/.test(item.innerHTML))
+					{ continue; }
 				var n = (
 					(item.getAttribute('data-id') == 'BOOK')
 					? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour avoir la compétence en cas d'apprenton
@@ -1532,7 +1536,7 @@ SM.buildMessage = function() {
 			if (!SM.sel('#research_module'))
 				{ alert(SM.TEXT['preformat-researches_nomodule']); break; }
 
-			message += "**//" + SM.TEXT['preformat-researches_title'] + " //**\n\n\n\n";
+			message += ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (i = 0; i < cards.length; i++)
 			{
@@ -1574,7 +1578,7 @@ SM.buildMessage = function() {
 
 			//Création du message
 			SM.addButton(popup, SM.TEXT['preformat-researches++_submit']).addEventListener('click', function() {
-				var message = "**//" + SM.TEXT['preformat-researches_title'] + " //**\n\n\n\n";
+				var message = ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
 				var researches = document.getElementsByClassName('SMresearch');
 				for (i = 0; i < researches.length; i++)
 				{
@@ -1600,7 +1604,7 @@ SM.buildMessage = function() {
 			if (!/img\/cards\/projects/.test(SM.sel('#cdModuleContent').innerHTML)) //Pas d'ID spécifique au Cœur de NERON :-/
 				{ alert(SM.TEXT['preformat-projects_nomodule']); break; }
 
-			message += "**//" + SM.TEXT['preformat-projects_title'] + " //**\n\n\n\n";
+			message += ":pa_core: **//" + SM.TEXT['preformat-projects_title'] + " //**:pa_core:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (i = 0; i < cards.length; i++)
 			{
@@ -1632,22 +1636,84 @@ SM.buildMessage = function() {
 					popup.style.display = 'block';
 					SM.addNewEl('h3', popup, null, SM.TEXT['preformat-planet_title']);
 					SM.addButton(popup, planets[0].firstElementChild.textContent).addEventListener('click', function() {
-						SM.sel('#tid_wallPost').value = SM.preformatPlanet(planets[0]);
+						message += SM.preformatPlanet(planets[0]);
+						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
 					}); //Première planète
 					SM.addButton(popup, planets[1].firstElementChild.textContent).addEventListener('click', function() {
-						SM.sel('#tid_wallPost').value = SM.preformatPlanet(planets[1]);
+						message += SM.preformatPlanet(planets[1]);
+						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
 					}); //Seconde planète
 					SM.addButton(popup, SM.TEXT['preformat-planet_both']).addEventListener('click', function() {
-						SM.sel('#tid_wallPost').value = SM.preformatPlanet(planets[0]) + "\n\n\n\n" + SM.preformatPlanet(planets[1]);
+						message += SM.preformatPlanet(planets[0]) + "\n\n\n\n" + SM.preformatPlanet(planets[1]);
+						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
 					}); //Les deux planètes
 					break;
 			}
+			break;
+
+		case 'comms':
+			if (!SM.sel('#trackerModule'))
+				{ alert(SM.TEXT['preformat-comms_nomodule']); break; }
+
+			message += ":com: " + SM.TEXT['preformat-comms_title'] + ":com:\n\n\n\n";
+
+			//Qualité du signal
+			message += SM.TEXT['preformat-comms_signal'] + SM.sel('#trackerModule .sensors p:first-of-type em').textContent.match(/[0-9]+\s*%/)[0] + "\n";
+
+			//Xyloph
+			message += SM.TEXT['preformat-comms_Xyloph'];
+			var dbs = SM.toArray(document.querySelectorAll('#trackerModule .perfor li:not(.undone)'));
+			if (dbs.length)
+			{
+				message += "\n";
+				for (i in dbs)
+					{ message += "- " + SM.getTipContent(dbs[i].onmouseover).match(/<h1>(.*)<\/h1>/)[1] + "\n"; }
+			}
+			else
+				{ message += SM.TEXT['preformat-comms_Xylophnone'] + "\n"; }
+
+			//Bases rebelles
+			message += SM.TEXT['preformat-comms_bases'];
+			var bases = SM.toArray(document.querySelectorAll('#trackerModule .bases [data-id]')).reverse();
+			var anysignal = false;
+			for (i in bases)
+			{
+				var id = bases[i].getAttribute('data-id');
+				var span = SM.sel('#trackerModule [data-id="' + id + '"] span');
+				var decoded = ((SM.sel('#trackerModule [data-id="' + id + '"] h3').textContent.trim() != "???") ? true : false);
+				if (!span && !decoded)
+					{ continue; } //Signal pas encore envoyé
+				if (!anysignal)
+				{
+					message += "\n";
+					anysignal = true;
+				}
+
+				message += "- //" + id.toLowerCase().replace(/_/, ' ').replace( /\b\w/g, function (l) { return l.toUpperCase(); }) + " : //"; //Nom de la base
+				if (decoded) //Décodée
+					{ message += SM.TEXT['preformat-comms_basedecoded'] + "\n"; }
+				else
+				{
+					if (span.className == 'percent') //En décodage
+						{ message += span.textContent.trim() + "\n"; }
+					else //Perdue
+						{ message += SM.TEXT['preformat-comms_baselost'] + "\n"; }
+				}
+			}
+			if (!anysignal) //Aucun signal pour le moment
+				{ message += SM.TEXT['preformat-comms_basesnone'] + "\n"; }
+
+			//MAJ NERON
+			message += SM.TEXT['preformat-comms_neron'] + SM.sel('#trackerModule .neron h2').textContent.match(/[0-9]+\.[0-9]+/)[0] + "\n\n\n\n//Over.//";
+
+			wallpost.value = message;
+			SM.refreshPreview();
 			break;
 	}
 
@@ -1661,7 +1727,7 @@ SM.preformatPlanet = function(planet) {
 	var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 	var zones = planet.lastElementChild.firstElementChild.innerHTML.match(/<h1>(.*)<\/h1>/g);
 
-	var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
+	var message = ":mush_planet_scanned_1: **" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
 	var unknown = 0;
 	for (i = 0; i < zones.length; i++)
 	{
@@ -1718,6 +1784,9 @@ SM.locale = function() {
 /* FONCTION D'INITIALISATION */
 
 SM.init = function() {
+	var getsrc = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' }));";
+	SM.addNewEl('script', document.head, null, getsrc); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible
+
 	if (SM.sel('#SMbar') == null)
 	{
 		SM.initCss();
@@ -1750,7 +1819,7 @@ SM.init = function() {
 	window.setInterval(function() {
 		if (!SM.sel('#SMenergybar'))
 			{ SM.reInit(); }
-	}, 250);
+	}, 500);
 };
 
 
@@ -1771,7 +1840,6 @@ SM.ME_ALONE = true;
 SM.ME_MODULING = false;
 SM.GUARDIAN = false;
 SM.GRAVITY = true;
-SM.curcycle = parseInt(SM.sel('#input').getAttribute('curcycle'));
 
 
 

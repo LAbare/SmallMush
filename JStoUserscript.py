@@ -54,7 +54,7 @@ for line in source:
 
 	elif 'PYTHON USERSCRIPT' in line:
 		for function in functions:
-			dest.write('exportFunction(SM.' + function + ', unsafeSM, {defineAs:"' + function + '"});\n')
+			dest.write('exportFunction(SM.' + function + ', unsafeSM, {defineAs: "' + function + '"});\n')
 		dest.write('\n\n')
 
 	else:
