@@ -109,6 +109,7 @@ SM.TEXT['preformat-comms_title'] = "**//Communications progress: //**";
 SM.TEXT['preformat-comms_signal'] = "**Signal quality:** ";
 SM.TEXT['preformat-comms_Xyloph'] = "**Xyloph databases decoded:** ";
 SM.TEXT['preformat-comms_Xylophnone'] = "none";
+SM.TEXT['preformat-comms_Xylophdesc'] = "Do you want to share Xyloph databases descriptions along with their names?";
 SM.TEXT['preformat-comms_bases'] = "**Rebel bases progress:** ";
 SM.TEXT['preformat-comms_basedecoded'] = "decoded";
 SM.TEXT['preformat-comms_baselost'] = "signal lost";

@@ -221,7 +221,7 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 	height: 1000px;
 	padding-right: 130px;
 	padding-top: 2px;
-	opacity: 0.8;
+	opacity: 0.6;
 	background-color: #000;
 	text-align: right;
 	font-size: 0.8em;
@@ -230,6 +230,7 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 
 #SMloadscreen {
 	padding: 0;
+	opacity: 0.8;
 	text-align: center;
 }
 
@@ -506,7 +507,7 @@ p.SMfire {
 	margin: 0;
 }
 
-#SMcharacterdiv .gogold {
+#SMcharacterdiv .gogold { /*Pub mode Or */
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -514,6 +515,8 @@ p.SMfire {
 	width: 100%;
 	margin: 0;
 }
+
+.gogold a { display: block; }
 
 /* Fenêtre d'up de niveau en cours de jeu */
 .cdLevelDialog {

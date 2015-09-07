@@ -540,8 +540,8 @@ SM.SMexitModule = function(func) {
 
 SM.changeActionFunctions = function() {
 	//Boutons Nouveau cycle et Nouvelle étape
-	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'Main.ajax("/", ["maincontainer"], function() { SM.initTabs(); SM.reInit(); }); return false;');
-	SM.sel('#txt_new_step a').setAttribute('onclick', 'Main.ajax("/", ["maincontainer"], function() { SM.initTabs(); SM.reInit(); }); return false;');
+	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
+	SM.sel('#txt_new_step a').setAttribute('onclick', 'Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
 	//Boutons d'action
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
 	for (i = 0; i < actions.length; i++)
@@ -573,8 +573,8 @@ SM.beforeAction = function(el) {
 
 	//Changement d'onglet Small(Mush)
 	var action = Main.extractAction(el.getAttribute('href'));
-	//Accéder à un terminal ou au Bloc de post-it, Envoyer une mission, Annonce générale
-	if (['ACCESS', 'COMMANDER_ORDER', 'DAILY_ORDER'].indexOf(action) != -1)
+	//Accéder à un terminal ou au Bloc de post-it, Radio du Daedalus, Envoyer une mission, Annonce générale
+	if (['ACCESS', 'ACCESS_SECONDARY', 'COMMANDER_ORDER', 'DAILY_ORDER'].indexOf(action) != -1)
 		{ SM.changeTab('room_col'); }
 	//Examiner, Lire, Vérifier son niveau pré-fongique, Lister l'équipage, Lire le niveau de fuel dans la Chambre de combustion
 	else if (['INSPECT', 'CONSULT_DOC', 'CHECK_FOR_INFECTION', 'CHECK_CREW_LIST', 'CHECK_LEVEL'].indexOf(action) != -1)
@@ -600,6 +600,8 @@ SM.reInit = function() {
 
 	Main.onLoad(1);
 	Main.enableClock = true;
+	if (!SM.sel('#ship_tab'))
+		{ SM.initTabs(); }
 	SM.sel('#ship_tab').innerHTML = '';
 	SM.sel('#room_tab').innerHTML = '';
 	SM.charTab();
@@ -692,7 +694,7 @@ SM.getSMParameters = function() {
 	SM.parameters['confirm-action'] = true;
 	SM.parameters['food-desc'] = true;
 	SM.parameters['forced-locale'] = false;
-	SM.parameters['locale'] = '0'; //0: non forcé ; 1: français ; 2: anglais
+	SM.parameters['locale'] = '0'; //0: non forcé ; 1: français ; 2: anglais ; 3: espagnol
 
 	var offset = document.cookie.search('SMparams');
 	if (offset != -1)
@@ -701,11 +703,15 @@ SM.getSMParameters = function() {
 		SM.parameters['first-time'] = ((parameters[0] == '1') ? true : false);
 		SM.parameters['confirm-action'] = ((parameters[1] == '1') ? true : false);
 		SM.parameters['food-desc'] = ((parameters[2] == '1') ? true : false);
-		SM.parameters['forced-locale'] = ((['1', '2'].indexOf(parameters[3]) != -1) ? true : false);
+		SM.parameters['forced-locale'] = ((['1', '2', '3'].indexOf(parameters[3]) != -1) ? true : false);
 		if (SM.parameters['forced-locale'])
 			{ SM.parameters['locale'] = parseInt(parameters[3]); }
 		else
-			{ SM.parameters['locale'] = ['', 'mush.vg', 'mush.twinoid.com'].indexOf(document.domain); }
+		{
+			SM.parameters['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
+			if (SM.parameters['locale'] == -1)
+				{ SM.parameters['locale'] = 2; } //Défault : anglais
+		}
 	}
 	else
 		{ SM.setSMParameters(); }
@@ -817,7 +823,7 @@ SM.initMenubar = function() {
 	var butreloadall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />");
 	butreloadall.addEventListener('click', function() {
 		SM.loadingScreen();
-		Main.ajax('/', ['maincontainer'], function() { SM.initTabs(); SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
+		Main.ajax('/', Main.SMupdtArr, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
 	butreloadall.setAttribute('data-SMtip', SM.TEXT['buttontip-reloadall']);
 
@@ -1246,6 +1252,15 @@ SM.roomTab = function() {
 
 SM.chatTab = function() {
 	var chat = SM.sel('#cdMainChat');
+
+	//Liens d'exploration
+	var bubbles = SM.toArray(document.querySelectorAll('.bubble:not(.SMlinked)'));
+	for (i in bubbles)
+	{
+		bubbles[i].innerHTML = bubbles[i].innerHTML.replace(/http:\/\/mush\.(vg|twinoid\.(com|es))\/expPerma\/[0-9]+/g, "<a target='_blank' href='$&'>$&</a>");
+		bubbles[i].className += ' SMlinked';
+	}
+
 	if (chat.className.search(/SM(hide|show)paste/) == -1)
 	{
 		chat.className = 'SMhidepaste';
@@ -1495,7 +1510,7 @@ SM.buildMessage = function() {
 					{ break; }
 				if (/hidden\.png/.test(item.getAttribute('data-name'))) //On ne liste pas les objets cachés
 					{ continue; }
-				if (/(tracker|talky_walky|super_talky)\.jpg/.test(item.innerHTML))
+				if (/(tracker|talky_walky|super_talky)\.jpg/.test(item.innerHTML)) //Ni les objets personnels
 					{ continue; }
 				var n = (
 					(item.getAttribute('data-id') == 'BOOK')
@@ -1567,7 +1582,6 @@ SM.buildMessage = function() {
 			{
 				var name = cards[i].firstElementChild.textContent.trim();
 				var progress = SM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] #p').textContent.trim();
-				researches.push([name, progress]);
 				var l = SM.addNewEl('tr', table, null, null, [['class', 'SMresearch']]);
 				SM.addNewEl('td', l, null, '<input type="checkbox" checked="true" />').className = 'SMcenter';
 				SM.addNewEl('td', l, null, name);
@@ -1601,7 +1615,7 @@ SM.buildMessage = function() {
 			break;
 
 		case 'projects':
-			if (!/img\/cards\/projects/.test(SM.sel('#cdModuleContent').innerHTML)) //Pas d'ID spécifique au Cœur de NERON :-/
+			if (!/img\/cards\/projects/.test(SM.sel('#cdModuleContent').innerHTML)) //Pas d'ID spécifique au Cœur de NERON :(
 				{ alert(SM.TEXT['preformat-projects_nomodule']); break; }
 
 			message += ":pa_core: **//" + SM.TEXT['preformat-projects_title'] + " //**:pa_core:\n\n\n\n";
@@ -1671,9 +1685,20 @@ SM.buildMessage = function() {
 			var dbs = SM.toArray(document.querySelectorAll('#trackerModule .perfor li:not(.undone)'));
 			if (dbs.length)
 			{
-				message += "\n";
+				message += dbs.length + "/12\n";
+				var writedesc = confirm(SM.TEXT['preformat-comms_Xylophdesc']);
 				for (i in dbs)
-					{ message += "- " + SM.getTipContent(dbs[i].onmouseover).match(/<h1>(.*)<\/h1>/)[1] + "\n"; }
+				{
+					var text = SM.getTipContent(dbs[i].onmouseover).replace(/\n|\r/g, " ");
+					if (writedesc)
+					{
+						var desc = " : //" + text.match(/<p><strong>(.*)<\/strong><\/p>/)[1] + "//";
+						desc = desc.replace(/\\'/g, "'").replace(/<img(?:.*)alt=['"]([a-zA-Z]+)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1");
+					}
+					else
+						{ var desc = ""; }
+					message += "- " + text.match(/<h1>(.*)<\/h1>/)[1] + desc + "\n";
+				}
 			}
 			else
 				{ message += SM.TEXT['preformat-comms_Xylophnone'] + "\n"; }
@@ -1695,7 +1720,7 @@ SM.buildMessage = function() {
 					anysignal = true;
 				}
 
-				message += "- //" + id.toLowerCase().replace(/_/, ' ').replace( /\b\w/g, function (l) { return l.toUpperCase(); }) + " : //"; //Nom de la base
+				message += "- //" + id.toLowerCase().replace(/_/, "-").replace(/\b\w/g, function (l) { return l.toUpperCase(); }) + " : //"; //Nom de la base
 				if (decoded) //Décodée
 					{ message += SM.TEXT['preformat-comms_basedecoded'] + "\n"; }
 				else
@@ -1727,7 +1752,7 @@ SM.preformatPlanet = function(planet) {
 	var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 	var zones = planet.lastElementChild.firstElementChild.innerHTML.match(/<h1>(.*)<\/h1>/g);
 
-	var message = ":mush_planet_scanned_1: **" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
+	var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
 	var unknown = 0;
 	for (i = 0; i < zones.length; i++)
 	{
@@ -1784,8 +1809,8 @@ SM.locale = function() {
 /* FONCTION D'INITIALISATION */
 
 SM.init = function() {
-	var getsrc = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' }));";
-	SM.addNewEl('script', document.head, null, getsrc); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible
+	var inlineJS = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' })); Main.SMupdtArr = ['maincontainer'];";
+	SM.addNewEl('script', document.head, null, inlineJS); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible et Main.SMupdtArr ne marche pas
 
 	if (SM.sel('#SMbar') == null)
 	{
