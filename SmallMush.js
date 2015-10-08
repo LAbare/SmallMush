@@ -1910,7 +1910,7 @@ SM.locale = function(func) {
 	SM.TEXT = {};
 	var lang = parseInt(SM.parameters['locale']);
 	if (typeof func == 'undefined')
-		{ var func = fonction() { var x; }; }
+		{ var func = function() { var x; }; }
 
 	//Doit rester indépendant de la locale choisie puisqu'en interaction avec la page elle-même
 	//.alertroom : certaines pièces (ex. Jardin) sont mal écrites dans les rapports d'alerte
