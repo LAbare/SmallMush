@@ -530,7 +530,7 @@ SM.changeChatTab = function(el) {
 		SM.sel('#SMeditortab').className = 'tab taboff';
 		SM.sel('#SMeditor').style.display = 'none';
 		Main.selChat(parseInt(el.getAttribute('data-tab')));
-		SM.sel('#chatBlock').style.height = '500px';
+		SM.sel('#chatBlock').style.height = '650px';
     }
     
     else //Onglet Éditeur de messages
@@ -775,7 +775,6 @@ SM.getSMParameters = function() {
 	else
 		{ SM.setSMParameters(); }
 
-	return true;
 	//SMparams=011
 	//0123456789AB
 };
@@ -836,26 +835,6 @@ SM.buildParamsMenu = function() {
 		SM.sel('#roomActionList1').style.opacity = 1;
 		SM.sel('#roomActionList2').style.opacity = 1;
 	});
-
-	//Rafraîchissement light
-	SM.addButton(popup, SM.TEXT['light_refresh-activate']).addEventListener('click', function() {
-		if (SM.sel('#SMlightbut'))
-			{ return false; }
-		SM.sel('#SMpopup').style.display = 'none';
-		//#chatBlock remplacé par #localChannel → dans le chat, seuls les logs sont mis à jour
-		Main.selUpdtArr.splice(Main.selUpdtArr.indexOf('chatBlock'), 1);
-		Main.selUpdtArr.push('localChannel');
-		var lightbut = SM.addButton(document.body, SM.TEXT['light_refresh-deactivate'], { id: 'SMlightbut' });
-		lightbut.onmouseover = function() { Main.showTip(this, SM.TEXT['light_refresh-deactivate_tip']); };
-		lightbut.onmouseout = function() { Main.hideTip(); };
-		SM.moveEl(lightbut, document.body, SM.sel('#SMparams'));
-		lightbut.addEventListener('click', function() {
-			Main.selUpdtArr = Main.normalSelUpdtArr;
-			document.body.removeChild(this);
-			Main.hideTip();
-		});
-	});
-	SM.addNewEl('p', popup, null, SM.TEXT['light_refresh-activate_text'], { class: 'nospace' });
 
 	//BETA
 	SM.addButton(popup, "BETA : reset cookies").addEventListener('click', function() {
@@ -959,8 +938,11 @@ SM.initMenubar = function() {
 	gametab.setAttribute('data-SMtip', SM.TEXT['tabtip-gametab']);
 	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'])
 	shoptab.addEventListener('click', function() {
-		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs_shop']; Main.ajax('/vending', null, function() {
-			SM.reInit(); SM.changeTab('room_col'); SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'];
+		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs_shop'];
+		Main.ajax('/vending', null, function() {
+			SM.reInit();
+			SM.changeTab('room_col');
+			SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'];
 		});
 	});
 	shoptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shoptab']);
@@ -1308,7 +1290,7 @@ SM.roomTab = function() {
 
 	// SCHRÖDINGER //
 	var cat = Main.npc.iterator();
-	if (cat.hasNext())
+	if (cat.hasNext() && !SM.sel('[data-id="BODY_CAT"]'))
 	{
 		var catli = SM.addNewEl('li', herolist, null, "<img src='" + SM.src + "ui/chars/schrodinger.png' />", { class: 'SMheroblock', 'data-serial': cat.next().serial });
 		catli.addEventListener('click', function() { SM.displayRoomActions(3, this.getAttribute('data-serial')); });
@@ -1829,6 +1811,7 @@ SM.buildMessage = function() {
 				var id = bases[i].getAttribute('data-id');
 				var span = SM.sel('#trackerModule [data-id="' + id + '"] span');
 				var decoded = ((SM.sel('#trackerModule [data-id="' + id + '"] h3').textContent.trim() != "???") ? true : false);
+				var name = id.toLowerCase().replace(/_/, "-").replace(/\b\w/g, function (l) { return l.toUpperCase(); });
 				if (!span && !decoded)
 					{ continue; } //Signal pas encore envoyé
 				if (!anysignal)
@@ -1837,7 +1820,7 @@ SM.buildMessage = function() {
 					anysignal = true;
 				}
 
-				message += "- //" + id.toLowerCase().replace(/_/, "-").replace(/\b\w/g, function (l) { return l.toUpperCase(); }) + " : //"; //Nom de la base
+				message += "- //" + name + " (" + SM.TEXT['abbr-day'] + (i + 2) + ") : //"; //Nom de la base
 				if (decoded) //Décodée
 					{ message += SM.TEXT['preformat-comms_basedecoded'] + "\n"; }
 				else
@@ -1865,13 +1848,19 @@ SM.buildMessage = function() {
 
 SM.preformatPlanet = function(planet) {
 	var name = planet.firstElementChild.textContent;
-	var direction = planet.children[2].children[1].children[0].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
-	var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 	var zones = planet.lastElementChild.firstElementChild.innerHTML.match(/<h1>(.*)<\/h1>/g);
 	var grouped = {};
-
-	var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
 	var unknown = 0;
+
+	//Détection orbite ou espace infini
+	if (SM.sel('.planet .pllist').firstElementChild.firstChild.tagName == 'IMG') //En orbite
+		{ var message = SM.TEXT['preformat-planet_orbiting'] + " **" + name + " :** "; }
+	else //Dans l'espace infini, donc fuel et direction nécessaires
+	{
+		var direction = planet.children[2].children[1].children[0].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
+		var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
+		var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
+	}
 
 	//Regroupement des zones identiques
 	for (var i = 0; i < zones.length; i++)

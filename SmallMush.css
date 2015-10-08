@@ -334,13 +334,6 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 	color: #000;
 }
 
-#SMlightbut { /* Bouton rafraîchissement léger */
-	position: fixed;
-	bottom: 5px;
-	right: 50px;
-	border: 2px red solid;
-}
-
 /* Incendie */
 .SMfire {
 	background-color: #811;
@@ -365,6 +358,12 @@ p.SMfire {
 #room_col .but { margin-top: 25px; }
 
 .readeverything { margin-bottom: 20px; }
+
+/* Choix du personnage */
+.charac table.choosehero2 td { display: block; }
+
+/* Distributeur classique */
+.cdDistrib { display: block; }
 
 
 
@@ -867,7 +866,7 @@ table.pvsm {
 
 #SMeditor #tid_wallPost { /* textarea */
 	width: 100%;
-	min-height: 100px;
+	min-height: 150px;
 	color: black;
 }
 

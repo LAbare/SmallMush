@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.7.2
+// @version   0.9.7.3
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -550,7 +550,7 @@ SM.changeChatTab = function(el) {
 		SM.sel('#SMeditortab').className = 'tab taboff';
 		SM.sel('#SMeditor').style.display = 'none';
 		Main.selChat(parseInt(el.getAttribute('data-tab')));
-		SM.sel('#chatBlock').style.height = '500px';
+		SM.sel('#chatBlock').style.height = '650px';
     }
     
     else //Onglet Éditeur de messages
@@ -795,7 +795,6 @@ SM.getSMParameters = function() {
 	else
 		{ SM.setSMParameters(); }
 
-	return true;
 	//SMparams=011
 	//0123456789AB
 };
@@ -856,26 +855,6 @@ SM.buildParamsMenu = function() {
 		SM.sel('#roomActionList1').style.opacity = 1;
 		SM.sel('#roomActionList2').style.opacity = 1;
 	});
-
-	//Rafraîchissement light
-	SM.addButton(popup, SM.TEXT['light_refresh-activate']).addEventListener('click', function() {
-		if (SM.sel('#SMlightbut'))
-			{ return false; }
-		SM.sel('#SMpopup').style.display = 'none';
-		//#chatBlock remplacé par #localChannel → dans le chat, seuls les logs sont mis à jour
-		Main.selUpdtArr.splice(Main.selUpdtArr.indexOf('chatBlock'), 1);
-		Main.selUpdtArr.push('localChannel');
-		var lightbut = SM.addButton(document.body, SM.TEXT['light_refresh-deactivate'], { id: 'SMlightbut' });
-		lightbut.onmouseover = function() { Main.showTip(this, SM.TEXT['light_refresh-deactivate_tip']); };
-		lightbut.onmouseout = function() { Main.hideTip(); };
-		SM.moveEl(lightbut, document.body, SM.sel('#SMparams'));
-		lightbut.addEventListener('click', function() {
-			Main.selUpdtArr = Main.normalSelUpdtArr;
-			document.body.removeChild(this);
-			Main.hideTip();
-		});
-	});
-	SM.addNewEl('p', popup, null, SM.TEXT['light_refresh-activate_text'], { class: 'nospace' });
 
 	//BETA
 	SM.addButton(popup, "BETA : reset cookies").addEventListener('click', function() {
@@ -979,8 +958,11 @@ SM.initMenubar = function() {
 	gametab.setAttribute('data-SMtip', SM.TEXT['tabtip-gametab']);
 	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'])
 	shoptab.addEventListener('click', function() {
-		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs_shop']; Main.ajax('/vending', null, function() {
-			SM.reInit(); SM.changeTab('room_col'); SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'];
+		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs_shop'];
+		Main.ajax('/vending', null, function() {
+			SM.reInit();
+			SM.changeTab('room_col');
+			SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'];
 		});
 	});
 	shoptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shoptab']);
@@ -1328,7 +1310,7 @@ SM.roomTab = function() {
 
 	// SCHRÖDINGER //
 	var cat = Main.npc.iterator();
-	if (cat.hasNext())
+	if (cat.hasNext() && !SM.sel('[data-id="BODY_CAT"]'))
 	{
 		var catli = SM.addNewEl('li', herolist, null, "<img src='" + SM.src + "ui/chars/schrodinger.png' />", { class: 'SMheroblock', 'data-serial': cat.next().serial });
 		catli.addEventListener('click', function() { SM.displayRoomActions(3, this.getAttribute('data-serial')); });
@@ -1849,6 +1831,7 @@ SM.buildMessage = function() {
 				var id = bases[i].getAttribute('data-id');
 				var span = SM.sel('#trackerModule [data-id="' + id + '"] span');
 				var decoded = ((SM.sel('#trackerModule [data-id="' + id + '"] h3').textContent.trim() != "???") ? true : false);
+				var name = id.toLowerCase().replace(/_/, "-").replace(/\b\w/g, function (l) { return l.toUpperCase(); });
 				if (!span && !decoded)
 					{ continue; } //Signal pas encore envoyé
 				if (!anysignal)
@@ -1857,7 +1840,7 @@ SM.buildMessage = function() {
 					anysignal = true;
 				}
 
-				message += "- //" + id.toLowerCase().replace(/_/, "-").replace(/\b\w/g, function (l) { return l.toUpperCase(); }) + " : //"; //Nom de la base
+				message += "- //" + name + " (" + SM.TEXT['abbr-day'] + (i + 2) + ") : //"; //Nom de la base
 				if (decoded) //Décodée
 					{ message += SM.TEXT['preformat-comms_basedecoded'] + "\n"; }
 				else
@@ -1885,13 +1868,19 @@ SM.buildMessage = function() {
 
 SM.preformatPlanet = function(planet) {
 	var name = planet.firstElementChild.textContent;
-	var direction = planet.children[2].children[1].children[0].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
-	var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 	var zones = planet.lastElementChild.firstElementChild.innerHTML.match(/<h1>(.*)<\/h1>/g);
 	var grouped = {};
-
-	var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
 	var unknown = 0;
+
+	//Détection orbite ou espace infini
+	if (SM.sel('.planet .pllist').firstElementChild.firstChild.tagName == 'IMG') //En orbite
+		{ var message = SM.TEXT['preformat-planet_orbiting'] + " **" + name + " :** "; }
+	else //Dans l'espace infini, donc fuel et direction nécessaires
+	{
+		var direction = planet.children[2].children[1].children[0].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
+		var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
+		var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
+	}
 
 	//Regroupement des zones identiques
 	for (var i = 0; i < zones.length; i++)
@@ -1980,10 +1969,6 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_food-desc'] = "Afficher les effets des aliments sous l'inventaire";
 		SM.TEXT['SMparams_forced-locale'] = "Forcer la langue de Small(Mush)";
 		SM.TEXT['SMparams_lang-title'] = "Langue de l'interface Small(Mush) :";
-		SM.TEXT['light_refresh-activate'] = "Activer le rechargement léger";
-		SM.TEXT['light_refresh-activate_text'] = "Le rechargement léger ne met pas à jour les canaux de discussion. Cela rend le jeu plus réactif si vous êtes sur mobile sur un vaisseau très bavard, le temps de faire quelques actions. N'oubliez pas de le désactiver ensuite !";
-		SM.TEXT['light_refresh-deactivate'] = "Réactiver le rechargement normal";
-		SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Réactiver le rechargement normal</h1>Le rechargement normal est nécessaire pour que le chat soit mis à jour.</div></div></div></div>";
 		SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
 		SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 		SM.TEXT['tabs_char'] = "Perso";
@@ -2071,6 +2056,7 @@ SM.locale = function(func) {
 		SM.TEXT['preformat-planet_title'] = "Choisissez une planète :";
 		SM.TEXT['preformat-planet_nomodule'] = "Veuillez accéder au Terminal Astro pour activer cette fonction.";
 		SM.TEXT['preformat-planet_both'] = "Partager les deux";
+		SM.TEXT['preformat-planet_orbiting'] = "En orbite de la planète";
 		SM.TEXT['preformat-planet_unknown'] = "zone(s) inconnue(s)";
 		SM.TEXT['preformat-projects_nomodule'] = "Veuillez accéder au Cœur de NERON pour activer cette fonction.";
 		SM.TEXT['preformat-projects_title'] = "Nouveaux projets :";
@@ -2085,6 +2071,7 @@ SM.locale = function(func) {
 		SM.TEXT['preformat-comms_baselost'] = "signal perdu";
 		SM.TEXT['preformat-comms_basesnone'] = "aucune";
 		SM.TEXT['preformat-comms_neron'] = "**Version de NERON :** ";
+		SM.TEXT['abbr-day'] = "J";
 		SM.TEXT['minimap-button'] = "Afficher la minimap Small(Mush)";
 		SM.TEXT['minimap-title'] = "Minimap Small(Mush)";
 		SM.TEXT['minimap-warning'] = "<b>ATTENTION :</b> cette minimap n'est pas celle du jeu Flash ; elle ne sert que de repère avec quelques indications. Il se peut que certaines avaries signalées n'y apparaissent pas.";
@@ -2130,10 +2117,6 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_food-desc'] = "Show consumables effects under inventory";
 		SM.TEXT['SMparams_forced-locale'] = "Force Small(Mush) language";
 		SM.TEXT['SMparams_lang-title'] = "Small(Mush) language:";
-		SM.TEXT['light_refresh-activate'] = "Activate light refresh";
-		SM.TEXT['light_refresh-activate_text'] = "Light refresh does not update discussion channels. It is useful in a very talkative ship if you are on mobile: you will find the game to be quicker to react if you temporarily need to do a few actions. Don't forget to deactivate it afterwards!";
-		SM.TEXT['light_refresh-deactivate'] = "Reactivate normal refresh";
-		SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Reactivate normal refresh</h1>Normal refresh is necessary for the chat to be fully updated.</div></div></div></div>";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
@@ -2196,7 +2179,7 @@ SM.locale = function(func) {
 		SM.TEXT['premessages_researches++'] = "Share researches (advanced mode)";
 		SM.TEXT['premessages_projects'] = "Share projects";
 		SM.TEXT['premessages_planet'] = "Share a planet";
-		SM.TEXT['premessages_comms'] = "Communications progress:";
+		SM.TEXT['premessages_comms'] = "Share communications progress";
 		SM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
 		SM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
 		SM.TEXT['preformat-researches_nomodule'] = "Please access the laboratory in order to activate research preformatting.";
@@ -2221,6 +2204,7 @@ SM.locale = function(func) {
 		SM.TEXT['preformat-planet_title'] = "Choose a planet:";
 		SM.TEXT['preformat-planet_nomodule'] = "Please access the Astro Terminal in order to activate planet preformatting.";
 		SM.TEXT['preformat-planet_both'] = "Share both";
+		SM.TEXT['preformat-planet_orbiting'] = "Orbiting planet";
 		SM.TEXT['preformat-planet_unknown'] = "unknown zone(s)";
 		SM.TEXT['preformat-projects_nomodule'] = "Please access the NERON Core in order to activate research preformatting.";
 		SM.TEXT['preformat-projects_title'] = "New projects:";
@@ -2235,6 +2219,7 @@ SM.locale = function(func) {
 		SM.TEXT['preformat-comms_baselost'] = "signal lost";
 		SM.TEXT['preformat-comms_basesnone'] = "none";
 		SM.TEXT['preformat-comms_neron'] = "**NERON version:** ";
+		SM.TEXT['abbr-day'] = "D";
 		SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 		SM.TEXT['minimap-title'] = "Small(Mush) minimap";
 		SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
@@ -2280,10 +2265,6 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_food-desc'] = "Show consumables effects under inventory";
 		SM.TEXT['SMparams_forced-locale'] = "Force Small(Mush) language";
 		SM.TEXT['SMparams_lang-title'] = "Small(Mush) language:";
-		SM.TEXT['light_refresh-activate'] = "Activate light refresh";
-		SM.TEXT['light_refresh-activate_text'] = "Light refresh does not update discussion channels. It is useful in a very talkative ship if you are on mobile: you will find the game to be quicker to react if you temporarily need to do a few actions. Don't forget to deactivate it afterwards!";
-		SM.TEXT['light_refresh-deactivate'] = "Reactivate normal refresh";
-		SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Reactivate normal refresh</h1>Normal refresh is necessary for the chat to be fully updated.</div></div></div></div>";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
@@ -2346,7 +2327,7 @@ SM.locale = function(func) {
 		SM.TEXT['premessages_researches++'] = "Share researches (advanced mode)";
 		SM.TEXT['premessages_projects'] = "Share projects";
 		SM.TEXT['premessages_planet'] = "Share a planet";
-		SM.TEXT['premessages_comms'] = "Communications progress:";
+		SM.TEXT['premessages_comms'] = "Share communications progress";
 		SM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
 		SM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
 		SM.TEXT['preformat-researches_nomodule'] = "Please access the laboratory in order to activate research preformatting.";
@@ -2371,6 +2352,7 @@ SM.locale = function(func) {
 		SM.TEXT['preformat-planet_title'] = "Choose a planet:";
 		SM.TEXT['preformat-planet_nomodule'] = "Please access the Astro Terminal in order to activate planet preformatting.";
 		SM.TEXT['preformat-planet_both'] = "Share both";
+		SM.TEXT['preformat-planet_orbiting'] = "Orbiting planet";
 		SM.TEXT['preformat-planet_unknown'] = "unknown zone(s)";
 		SM.TEXT['preformat-projects_nomodule'] = "Please access the NERON Core in order to activate research preformatting.";
 		SM.TEXT['preformat-projects_title'] = "New projects:";
@@ -2385,6 +2367,7 @@ SM.locale = function(func) {
 		SM.TEXT['preformat-comms_baselost'] = "signal lost";
 		SM.TEXT['preformat-comms_basesnone'] = "none";
 		SM.TEXT['preformat-comms_neron'] = "**NERON version:** ";
+		SM.TEXT['abbr-day'] = "D";
 		SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 		SM.TEXT['minimap-title'] = "Small(Mush) minimap";
 		SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
