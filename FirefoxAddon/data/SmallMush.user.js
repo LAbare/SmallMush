@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.7
+// @version   0.9.7.1
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -770,7 +770,7 @@ SM.itemRight = function() {
 SM.getSMParameters = function() {
 	SM.parameters = {};
 	SM.parameters['first-time'] = true;
-	SM.parameters['confirm-action'] = true;
+	SM.parameters['confirm-action'] = false;
 	SM.parameters['food-desc'] = true;
 	SM.parameters['forced-locale'] = false;
 	SM.parameters['locale'] = '0'; //0: non forcé ; 1: français ; 2: anglais ; 3: espagnol
@@ -810,6 +810,9 @@ SM.setSMParameters = function() {
 	var date = new Date();
 	date.setTime(date.getTime() + 31536000000);
 	document.cookie = 'SMparams=' + parameters + '; expires=' + date.toGMTString() + '; path=/';
+
+	SM.getSMParameters();
+	SM.buildParamsMenu();
 };
 
 
@@ -827,15 +830,15 @@ SM.buildParamsMenu = function() {
 		var div = SM.addNewEl('div', popup);
 		if (SM.parameters[parameter])
 		{
-			SM.addNewEl('input', div, null, null, { type: 'checkbox', checked: 'true' });
-			div.addEventListener('click', function() { SM.parameters[parameter] = false; SM.setSMParameters(); });
+			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', checked: 'true', 'data-parameter': parameter })
+			input.addEventListener('change', function() { SM.parameters[this.getAttribute('data-parameter')] = false; SM.setSMParameters(); });
 		}
 		else
 		{
-			SM.addNewEl('input', div, null, null, { type: 'checkbox' });
-			div.addEventListener('click', function() { SM.parameters[parameter] = true; SM.setSMParameters(); });
+			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', 'data-parameter': parameter })
+			input.addEventListener('change', function() { SM.parameters[this.getAttribute('data-parameter')] = true; SM.setSMParameters(); });
 		}
-		div.innerHTML += SM.TEXT['SMparams_' + parameter];
+		SM.addNewEl('label', div, null, SM.TEXT['SMparams_' + parameter], { 'for': 'SMlabel_' + parameter });
 		div.className = 'SMparamsdiv';
 	}
 
@@ -843,7 +846,7 @@ SM.buildParamsMenu = function() {
 	var langs = SM.addNewEl('select', popup, 'SMlangselect');
 	SM.addNewEl('option', langs, null, "Français", ((SM.parameters['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
 	SM.addNewEl('option', langs, null, "English", ((SM.parameters['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
-	langs.addEventListener('change', function() { SM.parameters['locale'] = this.value; SM.locale(); SM.setSMParameters(); });
+	langs.addEventListener('change', function() { SM.parameters['locale'] = this.value; SM.locale(function() { SM.setSMParameters(); }); });
 
 	//Affichage de l'inventaire dans l'onglet Module
 	SM.addButton(popup, SM.TEXT['show-flash-inventory']).addEventListener('click', function() {
@@ -874,6 +877,13 @@ SM.buildParamsMenu = function() {
 	});
 	SM.addNewEl('p', popup, null, SM.TEXT['light_refresh-activate_text'], { class: 'nospace' });
 
+	//BETA
+	SM.addButton(popup, "BETA : reset cookies").addEventListener('click', function() {
+		var date = new Date();
+		date.setTime(date.getTime() + 31536000000);
+		document.cookie = 'SMparams=0000; expires=' + date.toGMTString() + '; path=/';
+	});
+
 	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits']);
 };
 
@@ -884,12 +894,6 @@ SM.buildParamsMenu = function() {
 SM.initCss = function() {
 	SM.addNewEl('link', document.head, null, null, { rel: 'stylesheet', href: SM.src + "SmallMush.css", type: 'text/css' });
 	SM.addNewEl('meta', document.head, null, null, { name: 'viewport', content: 'width=424px, initial-scale=' + screen.width / 424 });
-	
-	//Paramètres Small(Mush)
-	SM.addNewEl('img', document.body, 'SMparams', null, { src: SM.src + "ui/params.png" }).addEventListener('click', function() {
-		SM.buildParamsMenu();
-		SM.sel('#SMpopup').style.display = 'block';
-	});
 
 	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: SM.src + "ui/bottom.png" }), document.body, SM.sel('#tid_bar_down'));
 
@@ -943,6 +947,12 @@ SM.initMenubar = function() {
 
 	SM.copyEl(SM.sel('.cycletime'), bar); //Jour et cycle
 	SM.copyEl(SM.sel('.cdShipCasio'), bar); //Horloge
+
+	//Paramètres Small(Mush)
+	SM.addNewEl('img', bar, 'SMparams', null, { src: SM.src + "ui/params.png" }).addEventListener('click', function() {
+		SM.buildParamsMenu();
+		SM.sel('#SMpopup').style.display = 'block';
+	});
 
 	//Liens
 	var links = SM.toArray(SM.sel('#menuBar').children);
@@ -1916,9 +1926,11 @@ SM.preformatPlanet = function(planet) {
 
 /* FONCTION DE LOCALISATION */
 
-SM.locale = function() {
+SM.locale = function(func) {
 	SM.TEXT = {};
 	var lang = parseInt(SM.parameters['locale']);
+	if (typeof func == 'undefined')
+		{ var func = fonction() { var x; }; }
 
 	//Doit rester indépendant de la locale choisie puisqu'en interaction avec la page elle-même
 	//.alertroom : certaines pièces (ex. Jardin) sont mal écrites dans les rapports d'alerte
@@ -2394,7 +2406,7 @@ SM.locale = function() {
 		break;
 	}
 
-	SM.init();
+	func();
 };
 
 
@@ -2441,51 +2453,51 @@ SM.init = function() {
 };
 
 
-exportFunction(SM.sel, unsafeSM, {defineAs: "sel"});
-exportFunction(SM.getAttributesList, unsafeSM, {defineAs: "getAttributesList"});
-exportFunction(SM.addNewEl, unsafeSM, {defineAs: "addNewEl"});
-exportFunction(SM.addButton, unsafeSM, {defineAs: "addButton"});
-exportFunction(SM.moveEl, unsafeSM, {defineAs: "moveEl"});
-exportFunction(SM.copyEl, unsafeSM, {defineAs: "copyEl"});
-exportFunction(SM.getTipContent, unsafeSM, {defineAs: "getTipContent"});
-exportFunction(SM.toArray, unsafeSM, {defineAs: "toArray"});
-exportFunction(SM.reformat, unsafeSM, {defineAs: "reformat"});
-exportFunction(SM.generateMinimap, unsafeSM, {defineAs: "generateMinimap"});
-exportFunction(SM.changeTab, unsafeSM, {defineAs: "changeTab"});
-exportFunction(SM.SMhelp, unsafeSM, {defineAs: "SMhelp"});
-exportFunction(SM.toggleAlertList, unsafeSM, {defineAs: "toggleAlertList"});
-exportFunction(SM.changeRoom, unsafeSM, {defineAs: "changeRoom"});
-exportFunction(SM.displayRoomActions, unsafeSM, {defineAs: "displayRoomActions"});
-exportFunction(SM.updateRoomActions, unsafeSM, {defineAs: "updateRoomActions"});
-exportFunction(SM.changeChatTab, unsafeSM, {defineAs: "changeChatTab"});
-exportFunction(SM.SMexitModule, unsafeSM, {defineAs: "SMexitModule"});
-exportFunction(SM.changeActionFunctions, unsafeSM, {defineAs: "changeActionFunctions"});
-exportFunction(SM.beforeAction, unsafeSM, {defineAs: "beforeAction"});
-exportFunction(SM.loadingScreen, unsafeSM, {defineAs: "loadingScreen"});
-exportFunction(SM.reInit, unsafeSM, {defineAs: "reInit"});
-exportFunction(SM.showLicense, unsafeSM, {defineAs: "showLicense"});
-exportFunction(SM.selectItem, unsafeSM, {defineAs: "selectItem"});
-exportFunction(SM.itemLeft, unsafeSM, {defineAs: "itemLeft"});
-exportFunction(SM.itemRight, unsafeSM, {defineAs: "itemRight"});
-exportFunction(SM.getSMParameters, unsafeSM, {defineAs: "getSMParameters"});
-exportFunction(SM.setSMParameters, unsafeSM, {defineAs: "setSMParameters"});
-exportFunction(SM.buildParamsMenu, unsafeSM, {defineAs: "buildParamsMenu"});
-exportFunction(SM.initCss, unsafeSM, {defineAs: "initCss"});
-exportFunction(SM.initMenubar, unsafeSM, {defineAs: "initMenubar"});
-exportFunction(SM.initTabs, unsafeSM, {defineAs: "initTabs"});
-exportFunction(SM.charTab, unsafeSM, {defineAs: "charTab"});
-exportFunction(SM.shipTab, unsafeSM, {defineAs: "shipTab"});
-exportFunction(SM.roomTab, unsafeSM, {defineAs: "roomTab"});
-exportFunction(SM.chatTab, unsafeSM, {defineAs: "chatTab"});
-exportFunction(SM.gameTab, unsafeSM, {defineAs: "gameTab"});
-exportFunction(SM.messageEditor, unsafeSM, {defineAs: "messageEditor"});
-exportFunction(SM.refreshPreview, unsafeSM, {defineAs: "refreshPreview"});
-exportFunction(SM.savePreview, unsafeSM, {defineAs: "savePreview"});
-exportFunction(SM.retrievePreview, unsafeSM, {defineAs: "retrievePreview"});
-exportFunction(SM.buildMessage, unsafeSM, {defineAs: "buildMessage"});
-exportFunction(SM.preformatPlanet, unsafeSM, {defineAs: "preformatPlanet"});
-exportFunction(SM.locale, unsafeSM, {defineAs: "locale"});
-exportFunction(SM.init, unsafeSM, {defineAs: "init"});
+exportFunction(SM.sel, unsafeSM, { defineAs: "sel" });
+exportFunction(SM.getAttributesList, unsafeSM, { defineAs: "getAttributesList" });
+exportFunction(SM.addNewEl, unsafeSM, { defineAs: "addNewEl" });
+exportFunction(SM.addButton, unsafeSM, { defineAs: "addButton" });
+exportFunction(SM.moveEl, unsafeSM, { defineAs: "moveEl" });
+exportFunction(SM.copyEl, unsafeSM, { defineAs: "copyEl" });
+exportFunction(SM.getTipContent, unsafeSM, { defineAs: "getTipContent" });
+exportFunction(SM.toArray, unsafeSM, { defineAs: "toArray" });
+exportFunction(SM.reformat, unsafeSM, { defineAs: "reformat" });
+exportFunction(SM.generateMinimap, unsafeSM, { defineAs: "generateMinimap" });
+exportFunction(SM.changeTab, unsafeSM, { defineAs: "changeTab" });
+exportFunction(SM.SMhelp, unsafeSM, { defineAs: "SMhelp" });
+exportFunction(SM.toggleAlertList, unsafeSM, { defineAs: "toggleAlertList" });
+exportFunction(SM.changeRoom, unsafeSM, { defineAs: "changeRoom" });
+exportFunction(SM.displayRoomActions, unsafeSM, { defineAs: "displayRoomActions" });
+exportFunction(SM.updateRoomActions, unsafeSM, { defineAs: "updateRoomActions" });
+exportFunction(SM.changeChatTab, unsafeSM, { defineAs: "changeChatTab" });
+exportFunction(SM.SMexitModule, unsafeSM, { defineAs: "SMexitModule" });
+exportFunction(SM.changeActionFunctions, unsafeSM, { defineAs: "changeActionFunctions" });
+exportFunction(SM.beforeAction, unsafeSM, { defineAs: "beforeAction" });
+exportFunction(SM.loadingScreen, unsafeSM, { defineAs: "loadingScreen" });
+exportFunction(SM.reInit, unsafeSM, { defineAs: "reInit" });
+exportFunction(SM.showLicense, unsafeSM, { defineAs: "showLicense" });
+exportFunction(SM.selectItem, unsafeSM, { defineAs: "selectItem" });
+exportFunction(SM.itemLeft, unsafeSM, { defineAs: "itemLeft" });
+exportFunction(SM.itemRight, unsafeSM, { defineAs: "itemRight" });
+exportFunction(SM.getSMParameters, unsafeSM, { defineAs: "getSMParameters" });
+exportFunction(SM.setSMParameters, unsafeSM, { defineAs: "setSMParameters" });
+exportFunction(SM.buildParamsMenu, unsafeSM, { defineAs: "buildParamsMenu" });
+exportFunction(SM.initCss, unsafeSM, { defineAs: "initCss" });
+exportFunction(SM.initMenubar, unsafeSM, { defineAs: "initMenubar" });
+exportFunction(SM.initTabs, unsafeSM, { defineAs: "initTabs" });
+exportFunction(SM.charTab, unsafeSM, { defineAs: "charTab" });
+exportFunction(SM.shipTab, unsafeSM, { defineAs: "shipTab" });
+exportFunction(SM.roomTab, unsafeSM, { defineAs: "roomTab" });
+exportFunction(SM.chatTab, unsafeSM, { defineAs: "chatTab" });
+exportFunction(SM.gameTab, unsafeSM, { defineAs: "gameTab" });
+exportFunction(SM.messageEditor, unsafeSM, { defineAs: "messageEditor" });
+exportFunction(SM.refreshPreview, unsafeSM, { defineAs: "refreshPreview" });
+exportFunction(SM.savePreview, unsafeSM, { defineAs: "savePreview" });
+exportFunction(SM.retrievePreview, unsafeSM, { defineAs: "retrievePreview" });
+exportFunction(SM.buildMessage, unsafeSM, { defineAs: "buildMessage" });
+exportFunction(SM.preformatPlanet, unsafeSM, { defineAs: "preformatPlanet" });
+exportFunction(SM.locale, unsafeSM, { defineAs: "locale" });
+exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 
 
@@ -2512,5 +2524,5 @@ SM.GRAVITY = true;
 if (SM.sel('#SMbar') == null) //Une seule initialisation suffit, sinon ça casse !
 {
 	SM.getSMParameters();
-	SM.locale();
+	SM.locale(function() { SM.init(); });
 }

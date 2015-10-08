@@ -266,7 +266,7 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 
 /* Paramètres Small(Mush) */
 #SMparams { /* Bouton Paramètres */
-	position: fixed;
+	position: absolute;
 	top: 5px;
 	right: 5px;
 	padding: 2px;

@@ -56,7 +56,7 @@
 .preformatPlanet(planet, *Schmanet, *Janet): crée un message de partage de planète préformaté
 
 *** Fonction de localisation : ***
-.locale(): fonction de localisation de l'interface
+.locale(*func): fonction de localisation de l'interface, lance une fonction au chargement de la locale
 
 *** Fonction d'initialisation : ***
 .init(): appelée après le chargement de la locale

@@ -47,14 +47,14 @@ for line in source:
 		dest.write('\n\t\tbreak;\n')
 
 		dest.write('\t}\n\n')
-		dest.write('\tSM.init();\n')
+		dest.write('\tfunc();\n')
 
 	elif 'END PYTHON REPLACE' in line:
 		replacing = False;
 
 	elif 'PYTHON USERSCRIPT' in line:
 		for function in functions:
-			dest.write('exportFunction(SM.' + function + ', unsafeSM, {defineAs: "' + function + '"});\n')
+			dest.write('exportFunction(SM.' + function + ', unsafeSM, { defineAs: "' + function + '" });\n')
 		dest.write('\n\n')
 
 	else:
