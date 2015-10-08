@@ -1,4 +1,12 @@
-SM.TEXT['ap'] = "AP";
+SM.TEXT['AP-general'] = "action point(s)";
+SM.TEXT['AP-eng'] = "tech point(s)";
+SM.TEXT['AP-garden'] = "gardening point(s)";
+SM.TEXT['AP-neron'] = "NERON projects point(s)";
+SM.TEXT['AP-comp'] = "IT point(s)";
+SM.TEXT['AP-heal'] = "healing point(s)";
+SM.TEXT['AP-pilgred'] = "PILGRED point(s)";
+SM.TEXT['AP-shoot'] = "shooting point(s)";
+SM.TEXT['AP-cook'] = "cooking point(s)";
 SM.TEXT['hide_alert_reports'] = "Hide reports";
 SM.TEXT['show_alert_reports'] = "Show reports";
 SM.TEXT['unvalid_move'] = "This door is broken, you cannot move there!";
@@ -14,6 +22,10 @@ SM.TEXT['SMparams_confirm-action'] = "Confirm actions";
 SM.TEXT['SMparams_food-desc'] = "Show consumables effects under inventory";
 SM.TEXT['SMparams_forced-locale'] = "Force Small(Mush) language";
 SM.TEXT['SMparams_lang-title'] = "Small(Mush) language:";
+SM.TEXT['light_refresh-activate'] = "Activate light refresh";
+SM.TEXT['light_refresh-activate_text'] = "Light refresh does not update discussion channels. It is useful in a very talkative ship if you are on mobile: you will find the game to be quicker to react if you temporarily need to do a few actions. Don't forget to deactivate it afterwards!";
+SM.TEXT['light_refresh-deactivate'] = "Reactivate normal refresh";
+SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Reactivate normal refresh</h1>Normal refresh is necessary for the chat to be fully updated.</div></div></div></div>";
 SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
 SM.TEXT['confirm_action'] = "Do you want to '";
 SM.TEXT['tabs_char'] = "Myself";
@@ -130,6 +142,6 @@ SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common acti
 SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
 SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
 
-SM.loadingTexts = ["Photoscamping the scransons…", "Cat / microwave experiment in progress…", "Scanning for BBC signal…", "Emptying Swiss bank accounts…", "Creating file in page reloaders register…", "Looking for Waldo…", "Hiding body in a persian rug…", "Displaying supposedly funny waiting text…", "Creating array D-bool…", "Reloading blasters with jam…", "Hello worlding…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements module…", "Locating drones…", "Mapping PILGRED transistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Microperforation floor cleaning…", "Saving Private Ryan…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Updating PDA…", "Scaling the kitty's teeth…"];
+SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
 
 SM.localerooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];

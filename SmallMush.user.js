@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.6
+// @version   0.9.7
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -31,11 +31,11 @@ SM.sel = function(name) {
 
 
 SM.getAttributesList = function(el) {
-	var attrs = [];
+	var attrs = {};
 	for (var i = 0; i < el.attributes.length; i++)
 	{
 		if (el.attributes[i].name != 'id')
-			{ attrs.push([el.attributes[i].name, el.attributes[i].value]); }
+			{ attrs[el.attributes[i].name] = el.attributes[i].value; }
 	};
 	return attrs;
 };
@@ -48,25 +48,26 @@ SM.addNewEl = function(type, parent, id, content, attrs) {
 		{ var el = document.createElement(type); }
 	if (id) { el.id = id; }
 	if (content) { el.innerHTML = content; }
-	if (attrs) { for (var i = 0; i < attrs.length; i++) { el.setAttribute(attrs[i][0], attrs[i][1]); } }
+	if (attrs) { for (i in attrs) { el.setAttribute(i, attrs[i]); } }
 	if (parent) { parent.appendChild(el); }
 	return el;
 };
 
 
 SM.addButton = function(parent, text, attrs) {
-	var butattrs = [['class', 'but']];
+	var butattrs = { class: 'but' };
 	if (attrs) {
-		for (var i = 0; i < attrs.length; i++) {
-			if (attrs[i][0] == 'class')
-				{ butattrs[0][1] += ' ' + attrs[i][1]; }
+		for (i in attrs)
+		{
+			if (i == 'class')
+				{ butattrs['class'] += ' ' + attrs[i]; }
 			else
-				{ butattrs.push(attrs[i]); }
+				{ butattrs[i] = attrs[i]; }
 		}
 	}
-	var a = SM.addNewEl('div', parent, null, null, butattrs);
-	var b = SM.addNewEl('div', a, null, null, [['class', 'butright']]);
-	var c = SM.addNewEl('div', b, null, text, [['class', 'butbg']]);
+	var a = SM.addNewEl('div', ((parent) ? parent : null), null, null, butattrs);
+	var b = SM.addNewEl('div', a, null, null, { class: 'butright' });
+	var c = SM.addNewEl('div', b, null, text, { class: 'butbg' });
 	return a;
 };
 
@@ -82,7 +83,7 @@ SM.moveEl = function(el, dest, bef) {
 SM.copyEl = function (el, dest, bef) {
 	var newEl = SM.addNewEl(el.nodeName, null, ((el.id) ? 'SM' + el.id : ''), el.innerHTML, SM.getAttributesList(el));
 	var children = newEl.getElementsByTagName("*");
-	for (i = 0; i < children.length; i++)
+	for (var i = 0; i < children.length; i++)
 		{ if (children[i].id) { children[i].id = 'SM' + children[i].id; } }
 	if (bef) { dest.insertBefore(newEl, bef); }
 	else { dest.appendChild(newEl); }
@@ -102,6 +103,10 @@ SM.toArray = function(obj) {
 	return [].slice.call(obj);
 };
 
+SM.reformat = function(text) {
+	return text.replace(/\\r|\\n|\r|\n/g, '').replace(/\s+/g, ' ').replace(/\\'/g, "'").replace(/&nbsp;/g, ' ');
+};
+
 
 
 /* FONCTIONS SMALL(MUSH) */
@@ -113,7 +118,7 @@ SM.generateMinimap = function() {
 
 	var popup = SM.sel('#SMpopup');
 	popup.innerHTML = '';
-	SM.addButton(popup, "X", [['id', 'SMpopupclose']]).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
+	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
 	popup.style.display = 'block';
 
 	SM.addNewEl('h4', popup, null, "<img src='" + SM.src + "ico.png' /> " + SM.TEXT['minimap-title']);
@@ -125,13 +130,13 @@ SM.generateMinimap = function() {
 	for (var j in al)
 	{
 		var k = SM.sel('.alarm_bg [src$="/' + al[j] + '.png"]');
-		al[j] = ((k) ? k.parentNode.getAttribute('onmouseover').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ') : '');
+		al[j] = ((k) ? SM.reformat(k.parentNode.getAttribute('onmouseover')) : '');
 	}
 
 	var bloc = SM.addNewEl('div', popup, 'SMminimapbloc');
-	var svg = SM.addNewEl('svg', bloc, 'SMminimap', null, [['width', '320'], ['height', '530']]);
+	var svg = SM.addNewEl('svg', bloc, 'SMminimap', null, { width: '320', height: '530' });
 
-	for (i = 0; i < rooms.length; i++)
+	for (var i = 0; i < rooms.length; i++)
 	{
 		var r = rooms[i];
 		if (!r.length)
@@ -144,7 +149,7 @@ SM.generateMinimap = function() {
 			{ var roomclass = 'SMmaproom'; }
 		if (r.length == 2) //Pièce non rectangulaire
 		{
-			SM.addNewEl('path', svg, null, null, [['d', r[0]], ['data-maproom', i], ['class', roomclass]]).addEventListener('click', function() {
+			SM.addNewEl('path', svg, null, null, { d: r[0], 'data-maproom': i, class: roomclass }).addEventListener('click', function() {
 				var halo = SM.sel('#SMmapselected');
 				if (halo) { halo.id = ''; }
 				SM.sel('#SMminimaproom').textContent = SM.localerooms[parseInt(this.getAttribute('data-maproom'))];
@@ -154,7 +159,7 @@ SM.generateMinimap = function() {
 		}
 		else //Pièce rectangulaire
 		{
-			SM.addNewEl('rect', svg, null, null, [['width', r[0]], ['height', r[1]], ['x', r[2]], ['y', r[3]], ['data-maproom', i], ['class', roomclass]]).addEventListener('click', function() {
+			SM.addNewEl('rect', svg, null, null, { width: r[0], height: r[1], x: r[2], y: r[3], 'data-maproom': i, class: roomclass }).addEventListener('click', function() {
 				var halo = SM.sel('#SMmapselected');
 				if (halo) { halo.id = ''; }
 				SM.sel('#SMminimaproom').textContent = SM.localerooms[parseInt(this.getAttribute('data-maproom'))];
@@ -171,23 +176,23 @@ SM.generateMinimap = function() {
 		if (re) { re = re.length; }
 		if (rd && re)
 		{
-			SM.addNewEl('div', bloc, null, rd, [['style', 'position: absolute; left: ' + (c[0] - 10) + 'px; top: ' + c[1] + 'px;'], ['class', 'SMmapalertd']]);
-			SM.addNewEl('div', bloc, null, re, [['style', 'position: absolute; left: ' + (c[0] +5) + 'px; top: ' + c[1] + 'px;'], ['class', 'SMmapalerte']]);
+			SM.addNewEl('div', bloc, null, rd, { style: 'position: absolute; left: ' + (c[0] - 10) + 'px; top: ' + c[1] + 'px;', class: 'SMmapalertd' });
+			SM.addNewEl('div', bloc, null, re, { style: 'position: absolute; left: ' + (c[0] +5) + 'px; top: ' + c[1] + 'px;', class: 'SMmapalerte' });
 		}
 		else if (rd)
-			{ SM.addNewEl('div', bloc, null, rd, [['style', 'position: absolute; left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;'], ['class', 'SMmapalertd']]); }
+			{ SM.addNewEl('div', bloc, null, rd, { style: 'position: absolute; left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;', class: 'SMmapalertd' }); }
 		else if (re)
-			{ SM.addNewEl('div', bloc, null, re, [['style', 'position: absolute; left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;'], ['class', 'SMmapalerte']]); }
+			{ SM.addNewEl('div', bloc, null, re, { style: 'position: absolute; left: ' + (c[0] - 5) + 'px; top: ' + c[1] + 'px;', class: 'SMmapalerte' }); }
 	}
 	//Portes
-	for (i = 0; i < doors.length; i++)
-		{ SM.addNewEl('path', svg, null, null, [['d', 'm' + doors[i][0]], ['data-mapdoor', doors[i][1]], ['class', 'SMmapdoor']]); }
+	for (var i = 0; i < doors.length; i++)
+		{ SM.addNewEl('path', svg, null, null, { d: 'm' + doors[i][0], dataMapdoor: doors[i][1], class: 'SMmapdoor' }); }
 	var it = Main.items.iterator();
 	while (it.hasNext())
 	{
 		var i = it.next();
 		if (i.iid == 'DOOR')
-			{ SM.sel('[data-mapdoor="' + i.key + '"]').setAttribute('class', 'SMmapdoorbroken'); }
+			{ SM.sel('[dataMapdoor="' + i.key + '"]').setAttribute('class', 'SMmapdoorbroken'); }
 	}
 };
 
@@ -221,8 +226,9 @@ SM.changeTab = function(newtab) {
 
 
 SM.SMhelp = function(e) {
+	Main.hideTip();
 	var el = document.elementFromPoint(e.clientX, e.clientY);
-	for (i = 0; i < 5; i++)
+	for (var i = 0; i < 5; i++)
 	{
 		if (el.onmouseover)
 		{
@@ -233,7 +239,7 @@ SM.SMhelp = function(e) {
 		else if (el.getAttribute('data-tip')) //Item : 4 niveaux au-dessus
 		{
 			var name = decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(el.getAttribute('data-tip'))[1]);
-			var desc = el.getAttribute('data-desc').replace(/\\'/g, "'").replace(/\n|\r/g, '');
+			var desc = SM.reformat(el.getAttribute('data-desc'));
 			Main.showTip(el, "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>" + name + "</h1>" + desc + "</div></div></div></div>");
 			SM.sel('#SMhelpscreenB').style.display = 'block';
 			break;
@@ -276,23 +282,38 @@ SM.changeRoom = function(el) {
 		var energy = false;
 		if (SM.sel('[src$="/pa1.png"]') || SM.sel('[src$="/pa2.png"]'))
 			{ energy = true; }
+
 		//Monture non fonctionnelle aux cycles impairs
 		var boulder = false;
 		if (SM.sel('#myInventory [style*="rolling_boulder.jpg"]') && parseInt(SM.sel('#input').getAttribute('curcycle')) % 2 == 1) //0 = J1C1
 			{ boulder = true; }
+
+		//Handicapé et trottinette
 		var disabled = SM.sel('.statuses [src$="disabled.png"]');
+		var scooter = SM.sel('#myInventory [style*="antigrav_scooter.jpg"]');
+
+		//Sprinter : pas visible en icône si Mush
+		var sprinter = false;
+		var heroes = Main.heroes.iterator();
+		while (heroes.hasNext())
+		{
+			var hero = heroes.next();
+			if (hero.me == 'true')
+			{
+				var skills = hero.skills.iterator();
+				while (skills.hasNext())
+				{
+					if (skills.next().img == 'sprinter')
+						{ sprinter = true; }
+				}
+			}
+		}
+
 		/* Soit :
 		- on n'est pas handicapé et on n'a pas d'énergie ;
 		- on est handicapé, on est seul, et soit on n'a pas d'énergie, soit le Simulateur de gravité est en panne et ni compétence Sprinter, ni Trottinette ni Monture rocheuse fonctionnelle sur soi.
 		Ne prend pas en compte les blessures ni les objets lourds. */
-		if
-		(
-			(!disabled && !energy)
-			||
-			(disabled && SM.ME_ALONE
-				&& (!energy || (!SM.GRAVITY && !SM.sel('#char_col [src$="skills/sprint.png"]') && !SM.sel('#myInventory [style*="antigrav_scooter.jpg"]') && !boulder))
-			)
-		)
+		if ((!disabled && !energy) || (disabled && SM.ME_ALONE && (!energy || (!SM.GRAVITY && !sprinter && !scooter && !boulder))))
 		{
 			if (!confirm(SM.TEXT['move_alert']))
 				{ return false; }
@@ -316,14 +337,17 @@ SM.changeRoom = function(el) {
 				});
 			}
 			else
-				{ Main.ajax('/?fa=81&fp=' + select.value); }
+			{
+				SM.loadingScreen();
+				Main.ajax('/?fa=81&fp=' + select.value);
+			}
 		}
 	}
 };
 
 
-SM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment; 3: chat
-	var herohalo = SM.sel('#SMheroselected'); //Halo autour d'un personnage ou de Schrödinger
+SM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment; 3: chat; 5: drone
+	var herohalo = SM.sel('#SMheroselected'); //Halo autour d'un personnage, de Schrödinger ou d'un drone
 	var itemhalo = SM.sel('.SMselected'); //Halo autour d'un item de l'inventaire SM
 	if (itemhalo)
 		{ itemhalo.parentNode.removeChild(itemhalo); }
@@ -346,7 +370,7 @@ SM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 					{ herohalo.parentNode.removeChild(herohalo); }
 			}
 			var hero = Main.heroes.get(serial);
-			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, [['src', selectedhero.lastElementChild.getAttribute('src').replace(/\.png/, '_selected.png')]]), selectedhero, selectedhero.lastElementChild);
+			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, { src: selectedhero.lastElementChild.getAttribute('src').replace(/\.png/, '_selected.png') }), selectedhero, selectedhero.lastElementChild);
 			SM.updateRoomActions(type, serial);
 			break;
 
@@ -376,8 +400,27 @@ SM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 				else
 					{ herohalo.parentNode.removeChild(herohalo); }
 			}
-			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, [['src', SM.src + "ui/chars/schrodinger_selected.png"]]), cat, cat.lastElementChild);
+			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, { src: SM.src + "ui/chars/schrodinger_selected.png" }), cat, cat.lastElementChild);
 			SM.updateRoomActions(type, serial);
+			break;
+
+		case 5: //Drone
+			SM.sel('#equipmentselect').selectedIndex = 0;
+			var drone = SM.sel('[data-serial="' + serial + '"]');
+
+			if (herohalo)
+			{
+				if (herohalo.parentNode == drone)
+				{
+					drone.removeChild(herohalo);
+					SM.updateRoomActions(4);
+					break;
+				}
+				else
+					{ herohalo.parentNode.removeChild(herohalo); }
+			}
+			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, { src: SM.src + "ui/chars/drone_selected.png" }), drone, drone.lastElementChild);
+			SM.updateRoomActions(1, serial);
 			break;
 	}
 };
@@ -400,17 +443,17 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 	switch (type) {
 		case 0: //Personnage
 			var hero = Main.heroes.get(serial);
-			SM.addNewEl('div', actionListA, null, null, [['class', 'cdFace face portrait_' + hero.dev_surname]]); //Portrait
-			var herostatus = SM.addNewEl('div', actionListA, null, null, [['class', 'status']]);
-			SM.addNewEl('div', herostatus, null, hero.name, [['class', 'cdCharName charname']]); //Nom
+			SM.addNewEl('div', actionListA, null, null, { class: 'cdFace face portrait_' + hero.dev_surname }); //Portrait
+			var herostatus = SM.addNewEl('div', actionListA, null, null, { class: 'status' });
+			SM.addNewEl('div', herostatus, null, hero.name, { class: 'cdCharName charname' }); //Nom
 
 			//Statuts
-			var statuslist = SM.addNewEl('ul', herostatus, null, null, [['class', 'cdStatusList']]);
+			var statuslist = SM.addNewEl('ul', herostatus, null, null, { class: 'cdStatusList' });
 			var statuses = hero.statuses.iterator();
 			while (statuses.hasNext())
 			{
 				var status = statuses.next();
-				SM.addNewEl('li', statuslist, null, '<img src="/img/icons/ui/status/' + status.img + '.png" />', [['onmouseover', 'Main.showTip(this,"<div class=\'tiptop\' ><div class=\'tipbottom\'><div class=\'tipbg\'><div class=\'tipcontent\'><h1>' + status.name + '</h1>' + status.desc + '</div></div></div></div>");'], ['onmouseout', 'Main.hideTip();']]);
+				SM.addNewEl('li', statuslist, null, '<img src="/img/icons/ui/status/' + status.img + '.png" />', { onmouseover: 'Main.showTip(this,"<div class=\'tiptop\' ><div class=\'tipbottom\'><div class=\'tipbg\'><div class=\'tipcontent\'><h1>' + status.name + '</h1>' + status.desc + '</div></div></div></div>");', onmouseout: 'Main.hideTip();' });
 			}
 
 			//Titres
@@ -418,7 +461,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 			while (titles.hasNext())
 			{
 				var title = titles.next();
-				SM.addNewEl('li', statuslist, null, '<img src="/img/icons/ui/' + title.img + '.png" />', [['onmouseover', 'Main.showTip(this,"<div class=\'tiptop\' ><div class=\'tipbottom\'><div class=\'tipbg\'><div class=\'tipcontent\'><h1>' + title.name + '</h1>' + title.desc + '</div></div></div></div>");'], ['onmouseout', 'Main.hideTip();']]);
+				SM.addNewEl('li', statuslist, null, '<img src="/img/icons/ui/' + title.img + '.png" />', { onmouseover: 'Main.showTip(this,"<div class=\'tiptop\' ><div class=\'tipbottom\'><div class=\'tipbg\'><div class=\'tipcontent\'><h1>' + title.name + '</h1>' + title.desc + '</div></div></div></div>");', onmouseout: 'Main.hideTip();' });
 			}
 
 			//Spores
@@ -426,20 +469,20 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 				{ SM.addNewEl('li', SM.addNewEl('span', statuslist), null, "<img src='" + hero.spores.img + "' />x" + hero.spores.nb); }
 
 			//Bio courte
-			SM.addNewEl('div', actionListA, null, hero.short_desc, [['class', 'presentation']]);
+			SM.addNewEl('div', actionListA, null, hero.short_desc, { class: 'presentation' });
 
 			//Compétences
-			var skillslist = SM.addNewEl('ul', actionListA, null, null, [['class', 'cdSkills skills']]);
+			var skillslist = SM.addNewEl('ul', actionListA, null, null, { class: 'cdSkills skills' });
 			var skills = hero.skills.iterator();
 			while (skills.hasNext())
 			{
 				var skill = skills.next();
-				SM.addNewEl('li', skillslist, null, '<img src="/img/icons/skills/' + skill.img + '.png" />', [['onmouseover', 'Main.showTip(this,"<div class=\'tiptop\' ><div class=\'tipbottom\'><div class=\'tipbg\'><div class=\'tipcontent\'><h1>' + skill.name + '</h1>' + skill.desc.replace(/\n/g, '') + '</div></div></div></div>");'], ['onmouseout', 'Main.hideTip();']]);
+				SM.addNewEl('li', skillslist, null, '<img src="/img/icons/skills/' + skill.img + '.png" />', { onmouseover: 'Main.showTip(this,"<div class=\'tiptop\' ><div class=\'tipbottom\'><div class=\'tipbg\'><div class=\'tipcontent\'><h1>' + skill.name + '</h1>' + skill.desc.replace(/\n/g, '') + '</div></div></div></div>");', onmouseout: 'Main.hideTip();' });
 			} //.replace car un retour à la ligne empêcherait l'infobulle d'être correcte pour certains navigateurs (ex. Prémonition)
 
 			//Boutons d'action
 			var actions = SM.toArray(document.querySelectorAll('.cdActionRepository [webdata="' + serial + '"]'));
-			for (j = 0; j < actions.length; j++)
+			for (var j = 0; j < actions.length; j++)
 				{ SM.copyEl(actions[j], actionListB); }
 
 			actionListA.parentNode.className = 'player';
@@ -448,7 +491,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 
 		case 1: //Équipement
 			var actions = SM.toArray(document.querySelectorAll('.cdActionRepository [webdata="' + serial + '"]'));
-			for (j = 0; j < actions.length; j++)
+			for (var j = 0; j < actions.length; j++)
 			{
 				if (j % 2)
 					{ SM.copyEl(actions[j], actionListB); }
@@ -461,7 +504,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 
 		case 2: //Item
 			var actions = SM.toArray(document.querySelectorAll('.cdActionRepository [webdata="' + serial + '"]'));
-			for (j = 0; j < actions.length; j++)
+			for (var j = 0; j < actions.length; j++)
 			{
 				if (j % 2)
 					{ SM.copyEl(actions[j], actionListB); }
@@ -476,14 +519,14 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 				: item.getAttribute('data-name') //Pour avoir les attributs (charges, objet lourd, caché…) dans les autres cas
 			);
 			if (SM.parameters['food-desc'] && item.getAttribute('data-id') == 'CONSUMABLE')
-				{ SM.sel('#SMitemdesc').innerHTML = item.getAttribute('data-desc').replace(/\\r|\\n/g, '').replace(/\s+/g, ' ').replace(/\\'/g, "'"); }
+				{ SM.sel('#SMitemdesc').innerHTML = SM.reformat(item.getAttribute('data-desc')); }
 			else
 				{ SM.sel('#SMitemdesc').innerHTML = ''; }
 			break;
 
 		case 3: //Chat
 			var actions = SM.toArray(document.querySelectorAll('.cdActionRepository [webdata="' + serial + '"]'));
-			for (j = 0; j < actions.length; j++)
+			for (var j = 0; j < actions.length; j++)
 			{
 				if (j % 2)
 					{ SM.copyEl(actions[j], actionListB); }
@@ -513,13 +556,13 @@ SM.changeChatTab = function(el) {
     else //Onglet Éditeur de messages
 	{
 		var tabs = SM.sel('#cdTabsChat').children;
-		for (i = 0; i < tabs.length; i++)
+		for (var i = 0; i < tabs.length; i++)
 			{ tabs[i].className = tabs[i].className.replace(/tabon/, 'taboff'); }
 		SM.sel('#SMeditortab').className = 'tab tabon';
 
 		//Onglets
 		var walls = SM.sel('#chatBlock').children;
-		for (i = 0; i < walls.length; i++)
+		for (var i = 0; i < walls.length; i++)
 			{ walls[i].style.display = 'none'; }
 		SM.sel('#SMeditor').style.display = 'block';
 
@@ -560,11 +603,11 @@ SM.SMexitModule = function(func) {
 
 SM.changeActionFunctions = function() {
 	//Boutons Nouveau cycle et Nouvelle étape
-	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
-	SM.sel('#txt_new_step a').setAttribute('onclick', 'Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
+	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
+	SM.sel('#txt_new_step a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
 	//Boutons d'action
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
-	for (i = 0; i < actions.length; i++)
+	for (var i = 0; i < actions.length; i++)
 	{
 		if (!actions[i].getAttribute('onclick').match(/SM\./))
 			{ actions[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + actions[i].getAttribute('onclick')); }
@@ -585,7 +628,23 @@ SM.beforeAction = function(el) {
 	//Confirmation d'action
 	if (SM.parameters['confirm-action'])
 	{
-		var name = el.innerHTML.trim().replace(/ ?<img(?:.*)\/?>/g, SM.TEXT['ap']).replace(/<\/?span>/g, '').replace(/\s+/g, ' ').replace(/&nbsp;/g, ' ');
+		var name = SM.reformat(el.innerHTML.trim().replace(/<\/?span>/g, ''));
+		name = name.replace(/<img(?:.*)\/(.*)\.png(?:.*)\/?>/g, function (s, p) {
+			var pa;
+			switch (p)
+			{
+				case 'pa_eng': pa = 'eng'; break;
+				case 'pa_garden': pa = 'garden'; break;
+				case 'pa_core': pa = 'neron'; break;
+				case 'pa_comp': pa = 'comp'; break;
+				case 'pa_heal': pa = 'heal'; break;
+				case 'pa_pilgred': pa = 'pilgred'; break;
+				case 'pa_shoot': pa = 'shoot'; break;
+				case 'pa_cook': pa = 'cook'; break;
+				default: pa = 'general'; break;
+			}
+			return SM.TEXT['AP-' + pa] + " :";
+		});
 		if (!confirm(SM.TEXT['confirm_action'] + name + "' ?"))
 			{ return false; }
 	}
@@ -639,7 +698,7 @@ SM.reInit = function() {
 SM.showLicense = function() {
 	var popup = SM.sel('#SMpopup');
 	popup.innerHTML = '';
-	SM.addButton(popup, "X", [['id', 'SMpopupclose']]).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
+	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
 	SM.addNewEl('div', popup, null, SM.TEXT['license']);
 };
 
@@ -659,7 +718,7 @@ SM.selectItem = function(item) {
 		var itemhalo = SM.sel('.SMselected');
 		if (itemhalo)
 			{ itemhalo.parentNode.removeChild(itemhalo); }
-		SM.moveEl(SM.addNewEl('div', null, null, null, [['class', 'SMselected']]), item, itemchild);
+		SM.moveEl(SM.addNewEl('div', null, null, null, { class: 'SMselected' }), item, itemchild);
 		SM.updateRoomActions(2, item.getAttribute('serial'));
 	}
 
@@ -758,22 +817,22 @@ SM.buildParamsMenu = function() {
 	var popup = SM.sel('#SMpopup');
 	popup.innerHTML = '';
 
-	SM.addButton(popup, "X", [['id', 'SMpopupclose']]).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
+	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
 	SM.addNewEl('h4', popup, null, SM.TEXT['SMparams_title'] + "  <img src='" + SM.src + "ico.png' />");
 
 	var parameters = ['confirm-action', 'food-desc', 'forced-locale'];
-	for (i = 0; i < parameters.length; i++)
+	for (i in parameters)
 	{
 		var parameter = parameters[i];
 		var div = SM.addNewEl('div', popup);
 		if (SM.parameters[parameter])
 		{
-			SM.addNewEl('input', div, null, null, [['type', 'checkbox'], ['checked', 'true']]);
+			SM.addNewEl('input', div, null, null, { type: 'checkbox', checked: 'true' });
 			div.addEventListener('click', function() { SM.parameters[parameter] = false; SM.setSMParameters(); });
 		}
 		else
 		{
-			SM.addNewEl('input', div, null, null, [['type', 'checkbox']]);
+			SM.addNewEl('input', div, null, null, { type: 'checkbox' });
 			div.addEventListener('click', function() { SM.parameters[parameter] = true; SM.setSMParameters(); });
 		}
 		div.innerHTML += SM.TEXT['SMparams_' + parameter];
@@ -782,8 +841,8 @@ SM.buildParamsMenu = function() {
 
 	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_lang-title']);
 	var langs = SM.addNewEl('select', popup, 'SMlangselect');
-	SM.addNewEl('option', langs, null, "Français", ((SM.parameters['locale'] == 1) ? [['value', '1'], ['selected', 'selected']] : [['value', '1']]));
-	SM.addNewEl('option', langs, null, "English", ((SM.parameters['locale'] == 2) ? [['value', '2'], ['selected', 'selected']] : [['value', '2']]));
+	SM.addNewEl('option', langs, null, "Français", ((SM.parameters['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
+	SM.addNewEl('option', langs, null, "English", ((SM.parameters['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
 	langs.addEventListener('change', function() { SM.parameters['locale'] = this.value; SM.locale(); SM.setSMParameters(); });
 
 	//Affichage de l'inventaire dans l'onglet Module
@@ -795,6 +854,26 @@ SM.buildParamsMenu = function() {
 		SM.sel('#roomActionList2').style.opacity = 1;
 	});
 
+	//Rafraîchissement light
+	SM.addButton(popup, SM.TEXT['light_refresh-activate']).addEventListener('click', function() {
+		if (SM.sel('#SMlightbut'))
+			{ return false; }
+		SM.sel('#SMpopup').style.display = 'none';
+		//#chatBlock remplacé par #localChannel → dans le chat, seuls les logs sont mis à jour
+		Main.selUpdtArr.splice(Main.selUpdtArr.indexOf('chatBlock'), 1);
+		Main.selUpdtArr.push('localChannel');
+		var lightbut = SM.addButton(document.body, SM.TEXT['light_refresh-deactivate'], { id: 'SMlightbut' });
+		lightbut.onmouseover = function() { Main.showTip(this, SM.TEXT['light_refresh-deactivate_tip']); };
+		lightbut.onmouseout = function() { Main.hideTip(); };
+		SM.moveEl(lightbut, document.body, SM.sel('#SMparams'));
+		lightbut.addEventListener('click', function() {
+			Main.selUpdtArr = Main.normalSelUpdtArr;
+			document.body.removeChild(this);
+			Main.hideTip();
+		});
+	});
+	SM.addNewEl('p', popup, null, SM.TEXT['light_refresh-activate_text'], { class: 'nospace' });
+
 	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits']);
 };
 
@@ -803,11 +882,16 @@ SM.buildParamsMenu = function() {
 /* FONCTIONS D'ADAPTATION DE L'INTERFACE */
 
 SM.initCss = function() {
-	SM.addNewEl('link', document.head, null, null, [['rel', 'stylesheet'], ['href', SM.src + "SmallMush.css"], ['type', 'text/css']]);
-	SM.addNewEl('meta', document.head, null, null, [['name', 'viewport'], ['content', 'width=424px, initial-scale=' + screen.width / 424]]);
+	SM.addNewEl('link', document.head, null, null, { rel: 'stylesheet', href: SM.src + "SmallMush.css", type: 'text/css' });
+	SM.addNewEl('meta', document.head, null, null, { name: 'viewport', content: 'width=424px, initial-scale=' + screen.width / 424 });
+	
+	//Paramètres Small(Mush)
+	SM.addNewEl('img', document.body, 'SMparams', null, { src: SM.src + "ui/params.png" }).addEventListener('click', function() {
+		SM.buildParamsMenu();
+		SM.sel('#SMpopup').style.display = 'block';
+	});
 
-	SM.addNewEl('img', document.body, 'SMicon', null, [['src', SM.src + "ico.png"]]);
-	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, [['src', SM.src + "ui/bottom.png"]]), document.body, SM.sel('#tid_bar_down'));
+	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: SM.src + "ui/bottom.png" }), document.body, SM.sel('#tid_bar_down'));
 
 	//Styles CSS basés sur des URLs
 	var relcss = SM.addNewEl('style', document.head);
@@ -860,16 +944,9 @@ SM.initMenubar = function() {
 	SM.copyEl(SM.sel('.cycletime'), bar); //Jour et cycle
 	SM.copyEl(SM.sel('.cdShipCasio'), bar); //Horloge
 
-	//Paramètres Small(Mush)
-	SM.addNewEl('img', bar, 'SMparams', null, [['src', SM.src + "ui/params.png"]]).addEventListener('click', function() {
-		SM.buildParamsMenu();
-		SM.sel('#SMpopup').style.display = 'block';
-	});
-
-
 	//Liens
-	var links = SM.sel('#menuBar').children;
-	for (i = 0; i < links.length; i++)
+	var links = SM.toArray(SM.sel('#menuBar').children);
+	for (var i = 0; i < links.length; i++)
 		{ links[i].firstElementChild.setAttribute('target', '_blank'); }
 
 	//Onglets Small(Mush)
@@ -932,9 +1009,9 @@ SM.charTab = function() {
 	//Affiche les actions joueur, qui sont normalement cachées jusqu'au chargement du jeu Flash
 	if (SM.sel('.cdActionList').children.length == 0)
 	{
-		var a = SM.sel('.cdActionRepository .heroRoomActions').children;
-		for (i = 0; i < a.length - 1; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
-			{ SM.copyEl(a[i], SM.sel('.cdActionList')); }
+		var actions = SM.sel('.cdActionRepository .heroRoomActions').children;
+		for (var i = 0; i < actions.length; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
+			{ SM.copyEl(actions[i], SM.sel('.cdActionList')); }
 	}
 
 	if (SM.sel('#SMenergybar')) //Si l'onglet n'a pas déjà été adapté
@@ -967,9 +1044,9 @@ SM.charTab = function() {
 	var extraAPs = SM.toArray(document.getElementsByClassName('extrapa'));
 	if (extraAPs.length)
 	{
-		var extratd = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('.pvsm').firstElementChild), 'SMextratd', null, [['colspan', '2']]);
+		var extratd = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('.pvsm').firstElementChild), 'SMextratd', null, { colspan: '2' });
 		for (var i = 0; i < extraAPs.length; i++)
-		{ 
+		{
 			var extrapoint = SM.addNewEl('span', extratd, null, null, SM.getAttributesList(extraAPs[i]));
 			SM.moveEl(extraAPs[i].lastElementChild, extrapoint); //Image
 			SM.moveEl(extraAPs[i].firstElementChild, extrapoint); //Nombre
@@ -990,7 +1067,7 @@ SM.shipTab = function() {
 	var alerts = SM.sel('.alarm_bg').firstElementChild;
 
 	if (alerts.nodeName == 'IMG') //Vaisseau calme
-		{ var alertsdiv = SM.addNewEl('div', ship_tab, 'SMalerts', SM.sel('.alarm_bg').innerHTML + SM.getTipContent(SM.sel('.alarm').parentNode.onmouseover), [['class', 'SMnoalert']]); }
+		{ var alertsdiv = SM.addNewEl('div', ship_tab, 'SMalerts', SM.sel('.alarm_bg').innerHTML + SM.getTipContent(SM.sel('.alarm').parentNode.onmouseover), { class: 'SMnoalert' }); }
 	else
 	{
 		alerts = SM.copyEl(alerts, ship_tab);
@@ -1008,7 +1085,7 @@ SM.shipTab = function() {
 				//Liste de rapports (portes cassées, incendies…) → la liste est cachée (par CSS) et on ajoute un bouton « Afficher les rapports »
 				if (alertContent.lastElementChild.nodeName == 'UL')
 				{
-					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'], [['class', 'SMalertexpand']]), alertContent, alertContent.getElementsByClassName('ul')[0]);
+					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'], { class: 'SMalertexpand' }), alertContent, alertContent.getElementsByClassName('ul')[0]);
 					span.addEventListener('click', function() { SM.toggleAlertList(this); });
 					alertContent.className = 'SMhidden_alerts';
 				}
@@ -1033,9 +1110,9 @@ SM.shipTab = function() {
 	if (expoblock)
 	{
 		var firstalert = SM.sel('.alarm_bg li:first-of-type');
-		SM.copyEl(expoblock, ship_tab).style.display = 'block'; //Copie, et pas déplacement, sinon le bloc est perdu au rechargement interne
+		SM.copyEl(expoblock, ship_tab, SM.sel('#SMalerts')).style.display = 'block'; //Copie, et pas déplacement, sinon le bloc est perdu au rechargement interne
 		expoblock.style.display = 'none';
-		SM.moveEl(SM.addNewEl('img', null, null, null, [['src', '/img/icons/ui/planet.png']]), firstalert, firstalert.firstChild); //Icône planète = expédition en cours
+		SM.moveEl(SM.addNewEl('img', null, null, null, { src: '/img/icons/ui/planet.png' }), firstalert, firstalert.firstChild); //Icône planète = expédition en cours
 	}
 
 	// PROJETS, RECHERCHES & PILGRED //
@@ -1083,7 +1160,7 @@ SM.roomTab = function() {
 	)
 	{
 		infobar.className += ' SMfire'; //Changement du fond de la barre d'info
-		SM.addNewEl('p', room_tab, 'SMfiretext', SM.TEXT['fire'], [['class', 'SMfire']]); //Ajout d'un texte
+		SM.addNewEl('p', room_tab, 'SMfiretext', SM.TEXT['fire'], { class: 'SMfire' }); //Ajout d'un texte
 	}
 	else //Remise à zéro
 	{
@@ -1093,7 +1170,7 @@ SM.roomTab = function() {
 	}
 
 	// SE DÉPLACER //
-	var doors = [[10,13,24],[11,25,32,29,3],[14,25,34,30,26],[1,26,12,9],[26],[6,24,14],[24,5],[25],[24,31],[28,15,12,33,35,3],[0,24],[31,1],[3,9],[0,24],[5,2],[28,9],[],[],[],[],[],[],[],[],[0,10,13,6,5,8,31,25],[2,24,7,1],[2,29,30,4,3,28,33,35],[],[26,15,9],[1,26],[2,26],[24,8,11],[1],[26,9],[2],[26,9],[],[]];
+	var doors = [[24,10,13],[3,25,29,32,11],[25,26,30,34,14],[1,26,9,12],[26],[6,24,14],[24,5],[25],[24,31],[33,35,28,3,12,15],[0,24],[31,1],[3,9],[0,24],[5,2],[28,9],[],[],[],[],[],[],[],[],[0,10,13,6,5,8,31,25],[24,2,1,7],[2,3,29,30,4,28,33,35],[],[26,9,15],[1,26],[2,26],[24,11,8],[1],[26,9],[2],[26,9],[],[]];
    
 	var roomname = SM.sel('#input').getAttribute('d_name');
 	var room = SM.rooms.indexOf(roomname);
@@ -1120,13 +1197,13 @@ SM.roomTab = function() {
 		var roomdoors = SM.addNewEl('select', room_tab, 'roomselect');
 		SM.addButton(room_tab, SM.TEXT['move_button']).addEventListener('click', function() { SM.changeRoom(this); });
 
-		for (i = 0; i < doors[room].length; i++)
+		for (var i = 0; i < doors[room].length; i++)
 		{
 			var door = doors[room][i];
 			if (brokendoors.indexOf(door) != -1)
-				{ SM.addNewEl('option', roomdoors, null, SM.localerooms[door] + SM.TEXT['broken_door'], [['value', 'NULL'], ['class', 'SMbrokendoor']]); }
+				{ SM.addNewEl('option', roomdoors, null, SM.localerooms[door] + SM.TEXT['broken_door'], { value: 'NULL', class: 'SMbrokendoor' }); }
 			else
-				{ SM.addNewEl('option', roomdoors, null, SM.localerooms[door], [['value', door]]); }
+				{ SM.addNewEl('option', roomdoors, null, SM.localerooms[door], { value: door }); }
 		}
 	}
 
@@ -1134,7 +1211,7 @@ SM.roomTab = function() {
 	SM.addNewEl('p', room_tab, null, SM.TEXT['equipments']);
 	var equipmentlist = SM.addNewEl('select', room_tab, 'equipmentselect');
 	equipmentlist.addEventListener('change', function() { SM.displayRoomActions(1); });
-	SM.addNewEl('option', equipmentlist, null, "—", [['value', 'NULL']]);
+	SM.addNewEl('option', equipmentlist, null, "—", { value: 'NULL' });
 
 	var items = Main.items.iterator();
 	while (items.hasNext())
@@ -1168,12 +1245,12 @@ SM.roomTab = function() {
 		if (eqname)
 		{
 			var actions = document.querySelectorAll('[webdata="' + item.serial + '"]');
-			for (i = 0; i < actions.length; i++)
+			for (var i = 0; i < actions.length; i++)
 			{
 				if (actions[i].innerHTML.indexOf('REPAIR_OBJECT') != -1 || actions[i].innerHTML.indexOf('REPAIR_PATROL_SHIP') != -1)
-					{ eqname += ((item.iid == 'DOOR') ? SM.TEXT['broken_door'] : SM.TEXT['broken']); }
+					{ eqname += ((item.iid == 'DOOR') ? SM.TEXT['broken_door'] : SM.TEXT['broken']); break; }
 			}
-			SM.addNewEl('option', equipmentlist, null, eqname, [['value', item.serial]]);
+			SM.addNewEl('option', equipmentlist, null, eqname, { value: item.serial });
 		}
 	}
 
@@ -1215,27 +1292,27 @@ SM.roomTab = function() {
 				{ SM.ME_MODULING = true; }
 		}
 
-		var block = SM.addNewEl('li', herolist, null, null, [['class', 'SMheroblock'], ['data-serial', hero.serial]]);
+		var block = SM.addNewEl('li', herolist, null, null, { class: 'SMheroblock', 'data-serial': hero.serial });
 		block.addEventListener('click', function() { SM.displayRoomActions(0, this.getAttribute('data-serial')); });
 
 
 		if (berzerk)
-			{ SM.addNewEl('img', block, null, null, [['src', SM.src + "ui/chars/berzerk.png"]]); }
+			{ SM.addNewEl('img', block, null, null, { src: SM.src + "ui/chars/berzerk.png" }); }
 		else
 		{
 			if (laid)
 			{
 				if (room == 5)
-					{ SM.addNewEl('img', block, null, null, [['src', SM.src + "ui/bed_medlab.png"]]); }
+					{ SM.addNewEl('img', block, null, null, { src: SM.src + "ui/bed_medlab.png" }); }
 				else
-					{ SM.addNewEl('img', block, null, null, [['src', SM.src + "ui/bed_" + (Math.floor(Math.random() * 6) + 1) + ".png"]]); }
-				SM.addNewEl('img', block, null, null, [['src', SM.src + "ui/chars/" + hero.dev_surname + "-laid.png"]]);
+					{ SM.addNewEl('img', block, null, null, { src: SM.src + "ui/bed_" + (Math.floor(Math.random() * 6) + 1) + ".png" }); }
+				SM.addNewEl('img', block, null, null, { src: SM.src + "ui/chars/" + hero.dev_surname + "-laid.png" });
 				if (herolist.children.length > 1)
 					{ SM.moveEl(block, herolist, herolist.firstChild); }
 				block.className += ' SMlaid';
 			}
 			else
-				{ SM.addNewEl('img', block, null, null, [['src', SM.src + "ui/chars/" + hero.dev_surname + ".png"]]); }
+				{ SM.addNewEl('img', block, null, null, { src: SM.src + "ui/chars/" + hero.dev_surname + ".png" }); }
 		}
 	}
 
@@ -1243,8 +1320,20 @@ SM.roomTab = function() {
 	var cat = Main.npc.iterator();
 	if (cat.hasNext())
 	{
-		var catli = SM.addNewEl('li', herolist, null, "<img src='" + SM.src + "ui/chars/schrodinger.png' />", [['class', 'SMheroblock'], ['data-serial', cat.next().serial]]);
+		var catli = SM.addNewEl('li', herolist, null, "<img src='" + SM.src + "ui/chars/schrodinger.png' />", { class: 'SMheroblock', 'data-serial': cat.next().serial });
 		catli.addEventListener('click', function() { SM.displayRoomActions(3, this.getAttribute('data-serial')); });
+	}
+	
+	// DRONES (GRAPHIQUE) //
+	var drones = Main.items.iterator();
+	while (drones.hasNext())
+	{
+		var drone = drones.next();
+		if (drone.iid == 'HELP_DRONE')
+		{
+			var d = SM.addNewEl('li', herolist, null, "<img src='" + SM.src + "ui/chars/drone.png' />", { class: 'SMheroblock', 'data-serial': drone.serial });
+			d.addEventListener('click', function() { SM.displayRoomActions(5, this.getAttribute('data-serial')); });
+		}
 	}
 
 	// INVENTAIRE (COPIÉ) //
@@ -1263,7 +1352,7 @@ SM.roomTab = function() {
 	SM.sel('#SMtt_itemname').previousElementSibling.setAttribute('onclick', 'SM.itemLeft();');
 	SM.sel('#SMtt_itemname').nextElementSibling.setAttribute('onclick', 'SM.itemRight();');
 	var inventory = SM.sel('#SMroom');
-	for (i = 0; i < inventory.children.length; i++)
+	for (var i = 0; i < inventory.children.length; i++)
 		{ inventory.children[i].setAttribute('onclick', 'SM.selectItem(this);'); }
 
 	SM.moveEl(SM.addNewEl('div', null, 'SMitemdesc', null), invblock, invblock.lastElementChild);
@@ -1275,9 +1364,9 @@ SM.chatTab = function() {
 
 	//Liens d'exploration
 	var bubbles = SM.toArray(document.querySelectorAll('.bubble:not(.SMlinked)'));
-	for (i in bubbles)
+	for (var i = 0; i < bubbles.length; i++)
 	{
-		bubbles[i].innerHTML = bubbles[i].innerHTML.replace(/http:\/\/mush\.(vg|twinoid\.(com|es))\/expPerma\/[0-9]+/g, "<a target='_blank' href='$&'>$&</a>");
+		bubbles[i].innerHTML = bubbles[i].innerHTML.replace(/https?:\/\/mush\.(vg|twinoid\.(com|es))\/expPerma\/[0-9]+/g, "<a target='_blank' href='$&'>$&</a>");
 		bubbles[i].className += ' SMlinked';
 	}
 
@@ -1286,15 +1375,15 @@ SM.chatTab = function() {
 		chat.className = 'SMhidepaste';
 		//#wall : création d'un nouveau topic général ; #privateform : création d'un message privé
 		var wallinputs = [['#wall', '#cdChatInput5'], ['#privateform', '#cdChatInput7']];
-		for (i = 0; i < wallinputs.length; i++)
+		for (i in wallinputs)
 		{
 			var input = SM.sel(wallinputs[i][1]);
 			input.setAttribute('onfocus', '$(this).addClass("chatboxfocus"); return true;'); //Main.onChatFocus ne fait qu'empêcher le collage… -_-
 			input.value = '';
-			SM.addButton(SM.sel(wallinputs[i][0]), SM.TEXT['paste'], [['class', 'SMpastebutton'], ['data-id', wallinputs[i][1]]]).addEventListener('click', function() {
+			SM.addButton(SM.sel(wallinputs[i][0]), SM.TEXT['paste'], { class: 'SMpastebutton', dataId: wallinputs[i][1] }).addEventListener('click', function() {
 				if (SM.previewtext)
 				{
-					var t = SM.sel(this.getAttribute('data-id'));
+					var t = SM.sel(this.getAttribute('dataId'));
 					t.value = SM.previewtext;
 					t.focus();
 				}
@@ -1305,14 +1394,14 @@ SM.chatTab = function() {
 
 	//Topics
 	var units = document.getElementsByClassName('unit');
-	for (i = 0; i < units.length; i++)
+	for (var i = 0; i < units.length; i++)
 	{
 		if (units[i].lastElementChild.className != 'but SMpastebutton')
 		{
-			SM.addButton(units[i], SM.TEXT['paste'], [['class', 'SMpastebutton'], ['data-id', units[i].getAttribute('data-k')]]).addEventListener('click', function() {
+			SM.addButton(units[i], SM.TEXT['paste'], { class: 'SMpastebutton', dataId: units[i].getAttribute('data-k') }).addEventListener('click', function() {
 				if (SM.previewtext)
 				{
-					var t = SM.sel('#wall_reply_' + this.getAttribute('data-id'));
+					var t = SM.sel('#wall_reply_' + this.getAttribute('dataId'));
 					t.value = SM.previewtext;
 					t.parentNode.parentNode.parentNode.className = 'blockreply';
 					t.focus();
@@ -1321,6 +1410,14 @@ SM.chatTab = function() {
 			});
 		}
 	}
+
+	//Favori/défavori
+	var unfavs = SM.toArray(document.querySelectorAll('[onclick^="Main.onUnfavClick"]'));
+	for (var i = 0; i < unfavs.length; i++)
+		{ unfavs[i].setAttribute('onclick', "SM.loadingScreen(); Main.onUnfavClick($(this)); return false;"); }
+	var favs = SM.toArray(document.querySelectorAll('[onclick^="Main.onFavClick"]'));
+	for (var i = 0; i < favs.length; i++)
+		{ favs[i].setAttribute('onclick', "SM.loadingScreen(); Main.onFavClick($(this)); return false;"); }
 
 	//Fonction répétée lors du chargement de nouveaux messages pour relancer SM.chatTab() une fois ces messages chargés
 	SM.sel('#chatBlock').setAttribute('onscroll', 'Main.onChatScroll( $(this) ); var chatloading = window.setInterval(function() { if (!Main.lmwProcessing) { clearInterval(chatloading); SM.chatTab(); } }, 200); return true;');
@@ -1338,6 +1435,16 @@ SM.gameTab = function() {
 			SM.reInit();
 		});
 	});
+	
+	//Annonce : /submitDailyOrder
+	var writeblock = SM.sel('#msg_write_form'); //Formulaire d'annonce / ordre
+	if (writeblock)
+	{
+		SM.addButton(writeblock, SM.TEXT['paste'], { class: 'SMpastebutton' }).addEventListener('click', function() {
+			if (SM.previewtext)
+				{ SM.sel('#msg_write_form textarea').value = SM.previewtext; }
+		});
+	}
 
 	var egg = SM.sel('#calcModule [style*="display:none"]');
 	if (egg)
@@ -1350,7 +1457,7 @@ SM.gameTab = function() {
 
 SM.messageEditor = function() {
 	var tabs = SM.sel('#cdTabsChat').children;
-	for (i = 0; i < tabs.length; i++)
+	for (var i = 0; i < tabs.length; i++)
 		{ tabs[i].setAttribute('onclick', 'SM.changeChatTab(this);'); }
 
 	if (SM.sel('#SMeditor')) //Si l'onglet existe déjà
@@ -1366,7 +1473,7 @@ SM.messageEditor = function() {
 	}
 
 	var tab = SM.addNewEl('li', SM.sel('.tabschat'), 'SMeditortab', '<img src="http://mush.twinoid.com/img/icons/ui/conceptor.png" />');
-	tab.addEventListener('mouseover', function() { Main.showTip(this, SM.TEXT['editor_tip']); });
+	tab.onmouseover = function() { Main.showTip(this, SM.TEXT['editor_tip']); };
 	tab.addEventListener('mouseout', function() { Main.hideTip(); });
 	tab.addEventListener('click', function() { SM.changeChatTab(this); });
 	tab.className = 'tab taboff';
@@ -1379,7 +1486,7 @@ SM.messageEditor = function() {
 	//On récupère le formulaire de post de message sur le Nexus de Twinoid pour avoir la prévisualisation Twinoid et les smileys
 	var src = document.body.getAttribute('data-SM-src');
 	SM.addNewEl('div', editor, 'tabreply_content');
-	SM.addNewEl('script', document.body, null, null, [['src', src], ['async', 'true']]).onload = function() {
+	SM.addNewEl('script', document.body, null, null, { src: src, async: 'true' }).onload = function() {
 		var form = SM.sel('[action="/mod/wall/post?submit=1"]');
 		form.removeChild(form.lastElementChild); //Boutons Envoyer, Options avancées… complètement inutiles ici
 		form.removeChild(form.lastElementChild);
@@ -1407,7 +1514,7 @@ SM.messageEditor = function() {
 		});
 
 		//Ajout des smileys Mush
-		SM.addNewEl('p', form, null, '↓ ' + SM.TEXT['editor-mush_smileys'] + ' ↓', [['class', 'SMcenter']]).addEventListener('click', function() {
+		SM.addNewEl('p', form, null, '↓ ' + SM.TEXT['editor-mush_smileys'] + ' ↓', { class: 'SMcenter' }).addEventListener('click', function() {
 			var block = SM.sel('#SMsmileysblock');
 			if (block.style.display == 'none')
 			{
@@ -1422,21 +1529,21 @@ SM.messageEditor = function() {
 		});
 		var s = SM.addNewEl('div', form, 'SMsmileysblock');
 		s.style.display = 'none';
-		for (i = 0; i < SM.smileys.length; i++) //Smileys Mush
+		for (var i = 0; i < SM.smileys.length; i++) //Smileys Mush
 		{
-			SM.addNewEl('img', s, null, null, [['src', '/img/icons/ui/' + SM.smileys[i][1]], ['data-smiley', SM.smileys[i][0].split('|')[0]]]).addEventListener('click', function() {
-				SM.sel('#tid_wallPost').value += ':' + this.getAttribute('data-smiley') + ':';
+			SM.addNewEl('img', s, null, null, { src: '/img/icons/ui/' + SM.smileys[i][1], dataSmiley: SM.smileys[i][0].split('|')[0] }).addEventListener('click', function() {
+				SM.sel('#tid_wallPost').value += ':' + this.getAttribute('dataSmiley') + ':';
 				setTimeout(function() { SM.refreshPreview(); }, 100);
 			});
 		}
 
 		//Liste des messages préformatés
-		SM.addNewEl('p', form, null, SM.TEXT['premessages_title'], [['style', 'color: black; margin-top: 20px;']]);
+		SM.addNewEl('p', form, null, SM.TEXT['premessages_title'], { style: 'color: black; margin-top: 20px;' });
 		var premessages = SM.addNewEl('select', form, 'SMpremessages');
 		premessages.addEventListener('change', function() { SM.buildMessage(); });
 		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms'];
-		for (i = 0; i < options.length; i++)
-			{ SM.addNewEl('option', premessages, null, SM.TEXT['premessages_' + options[i]], [['value', options[i]]]); }
+		for (var i = 0; i < options.length; i++)
+			{ SM.addNewEl('option', premessages, null, SM.TEXT['premessages_' + options[i]], { value: options[i] }); }
 
 		//Ajout des boutons de copie & sauvegarde
 		SM.addButton(form, SM.TEXT['preview_copy']).addEventListener('click', function() {
@@ -1473,7 +1580,7 @@ SM.refreshPreview = function () {
 	t = t.replace(/<span class=["']tid_preRoleplay["']>(.*)<\/span><span class=["']tid_roleplay["']><span class=["']tid_wroleplay["']>(.*)<\/span><\/span>/g, '[rp=$1]$2[/rp]'); //Balise RP
 	if (SM.ME_NERON) //Commande /neron
 		{ t = t.replace(/\/neron /, '<img src="http://mush.vg/img/icons/ui/pa_core.png" /> <span class="buddy">NERON : </span>'); }
-	for (i = 0; i < SM.smileys.length; i++) //Smileys Mush
+	for (var i = 0; i < SM.smileys.length; i++) //Smileys Mush
 		{ t = t.replace(RegExp(':\(' + SM.smileys[i][0] + '\):', 'g'), '<img src="/img/icons/ui/' + SM.smileys[i][1] + '" alt="$1" />'); }
 	SM.sel("#tid_wallPost_preview").innerHTML = t;
 };
@@ -1492,7 +1599,7 @@ SM.savePreview = function() {
 
 SM.retrievePreview = function() {
 	var cookies = document.cookie.split('; ');
-	for (i = 0; i < cookies.length; i++)
+	for (var i = 0; i < cookies.length; i++)
 	{
 		var cookie = cookies[i].split('=');
 		if (cookie[0] == 'SMptext')
@@ -1523,7 +1630,7 @@ SM.buildMessage = function() {
 		case 'inventory':
 			message += "**" + SM.sel('#input').getAttribute('d_name') + " :** "; //Nom de la pièce
 			var inventory = SM.sel('#room').children;
-			for (i = 0; i < inventory.length; i++)
+			for (var i = 0; i < inventory.length; i++)
 			{
 				var item = inventory[i];
 				if (item.className == 'item cdEmptySlot') //On arrête dès qu'on tombe sur un slot vide
@@ -1573,7 +1680,7 @@ SM.buildMessage = function() {
 
 			message += ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
-			for (i = 0; i < cards.length; i++)
+			for (var i = 0; i < cards.length; i++)
 			{
 				message += "**" + cards[i].firstElementChild.textContent.trim() + " :** ";
 				message += SM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] #p').textContent.trim() + "\n";
@@ -1598,11 +1705,11 @@ SM.buildMessage = function() {
 			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++_important']); //Prioritaire ?
 			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++_relay']); //Relais nécessaire ?
 			var cards = document.getElementsByClassName('cdProjCard');
-			for (i = 0; i < cards.length; i++)
+			for (var i = 0; i < cards.length; i++)
 			{
 				var name = cards[i].firstElementChild.textContent.trim();
 				var progress = SM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] #p').textContent.trim();
-				var l = SM.addNewEl('tr', table, null, null, [['class', 'SMresearch']]);
+				var l = SM.addNewEl('tr', table, null, null, { class: 'SMresearch' });
 				SM.addNewEl('td', l, null, '<input type="checkbox" checked="true" />').className = 'SMcenter';
 				SM.addNewEl('td', l, null, name);
 				SM.addNewEl('td', l, null, progress);
@@ -1614,7 +1721,7 @@ SM.buildMessage = function() {
 			SM.addButton(popup, SM.TEXT['preformat-researches++_submit']).addEventListener('click', function() {
 				var message = ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
 				var researches = document.getElementsByClassName('SMresearch');
-				for (i = 0; i < researches.length; i++)
+				for (var i = 0; i < researches.length; i++)
 				{
 					var children = researches[i].children;
 					if (children[0].firstChild.checked) //À partager
@@ -1640,7 +1747,7 @@ SM.buildMessage = function() {
 
 			message += ":pa_core: **//" + SM.TEXT['preformat-projects_title'] + " //**:pa_core:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
-			for (i = 0; i < cards.length; i++)
+			for (var i = 0; i < cards.length; i++)
 			{
 				message += "**" + cards[i].firstElementChild.textContent.trim() + " :** ";
 				message += SM.sel('[data-p="' + cards[i].getAttribute('data-p') + '"] .desc').textContent.trim() + "\n";
@@ -1707,13 +1814,13 @@ SM.buildMessage = function() {
 			{
 				message += dbs.length + "/12\n";
 				var writedesc = confirm(SM.TEXT['preformat-comms_Xylophdesc']);
-				for (i in dbs)
+				for (var i = 0; i < dbs.length; i++)
 				{
-					var text = SM.getTipContent(dbs[i].onmouseover).replace(/\n|\r/g, " ");
+					var text = SM.reformat(SM.getTipContent(dbs[i].onmouseover));
 					if (writedesc)
 					{
 						var desc = " : //" + text.match(/<p><strong>(.*)<\/strong><\/p>/)[1] + "//";
-						desc = desc.replace(/\\'/g, "'").replace(/<img(?:.*)alt=['"]([a-zA-Z]+)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1");
+						desc = SM.reformat(desc.replace(/<img(?:.*)alt=['"]([a-zA-Z]+)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1"));
 					}
 					else
 						{ var desc = ""; }
@@ -1727,7 +1834,7 @@ SM.buildMessage = function() {
 			message += SM.TEXT['preformat-comms_bases'];
 			var bases = SM.toArray(document.querySelectorAll('#trackerModule .bases [data-id]')).reverse();
 			var anysignal = false;
-			for (i in bases)
+			for (var i = 0; i < bases.length; i++)
 			{
 				var id = bases[i].getAttribute('data-id');
 				var span = SM.sel('#trackerModule [data-id="' + id + '"] span');
@@ -1771,16 +1878,32 @@ SM.preformatPlanet = function(planet) {
 	var direction = planet.children[2].children[1].children[0].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 	var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 	var zones = planet.lastElementChild.firstElementChild.innerHTML.match(/<h1>(.*)<\/h1>/g);
+	var grouped = {};
 
 	var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
 	var unknown = 0;
-	for (i = 0; i < zones.length; i++)
+
+	//Regroupement des zones identiques
+	for (var i = 0; i < zones.length; i++)
 	{
 		var zone = zones[i].slice(4, -5);
 		if (zone == '???')
 			{ unknown += 1; }
 		else
-			{ message += zone + ", "; }
+		{
+			if (typeof grouped[zone] == 'undefined')
+				{ grouped[zone] = 1; }
+			else
+				{ grouped[zone] += 1; }
+		}
+	}
+	for (zone in grouped)
+	{
+		var qty = grouped[zone];
+		if (qty == 1)
+			{ message += zone + ', '; }
+		else
+			{ message += zone + ' //x' + qty + '//, '; }
 	}
 	if (unknown)
 		{ message += "//" + unknown + " " + SM.TEXT['preformat-planet_unknown'] + '//, '; }
@@ -1821,7 +1944,15 @@ SM.locale = function() {
 	switch (lang)
 	{
 		case 1: //Français
-		SM.TEXT['ap'] = "PA";
+		SM.TEXT['AP-general'] = "point(s) d'action";
+		SM.TEXT['AP-eng'] = "point(s) de mécanique";
+		SM.TEXT['AP-garden'] = "point(s) de jardinage";
+		SM.TEXT['AP-neron'] = "point(s) de Nexus";
+		SM.TEXT['AP-comp'] = "point(s) d'informatique";
+		SM.TEXT['AP-heal'] = "point(s) de soin";
+		SM.TEXT['AP-pilgred'] = "point(s) de PILGRED";
+		SM.TEXT['AP-shoot'] = "point(s) de tir";
+		SM.TEXT['AP-cook'] = "point(s) de cuisine";
 		SM.TEXT['hide_alert_reports'] = "Cacher les rapports";
 		SM.TEXT['show_alert_reports'] = "Lister les rapports";
 		SM.TEXT['unvalid_move'] = "Cette porte est cassée, vous ne pouvez pas vous déplacer !";
@@ -1837,6 +1968,10 @@ SM.locale = function() {
 		SM.TEXT['SMparams_food-desc'] = "Afficher les effets des aliments sous l'inventaire";
 		SM.TEXT['SMparams_forced-locale'] = "Forcer la langue de Small(Mush)";
 		SM.TEXT['SMparams_lang-title'] = "Langue de l'interface Small(Mush) :";
+		SM.TEXT['light_refresh-activate'] = "Activer le rechargement léger";
+		SM.TEXT['light_refresh-activate_text'] = "Le rechargement léger ne met pas à jour les canaux de discussion. Cela rend le jeu plus réactif si vous êtes sur mobile sur un vaisseau très bavard, le temps de faire quelques actions. N'oubliez pas de le désactiver ensuite !";
+		SM.TEXT['light_refresh-deactivate'] = "Réactiver le rechargement normal";
+		SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Réactiver le rechargement normal</h1>Le rechargement normal est nécessaire pour que le chat soit mis à jour.</div></div></div></div>";
 		SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
 		SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 		SM.TEXT['tabs_char'] = "Perso";
@@ -1953,13 +2088,21 @@ SM.locale = function() {
 		SM.TEXT['buttontip-reloadall'] = "<h1>Rechargement complet</h1>Rafraîchit tout le cadre de jeu (plus lent). Utile lors d'un nouveau cycle ou d'une nouvelle étape d'exploration.";
 		SM.TEXT['buttontip-help'] = "<h1>Aide</h1>Affiche les infobulles (dont certaines récalcitrantes sur mobile) ainsi que de l'aide pour les éléments ajoutés par le script Small(Mush).";
 		
-		SM.loadingTexts = ["Photobirouillage des métaplores…", "Test chat / micro-ondes en cours…", "Recherche de signal TF1…", "Vidange des comptes en Suisse…", "Inscription au registre des rechargeurs de page…", "Recherche de Charlie…", "Enroulage du corps dans un tapis persan…", "Affichage d'un texte d'attente prétendument drôle…", "Transfert d'arrays de bool…", "Rechargement des blasters à la confiture…", "Salutations au monde…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du module des annonces vocodées…", "Localisation des drones…", "Schématisation des transistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Nettoyage plancher par microperforation…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Mise à jour module perso…", "Détartrage du matou…"];
+		SM.loadingTexts = ["Photobirouillage des métaplores…", "Tir aux poulets intergalactiques…", "Test chat / micro-ondes…", "Recherche de Charlie…", "Tournée d'arrays de bool…", "Rechargement des blasters à la confiture…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du lutin des annonces vocodées…", "Localisation des drones…", "Schématisation des Terminatransistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Surchauffe des modules persos…", "Détartrage du matou…", "Cueillette des champignons…"];
 		
 		SM.localerooms = ['Pont', 'Baie Alpha', 'Baie Beta', 'Baie Alpha 2', 'Nexus', 'Infirmerie', 'Laboratoire', 'Réfectoire', 'Jardin Hydroponique', 'Salle des moteurs', 'Tourelle Alpha avant', 'Tourelle Alpha centre', 'Tourelle Alpha arrière', 'Tourelle Beta avant', 'Tourelle Beta centre', 'Tourelle Beta arrière', 'Patrouilleur Longane', 'Patrouilleur Jujube', 'Patrouilleur Tamarin', 'Patrouilleur Socrate', 'Patrouilleur Epicure', 'Patrouilleur Platon', 'Patrouilleur Wallis', 'Pasiphae', 'Couloir avant', 'Couloir central', 'Couloir arrière', 'Planète', 'Baie Icarus', 'Dortoir Alpha', 'Dortoir Beta', 'Stockage Avant', 'Stockage Alpha centre', 'Stockage Alpha arrière', 'Stockage Beta centre', 'Stockage Beta arrière', 'Espace infini', 'Les Limbes'];
 		break;
 
 		case 2: //Anglais
-		SM.TEXT['ap'] = "AP";
+		SM.TEXT['AP-general'] = "action point(s)";
+		SM.TEXT['AP-eng'] = "tech point(s)";
+		SM.TEXT['AP-garden'] = "gardening point(s)";
+		SM.TEXT['AP-neron'] = "NERON projects point(s)";
+		SM.TEXT['AP-comp'] = "IT point(s)";
+		SM.TEXT['AP-heal'] = "healing point(s)";
+		SM.TEXT['AP-pilgred'] = "PILGRED point(s)";
+		SM.TEXT['AP-shoot'] = "shooting point(s)";
+		SM.TEXT['AP-cook'] = "cooking point(s)";
 		SM.TEXT['hide_alert_reports'] = "Hide reports";
 		SM.TEXT['show_alert_reports'] = "Show reports";
 		SM.TEXT['unvalid_move'] = "This door is broken, you cannot move there!";
@@ -1975,6 +2118,10 @@ SM.locale = function() {
 		SM.TEXT['SMparams_food-desc'] = "Show consumables effects under inventory";
 		SM.TEXT['SMparams_forced-locale'] = "Force Small(Mush) language";
 		SM.TEXT['SMparams_lang-title'] = "Small(Mush) language:";
+		SM.TEXT['light_refresh-activate'] = "Activate light refresh";
+		SM.TEXT['light_refresh-activate_text'] = "Light refresh does not update discussion channels. It is useful in a very talkative ship if you are on mobile: you will find the game to be quicker to react if you temporarily need to do a few actions. Don't forget to deactivate it afterwards!";
+		SM.TEXT['light_refresh-deactivate'] = "Reactivate normal refresh";
+		SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Reactivate normal refresh</h1>Normal refresh is necessary for the chat to be fully updated.</div></div></div></div>";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
@@ -2091,13 +2238,21 @@ SM.locale = function() {
 		SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
 		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
 		
-		SM.loadingTexts = ["Photoscamping the scransons…", "Cat / microwave experiment in progress…", "Scanning for BBC signal…", "Emptying Swiss bank accounts…", "Creating file in page reloaders register…", "Looking for Waldo…", "Hiding body in a persian rug…", "Displaying supposedly funny waiting text…", "Creating array D-bool…", "Reloading blasters with jam…", "Hello worlding…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements module…", "Locating drones…", "Mapping PILGRED transistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Microperforation floor cleaning…", "Saving Private Ryan…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Updating PDA…", "Scaling the kitty's teeth…"];
+		SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
 		
 		SM.localerooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];
 		break;
 
 		case 3: //Espagnol
-		SM.TEXT['ap'] = "AP";
+		SM.TEXT['AP-general'] = "action point(s)";
+		SM.TEXT['AP-eng'] = "tech point(s)";
+		SM.TEXT['AP-garden'] = "gardening point(s)";
+		SM.TEXT['AP-neron'] = "NERON projects point(s)";
+		SM.TEXT['AP-comp'] = "IT point(s)";
+		SM.TEXT['AP-heal'] = "healing point(s)";
+		SM.TEXT['AP-pilgred'] = "PILGRED point(s)";
+		SM.TEXT['AP-shoot'] = "shooting point(s)";
+		SM.TEXT['AP-cook'] = "cooking point(s)";
 		SM.TEXT['hide_alert_reports'] = "Hide reports";
 		SM.TEXT['show_alert_reports'] = "Show reports";
 		SM.TEXT['unvalid_move'] = "This door is broken, you cannot move there!";
@@ -2113,6 +2268,10 @@ SM.locale = function() {
 		SM.TEXT['SMparams_food-desc'] = "Show consumables effects under inventory";
 		SM.TEXT['SMparams_forced-locale'] = "Force Small(Mush) language";
 		SM.TEXT['SMparams_lang-title'] = "Small(Mush) language:";
+		SM.TEXT['light_refresh-activate'] = "Activate light refresh";
+		SM.TEXT['light_refresh-activate_text'] = "Light refresh does not update discussion channels. It is useful in a very talkative ship if you are on mobile: you will find the game to be quicker to react if you temporarily need to do a few actions. Don't forget to deactivate it afterwards!";
+		SM.TEXT['light_refresh-deactivate'] = "Reactivate normal refresh";
+		SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Reactivate normal refresh</h1>Normal refresh is necessary for the chat to be fully updated.</div></div></div></div>";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
@@ -2229,7 +2388,7 @@ SM.locale = function() {
 		SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
 		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
 		
-		SM.loadingTexts = ["Photoscamping the scransons…", "Cat / microwave experiment in progress…", "Scanning for BBC signal…", "Emptying Swiss bank accounts…", "Creating file in page reloaders register…", "Looking for Waldo…", "Hiding body in a persian rug…", "Displaying supposedly funny waiting text…", "Creating array D-bool…", "Reloading blasters with jam…", "Hello worlding…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements module…", "Locating drones…", "Mapping PILGRED transistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Microperforation floor cleaning…", "Saving Private Ryan…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Updating PDA…", "Scaling the kitty's teeth…"];
+		SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
 		
 		SM.localerooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];
 		break;
@@ -2243,7 +2402,7 @@ SM.locale = function() {
 /* FONCTION D'INITIALISATION */
 
 SM.init = function() {
-	var inlineJS = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' })); Main.SMupdtArr = ['maincontainer'];";
+	var inlineJS = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' })); Main.SMupdtArr = ['maincontainer']; Main.normalSelUpdtArr = Main.selUpdtArr;";
 	SM.addNewEl('script', document.head, null, inlineJS); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible et Main.SMupdtArr ne marche pas
 
 	if (SM.sel('#SMbar') == null)
@@ -2290,6 +2449,7 @@ exportFunction(SM.moveEl, unsafeSM, {defineAs: "moveEl"});
 exportFunction(SM.copyEl, unsafeSM, {defineAs: "copyEl"});
 exportFunction(SM.getTipContent, unsafeSM, {defineAs: "getTipContent"});
 exportFunction(SM.toArray, unsafeSM, {defineAs: "toArray"});
+exportFunction(SM.reformat, unsafeSM, {defineAs: "reformat"});
 exportFunction(SM.generateMinimap, unsafeSM, {defineAs: "generateMinimap"});
 exportFunction(SM.changeTab, unsafeSM, {defineAs: "changeTab"});
 exportFunction(SM.SMhelp, unsafeSM, {defineAs: "SMhelp"});

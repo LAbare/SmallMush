@@ -137,6 +137,8 @@ table.genstatus td.spaceshipstatus ul li {
 	margin-left: 3px;
 }
 
+.people { font-size: 0; }
+
 .spaceshipstatus img { margin-left: -1px; }
 
 .alarm { margin-right: 3px; }
@@ -203,12 +205,6 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
   DIVERS
 \*--------------------*/
 
-#SMicon { /* Icône Small(Mush) */
-	position: fixed;
-	bottom: 0px;
-	right: 0px;
-}
-
 /* Écrans couvrant la page entière pour afficher une infobulle/l'icône de chargement */
 #SMhelpscreenA, #SMhelpscreenB, #SMloadscreen {
 	display: none;
@@ -270,11 +266,11 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 
 /* Paramètres Small(Mush) */
 #SMparams { /* Bouton Paramètres */
-	position: absolute;
-	top: 5px;
+	position: fixed;
+	bottom: 5px;
 	right: 5px;
 	padding: 2px;
-	border: 1px solid white;
+	border: 2px solid white;
 	border-radius: 2px;
 	background-color: navy;
 }
@@ -338,6 +334,13 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 	color: #000;
 }
 
+#SMlightbut { /* Bouton rafraîchissement léger */
+	position: fixed;
+	bottom: 5px;
+	right: 50px;
+	border: 2px red solid;
+}
+
 /* Incendie */
 .SMfire {
 	background-color: #811;
@@ -360,6 +363,8 @@ p.SMfire {
 
 /* Bouton « Afficher la minimap Small(Mush) » */
 #room_col .but { margin-top: 25px; }
+
+.readeverything { margin-bottom: 20px; }
 
 
 

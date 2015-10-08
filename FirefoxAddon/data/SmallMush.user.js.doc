@@ -9,6 +9,7 @@
 .copyEl(el, dest, *bef): copie un élément dans un autre, en ajoutant le préfixe 'SM' à tous les ID de l'arbre ; possibilité de préciser avant quel enfant
 .getTipContent(tipFunction): retourne le contenu d'une infobulle
 .toArray(obj): retourne un array qui n'influence pas (si copie) et n'est pas influencé (si .querySelectorAll) par sa source (obj)
+.reformat(text): retourne le texte passé débarrassé de ses retours à la ligne et espaces en trop, et remplace les apostrophes échappées et espaces insécables en notation HTML
 
 *** Fonctions Small(Mush) : ***
 .generateMinimap(): génère une minimap du vaisseau avec les alertes des avaries signalées

@@ -1,4 +1,12 @@
-SM.TEXT['ap'] = "PA";
+SM.TEXT['AP-general'] = "point(s) d'action";
+SM.TEXT['AP-eng'] = "point(s) de mécanique";
+SM.TEXT['AP-garden'] = "point(s) de jardinage";
+SM.TEXT['AP-neron'] = "point(s) de Nexus";
+SM.TEXT['AP-comp'] = "point(s) d'informatique";
+SM.TEXT['AP-heal'] = "point(s) de soin";
+SM.TEXT['AP-pilgred'] = "point(s) de PILGRED";
+SM.TEXT['AP-shoot'] = "point(s) de tir";
+SM.TEXT['AP-cook'] = "point(s) de cuisine";
 SM.TEXT['hide_alert_reports'] = "Cacher les rapports";
 SM.TEXT['show_alert_reports'] = "Lister les rapports";
 SM.TEXT['unvalid_move'] = "Cette porte est cassée, vous ne pouvez pas vous déplacer !";
@@ -14,6 +22,10 @@ SM.TEXT['SMparams_confirm-action'] = "Confirmer les actions";
 SM.TEXT['SMparams_food-desc'] = "Afficher les effets des aliments sous l'inventaire";
 SM.TEXT['SMparams_forced-locale'] = "Forcer la langue de Small(Mush)";
 SM.TEXT['SMparams_lang-title'] = "Langue de l'interface Small(Mush) :";
+SM.TEXT['light_refresh-activate'] = "Activer le rechargement léger";
+SM.TEXT['light_refresh-activate_text'] = "Le rechargement léger ne met pas à jour les canaux de discussion. Cela rend le jeu plus réactif si vous êtes sur mobile sur un vaisseau très bavard, le temps de faire quelques actions. N'oubliez pas de le désactiver ensuite !";
+SM.TEXT['light_refresh-deactivate'] = "Réactiver le rechargement normal";
+SM.TEXT['light_refresh-deactivate_tip'] = "<div class='tiptop' ><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Réactiver le rechargement normal</h1>Le rechargement normal est nécessaire pour que le chat soit mis à jour.</div></div></div></div>";
 SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
 SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 SM.TEXT['tabs_char'] = "Perso";
@@ -130,6 +142,6 @@ SM.TEXT['buttontip-reload'] = "<h1>Rafraîchir</h1>Rafraîchit le jeu pour les a
 SM.TEXT['buttontip-reloadall'] = "<h1>Rechargement complet</h1>Rafraîchit tout le cadre de jeu (plus lent). Utile lors d'un nouveau cycle ou d'une nouvelle étape d'exploration.";
 SM.TEXT['buttontip-help'] = "<h1>Aide</h1>Affiche les infobulles (dont certaines récalcitrantes sur mobile) ainsi que de l'aide pour les éléments ajoutés par le script Small(Mush).";
 
-SM.loadingTexts = ["Photobirouillage des métaplores…", "Test chat / micro-ondes en cours…", "Recherche de signal TF1…", "Vidange des comptes en Suisse…", "Inscription au registre des rechargeurs de page…", "Recherche de Charlie…", "Enroulage du corps dans un tapis persan…", "Affichage d'un texte d'attente prétendument drôle…", "Transfert d'arrays de bool…", "Rechargement des blasters à la confiture…", "Salutations au monde…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du module des annonces vocodées…", "Localisation des drones…", "Schématisation des transistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Nettoyage plancher par microperforation…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Mise à jour module perso…", "Détartrage du matou…"];
+SM.loadingTexts = ["Photobirouillage des métaplores…", "Tir aux poulets intergalactiques…", "Test chat / micro-ondes…", "Recherche de Charlie…", "Tournée d'arrays de bool…", "Rechargement des blasters à la confiture…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du lutin des annonces vocodées…", "Localisation des drones…", "Schématisation des Terminatransistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Surchauffe des modules persos…", "Détartrage du matou…", "Cueillette des champignons…"];
 
 SM.localerooms = ['Pont', 'Baie Alpha', 'Baie Beta', 'Baie Alpha 2', 'Nexus', 'Infirmerie', 'Laboratoire', 'Réfectoire', 'Jardin Hydroponique', 'Salle des moteurs', 'Tourelle Alpha avant', 'Tourelle Alpha centre', 'Tourelle Alpha arrière', 'Tourelle Beta avant', 'Tourelle Beta centre', 'Tourelle Beta arrière', 'Patrouilleur Longane', 'Patrouilleur Jujube', 'Patrouilleur Tamarin', 'Patrouilleur Socrate', 'Patrouilleur Epicure', 'Patrouilleur Platon', 'Patrouilleur Wallis', 'Pasiphae', 'Couloir avant', 'Couloir central', 'Couloir arrière', 'Planète', 'Baie Icarus', 'Dortoir Alpha', 'Dortoir Beta', 'Stockage Avant', 'Stockage Alpha centre', 'Stockage Alpha arrière', 'Stockage Beta centre', 'Stockage Beta arrière', 'Espace infini', 'Les Limbes'];
