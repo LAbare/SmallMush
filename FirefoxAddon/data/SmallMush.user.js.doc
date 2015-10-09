@@ -23,6 +23,7 @@
 .SMexitModule(*func): remplace Main.exitModule() pour éviter le rechargement total de la page, peut exécuter une fonction ensuite (voir .changeRoom)
 .changeActionFunctions(): ajoute un appel à SM.beforeAction() avant chaque action
 .beforeAction(): appelée avant chaque action pour sauvegarder le message actuel de l'éditeur, demander confirmation de l'action si besoin et changer d'onglet Small(Mush) pour certaines actions
+.hidePaste(): cache les boutons "Coller"
 .loadingScreen(): affiche l'écran de rechargement
 .reInit(): reconstruit l'interface Small(Mush) après mise à jour de la page
 .showLicense(): affiche la licence MIT
@@ -63,6 +64,7 @@
 
 
 ***** VARIABLES *****
+.version: (string) version du script
 .src: (string) adresse du dossier source du script
 .smileys: (list) couple raccourci/image des smileys Mush
 .previewtext: (string) message actuel de l'éditeur de message

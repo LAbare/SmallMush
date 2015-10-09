@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=424px">
+	<title>Small(Mush)</title>
+	<style>
+		html { margin: 0; padding: 0; }
+		body { margin: 0; padding: 5px; background-color: #AAF; }
+		h1 { color: white; text-align: center; text-shadow: black 2px 2px 2px; }
+		h2 { margin-left: 10px; margin-top: 50px; }
+		h3 { font-variant: small-caps; color: #003; }
+		p { text-align: justify; }
+		li { margin-bottom: 5px; }
+		em, i { color: #CF1830; }
+		strong, b { color: #090A61; }
+		.img { border: 2px #55A solid; background-color: #77C; }
+		.img p { text-align: center; }
+		.img img { display: none; max-width: 100%; }
+		.but { background-image: url("ui/butbg.png"); background-repeat: repeat-x; height: 21px; display: inline-block; vertical-align: middle; }
+		.but:before { content: url("ui/butleft.png"); }
+		.but:after { content: url("ui/butright.png"); }
+		.but img { position: relative; bottom: 3px; }
+		#code { border: 1px black solid; background-color: #EEE; padding: 2px; font-family: monospace; }
+		.question { margin-bottom: 0; margin-left: 10px; color: #B16; }
+		.answer { margin-top: 0; }
+    </style>
+</head>
+
+<body>
+	<script>function showImage(el) { el.firstElementChild.style.display = 'none'; el.lastElementChild.style.display = 'block'; }</script>
+	<h1><img src='ico.png' /> Small(Mush) <img src='ico.png' /></h1>
+
+	<p style='text-align: center;'><a href='#Use'>Use</a> — <a href='#Install'>Installation</a> — <a href='#Flash'>Install Flash</a> — <a href='#FAQ'>FAQ</a></p>
+	
+	<p>All images on this page display French text (sorry), but this won't prevent you from understanding what they show.</p>
+
+	<h2>Presentation</h2>
+	<p>Small(Mush) is a <em>script for Mush</em> coded by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>, thanks to which you may play your favourite game on your phone. Yes, that's right. Moreover, if your phone does not support Flash, the script is able to emulate the basic functionalities of the game. Neat, isn't it? Still, you should really try to <a href='#Flash'>install Flash</a> for a fully functional game.</p>
+	<p>However, I cannot stress enough that this is a <strong>script</strong>. It is <strong>not</strong> a mobile app for Mush. It is coded by a mere player, without the Motion Twin having anything to do with it; the game interface has to be slightly modified, and all bugs that occur while the script is active have to be reported to me, not on the forums. The main function of this script is to fit the large game in the small size of your phone. For any question, suggestion, any chocolate or love you may want to give me, send <a href='http://twinoid.com/user/8412516' target='_blank'>me</a> a message.</p>
+
+	
+	<h2 id='Use'>Use</h2>
+	<p>In order for the game to fit on your phone, Small(Mush) divides it into five tabs.</p>
+	<div class='img' onclick='showImage(this);'>
+		<p>Click to display the image.</p>
+		<img src='img/Interface.jpg' alt="Top left : refresh and help ; bar : game tabs ; top right : script parameters." />
+	</div>
+	<p>Top left: these buttons will refresh the game, and the help button will display any tooltip you want, even on added elements.
+	<br />Top right: this button opens the Small(Mush) parameters menu. Try it, there are useful options!
+	<br />The tabs bar gives you access to the five tabs: <a href='img/Tab-1.jpg' target='_blank'>Yourself</a>, <a href='img/Tab-2.jpg' target='_blank'>Ship</a>, <a href='img/Tab-3.jpg' target='_blank'>Room</a>, <a href='img/Tab-4.jpg' target='_blank'>Chat</a> and <a href='img/Tab-5.jpg' target='_blank'>Module</a> (that is the Flash game and the terminals you access), plus the vending machine.</p>
+
+
+	<h2 id='Install'>Installation and activation</h2>
+	<p>The script may be automatically activated for <b>Firefox</b> and <b>Dolphin Browser</b> on Android ; for some other browsers, such as Chrome, you may activate it manually each time you play Mush.</p>
+
+	<h3>Firefox (Android)</h3>
+	<p><ol>
+		<li>Install <a href='FirefoxAddon/smallmush.xpi'>the Small(Mush) addon</a>.</li>
+	</ol></p>
+
+	<h3>Dolphin Browser (Android)</h3>
+	<p><ol>
+		<li>Install the <a href='market://details?id=net.tampermonkey.dolphin'>Tampermonkey for Dolphin Browser addon</a> from the Play Store.</li>
+		<li>Install the script by clicking on <a href='SmallMush.user.js'>this link</a>, then « Install » in the next window.</li>
+	</ol></p>
+
+	<h3>Other browers (manual activation)</h3>
+	<p><b>Warning:</b> this may not work depending on the browser you use.</p>
+	<p><ol>
+		<li>Click on <a href='#javascript:(function(){var%20MM=document.createElement(%22script%22);MM.src=%22http://labare.github.io/SmallMush/SmallMush.js%22;document.head.appendChild(MM);})();'>this link</a> and add the page to your bookmarks. (Only the URL changes, not the page.)</li>
+		<li>Edit the bookmark you just created (long-press on it from the Bookmarks menu of your browser).</li>
+		<li>In the URL field, erase the hash (#) and all that is before it. You should get some code beginning with <i>javascript:</i>.</li>
+		<li>Once you're on Mush and the page is loaded, enter "Small(Mush)" in your browser address bar. it should display some links, and among them your bookmark; click it. You may also just open the bookmark from your Bookmarks folder, but that may not work.</li>
+	</ol></p>
+	<p>This works well with Chrome, as well as <a href='http://m.youtube.com/watch?v=Jm1j9-lfw98' target='_blank'>with Safari</a> for iPhone owners.</p>
+	<div class='img' onclick='showImage(this);'>
+		<p>Click to display the image.</p>
+		<img src='img/Manuel.jpg' alt="Description of manual activation" />
+	</div>
+
+
+	<h2 id='Flash'>Install Flash</h2>
+	<p>Although not necessary for this script, Flash will allow you to fully experience Mush.</p>
+	<p><b>Required:</b> Android 4.3 maximum. (See Settings → About my phone → Android version)</p>
+	<ol>
+		<li>Allow the installation of third-party apps (Settings → Applications or Security → Unknown sources <b>checked</b>) ;</li>
+		<li>Install <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.115.81/install_flash_player_ics.apk">Flash Player for Android 4.0+</a> or <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.111.73/install_flash_player_pre_ics.apk">Flash Player for Android 2 and 3</a> (once the download is finished, open your notifications bar and tap the file to directly install it) ;</li>
+		<li>Use a Flash-compatible browser (Firefox, Dolphin Browser).</li>
+	</ol>
+
+
+	<h2 id='FAQ'>Frequently Asked Questions</h2>
+	<h3 class='question'>What and how do you emulate from the game?</h3>
+	<p class='answer'>The script finds in the page all the information used by the Flash game it can process (that is, not everything). In the Room tab, you can see the equipments, the crewmembers and the inventory of the room, you can move, and you should be warned if the room is on fire. Without Flash, you <b>cannot</b> see the Flash minimap, nor see nor aim for the hunters you can see from a patrol ship or a turret. In patrol ships, you can still shoot randomly from the shooting equipment, that may help.</p>
+	<h3 class='question'>Why is the Flash game not fully zoomed?</h3>
+	<p class='answer'>I cannot do anything to improve this, but it should be enough to play.</p>
+	<h3 class='question'>How do I know if a camera is watching me?</h3>
+	<p class='answer'>An installed camera is considered an equipment by the game, thus you will find it in the Room tab.</p>
+	<h3 class='question'>Is it normal that the game is long to refresh?</h3>
+	<p class='answer'>Unfortunately yes, a phone is less powerful thus slower than a computer for this task. The chat is the heaviest part, so you can get rid of some old faves or reopen a private channel when it's getting old to make it a bit faster.</p>
+	<h3 class='question'>Does it consume a lot of data to play Mush on a phone?</h3>
+	<p class='answer'>As long as you don't wipe your cache every minute, not really. The script only changes when I update it, so the only thing your phone will download is the page itself: 30 to 50 Ko, reloaded at every action. This is about three to four times lighter than a Google search.</p>
+</body>
+</html>

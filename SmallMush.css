@@ -1,31 +1,6 @@
-/**——————————————————————————————————————————————**\
- *                SMALL(MUSH) - CSS               *
- *                                                *
- *     Catégories :                               *
- *         - ajustements ;                        *
- *         - barre d'info ;                       *
- *         - onglets ;                            *
- *         - divers ;                             *
- *         - onglet Personnage ;                  *
- *         - onglet Vaisseau ;                    *
- *         - onglet Pièce ;                       *
- *         - éditeur de messages Small(Mush) ;    *
- *         - minimap Small(Mush).                 *
- *                                                *
- * Les éléments Small(Mush) ont le préfixe SM     *
- * pour les distinguer des éléments de base.      *
- * Les éléments de base sont modifiés au minimum  *
- * (tant que faire se peut pour que ça marche…).  *
- *                                                *
- * Les propriétés sont rangées plus ou moins dans *
- * l'ordre suivant : display, position, taille,   *
- * marges externes et internes, bordure, contenu. *
- *                                                *
- * Bonne lecture ! :hordes_lol:                   *
- *             LAbare                             *
-\**——————————————————————————————————————————————**/
-
-
+/**——————————————————————**\
+ *    SMALL(MUSH) - CSS   *
+\**______________________**/
 
 
 
@@ -36,7 +11,7 @@
 /* Le viewport et certains éléments sont réglés à 424 pixels de large : il s'agit de la largeur du jeu Flash, autour duquel est basé l'interface Small(Mush). */
 /* Retrait de nombreuses marges internes et externes pour éviter les trous et avoir une interface propre. */
 
-/* Canaux privés invisibles : pas encore corrigé sur les serveurs anglais et espagnol */
+/* Canaux privés invisibles : pas encore bien corrigé sur les serveurs anglais et espagnol */
 .tid_editorContent { visibility: visible !important; }
 
 /* Barre Twinoid : panneaux latéraux */
@@ -319,7 +294,10 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 	font-size: 10pt;
 }
 
-#SMpopup p.nospace { margin-top: 5px; }
+.SMnospace {
+	margin-top: 5px !important;
+	margin-bottom: 5px;
+}
 
 #SMpopup thead { font-size: 0.8em; }
 
@@ -364,6 +342,16 @@ p.SMfire {
 
 /* Distributeur classique */
 .cdDistrib { display: block; }
+
+/* Reste de bêta */
+.cdReturnFromMoveButton { display: none; }
+
+.SMsmallbut  {
+	display: inline-block;
+	vertical-align: middle;
+	margin-bottom: 0 !important;
+	margin-right: 10px;
+}
 
 
 
@@ -884,14 +872,7 @@ table.pvsm {
 
 #SMeditor .but { margin-bottom: 20px; }
 
-/* Boutons rajoutés */
-.tid_editorButtons .but {
-	display: inline-block;
-	margin-bottom: 0 !important;
-	margin-left: 10px;
-}
-
-.tid_editorButtons .but:first-of-type { margin-left: 20px; }
+.tid_editorButton:last-of-type { margin-right: 20px; }
 
 /* Recherche pour la balise Joueur & sélection d'un message préformaté */
 input.tid_withFriends, { color: black; }

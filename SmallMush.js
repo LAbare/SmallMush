@@ -36,13 +36,12 @@ SM.addNewEl = function(type, parent, id, content, attrs) {
 
 SM.addButton = function(parent, text, attrs) {
 	var butattrs = { class: 'but' };
-	if (attrs) {
+	if (attrs)
+	{
 		for (i in attrs)
 		{
-			if (i == 'class')
-				{ butattrs['class'] += ' ' + attrs[i]; }
-			else
-				{ butattrs[i] = attrs[i]; }
+			if (i == 'class') { butattrs['class'] += ' ' + attrs[i]; }
+			else { butattrs[i] = attrs[i]; }
 		}
 	}
 	var a = SM.addNewEl('div', ((parent) ? parent : null), null, null, butattrs);
@@ -103,8 +102,8 @@ SM.generateMinimap = function() {
 
 	SM.addNewEl('h4', popup, null, "<img src='" + SM.src + "ico.png' /> " + SM.TEXT['minimap-title']);
 	SM.addNewEl('p', popup, null, SM.TEXT['minimap-warning']);
-	SM.addNewEl('p', popup, null, SM.TEXT['minimap-legend']).className = 'nospace';
-	SM.addNewEl('p', popup, null, SM.TEXT['minimap-room']).className = 'nospace';
+	SM.addNewEl('p', popup, null, SM.TEXT['minimap-legend']).className = 'SMnospace';
+	SM.addNewEl('p', popup, null, SM.TEXT['minimap-room']).className = 'SMnospace';
 
 	var al = { fAl: 'fire', dAl: 'door', eAl: 'alert' }; //Incendies, portes, équipements
 	for (var j in al)
@@ -302,25 +301,27 @@ SM.changeRoom = function(el) {
 		if (SM.GUARDIAN && !confirm(SM.TEXT['move_guardian']))
 			{ return false; }
 		
-		if (confirm(SM.TEXT['move_confirm'] + roomname + " ?"))
+		if (SM.parameters['confirm-action'])
 		{
-			el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + SM.TEXT['move_button'];
-			if (SM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
-			{
+			if (!confirm(SM.TEXT['move_confirm'] + roomname + " ?"))
+				{ return false; }
+		}
+		el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + SM.TEXT['move_button'];
+		if (SM.ME_MODULING) //Si le joueur est en train d'accéder à un terminal, il gardera le statut Concentré ; il faut donc quitter avant
+		{
+			SM.loadingScreen();
+			SM.SMexitModule(function() {
 				SM.loadingScreen();
-				SM.SMexitModule(function() {
-					SM.loadingScreen();
-					Main.ajax('/?fa=81&fp=' + select.value, null, function() {
-						SM.changeTab('room_tab');
-						SM.sel('#SMloadscreen').style.display = 'none';
-					});
+				Main.ajax('/?fa=81&fp=' + select.value, null, function() {
+					SM.changeTab('room_tab');
+					SM.sel('#SMloadscreen').style.display = 'none';
 				});
-			}
-			else
-			{
-				SM.loadingScreen();
-				Main.ajax('/?fa=81&fp=' + select.value);
-			}
+			});
+		}
+		else
+		{
+			SM.loadingScreen();
+			Main.ajax('/?fa=81&fp=' + select.value);
 		}
 	}
 };
@@ -530,7 +531,7 @@ SM.changeChatTab = function(el) {
 		SM.sel('#SMeditortab').className = 'tab taboff';
 		SM.sel('#SMeditor').style.display = 'none';
 		Main.selChat(parseInt(el.getAttribute('data-tab')));
-		SM.sel('#chatBlock').style.height = '650px';
+		SM.sel('#chatBlock').style.height = '550px';
     }
     
     else //Onglet Éditeur de messages
@@ -583,8 +584,8 @@ SM.SMexitModule = function(func) {
 
 SM.changeActionFunctions = function() {
 	//Boutons Nouveau cycle et Nouvelle étape
-	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
-	SM.sel('#txt_new_step a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); }); return false;');
+	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); SM.changeTab("char_col"); }); return false;');
+	SM.sel('#txt_new_step a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); SM.changeTab("room_col"); }); return false;');
 	//Boutons d'action
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
 	for (var i = 0; i < actions.length; i++)
@@ -641,6 +642,12 @@ SM.beforeAction = function(el) {
 
 	return true;
 };
+
+
+SM.hidePaste = function() {
+	SM.sel('#cdMainChat').className = 'SMhidepaste';
+	SM.sel('#cdModuleContent').className = SM.sel('#cdModuleContent').className.replace(/SMshowpaste/, 'SMhidepaste');
+}
 
 
 SM.loadingScreen = function() {
@@ -843,7 +850,8 @@ SM.buildParamsMenu = function() {
 		document.cookie = 'SMparams=0000; expires=' + date.toGMTString() + '; path=/';
 	});
 
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits']);
+	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits'], { class: 'SMnospace' });
+	SM.addNewEl('p', popup, null, "<a href='http://github.com/LAbare/SmallMush/releases' target='_blank'>v" + SM.version + "</a>", { class: 'SMnospace' });
 };
 
 
@@ -880,19 +888,19 @@ SM.initMenubar = function() {
 
 	// BARRE SMALL(MUSH) //
 	//Rechargement interne de la page
-	var butreload = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />");
-	butreload.addEventListener('click', function() {
+	var butr = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />");
+	butr.addEventListener('click', function() {
 		SM.loadingScreen();
 		Main.ajax('/', null, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
-	butreload.setAttribute('data-SMtip', SM.TEXT['buttontip-reload']);
+	butr.setAttribute('data-SMtip', SM.TEXT['buttontip-reload']);
 
-	var butreloadall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />");
-	butreloadall.addEventListener('click', function() {
+	var butrall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />");
+	butrall.addEventListener('click', function() {
 		SM.loadingScreen();
-		Main.ajax('/', Main.SMupdtArr, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
+		Main.ajax('/', Main.SMupdtArr, function() { SM.reInit(); SM.changeTab('char_col'); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
-	butreloadall.setAttribute('data-SMtip', SM.TEXT['buttontip-reloadall']);
+	butrall.setAttribute('data-SMtip', SM.TEXT['buttontip-reloadall']);
 
 	SM.addNewEl('div', document.body, 'SMloadscreen', "<img src='/img/icons/ui/loading1.gif' />").addEventListener('click', function() { this.style.display = 'none'; });
 
@@ -982,7 +990,7 @@ SM.charTab = function() {
 	if (SM.sel('.cdActionList').children.length == 0)
 	{
 		var actions = SM.sel('.cdActionRepository .heroRoomActions').children;
-		for (var i = 0; i < actions.length; i++) //Le dernier bouton est un reste de la beta à ne pas afficher (.move)
+		for (var i = 0; i < actions.length; i++)
 			{ SM.copyEl(actions[i], SM.sel('.cdActionList')); }
 	}
 
@@ -1166,8 +1174,8 @@ SM.roomTab = function() {
 		}
 
 		SM.addNewEl('b', SM.addNewEl('p', room_tab, null, SM.TEXT['current_room']), null, SM.localerooms[room]);
+		SM.addButton(room_tab, SM.TEXT['move_button'], { class: 'SMsmallbut' }).addEventListener('click', function() { SM.changeRoom(this); });
 		var roomdoors = SM.addNewEl('select', room_tab, 'roomselect');
-		SM.addButton(room_tab, SM.TEXT['move_button']).addEventListener('click', function() { SM.changeRoom(this); });
 
 		for (var i = 0; i < doors[room].length; i++)
 		{
@@ -1180,7 +1188,7 @@ SM.roomTab = function() {
 	}
 
 	// ÉQUIPEMENTS //
-	SM.addNewEl('p', room_tab, null, SM.TEXT['equipments']);
+	SM.addNewEl('p', room_tab, null, SM.TEXT['equipments'], { style: 'margin-top: 20px;' });
 	var equipmentlist = SM.addNewEl('select', room_tab, 'equipmentselect');
 	equipmentlist.addEventListener('change', function() { SM.displayRoomActions(1); });
 	SM.addNewEl('option', equipmentlist, null, "—", { value: 'NULL' });
@@ -1359,7 +1367,7 @@ SM.chatTab = function() {
 					t.value = SM.previewtext;
 					t.focus();
 				}
-				SM.sel('#cdMainChat').className = 'SMhidepaste';
+				SM.hidePaste();
 			});
 		}
 	}
@@ -1378,7 +1386,7 @@ SM.chatTab = function() {
 					t.parentNode.parentNode.parentNode.className = 'blockreply';
 					t.focus();
 				}
-				SM.sel('#cdMainChat').className = 'SMhidepaste';
+				SM.hidePaste();
 			});
 		}
 	}
@@ -1408,13 +1416,17 @@ SM.gameTab = function() {
 		});
 	});
 	
-	//Annonce : /submitDailyOrder
+	//Annonce : /submitDailyOrder ; TODO: marche peut-être aussi pour les missions ?
 	var writeblock = SM.sel('#msg_write_form'); //Formulaire d'annonce / ordre
 	if (writeblock)
 	{
+		SM.sel('#cdModuleContent').className += ' SMhidepaste';
 		SM.addButton(writeblock, SM.TEXT['paste'], { class: 'SMpastebutton' }).addEventListener('click', function() {
 			if (SM.previewtext)
-				{ SM.sel('#msg_write_form textarea').value = SM.previewtext; }
+			{
+				SM.sel('#msg_write_form textarea').value = SM.previewtext;
+				SM.hidePaste();
+			}
 		});
 	}
 
@@ -1476,12 +1488,13 @@ SM.messageEditor = function() {
 		buts.removeChild(buts.lastChild); //.tid_clear
 
 		//Ajout des boutons de prévisualisation Rafraîchir & Effacer
-		SM.addButton(buts, SM.TEXT['preview_refresh']).addEventListener('click', function() { SM.refreshPreview(); });
-		SM.addButton(buts, SM.TEXT['preview_erase']).addEventListener('click', function() {
+		SM.addButton(buts, SM.TEXT['preview_refresh'], { class: 'SMsmallbut' }).addEventListener('click', function() { SM.refreshPreview(); });
+		SM.addButton(buts, SM.TEXT['preview_erase'], { class: 'SMsmallbut' }).addEventListener('click', function() {
 			if (confirm(SM.TEXT['preview_confirm_erase']))
 			{
 				SM.sel('#tid_wallPost').value = '';
 				SM.refreshPreview();
+				SM.hidePaste();
 			}
 		});
 
@@ -1523,6 +1536,7 @@ SM.messageEditor = function() {
 			{
 				SM.previewtext = SM.sel('#tid_wallPost').value.slice(0, 2500);
 				SM.sel('#cdMainChat').className = 'SMshowpaste';
+				SM.sel('#cdModuleContent').className = SM.sel('#cdModuleContent').className.replace(/SMhidepaste/, 'SMshowpaste');
 			}
 		});
 		SM.addButton(form, SM.TEXT['preview_save']).addEventListener('click', function() { SM.savePreview(); });
@@ -1849,7 +1863,6 @@ SM.buildMessage = function() {
 SM.preformatPlanet = function(planet) {
 	var name = planet.firstElementChild.textContent;
 	var zones = planet.lastElementChild.firstElementChild.innerHTML.match(/<h1>(.*)<\/h1>/g);
-	var grouped = {};
 	var unknown = 0;
 
 	//Détection orbite ou espace infini
@@ -1869,20 +1882,7 @@ SM.preformatPlanet = function(planet) {
 		if (zone == '???')
 			{ unknown += 1; }
 		else
-		{
-			if (typeof grouped[zone] == 'undefined')
-				{ grouped[zone] = 1; }
-			else
-				{ grouped[zone] += 1; }
-		}
-	}
-	for (zone in grouped)
-	{
-		var qty = grouped[zone];
-		if (qty == 1)
 			{ message += zone + ', '; }
-		else
-			{ message += zone + ' //x' + qty + '//, '; }
 	}
 	if (unknown)
 		{ message += "//" + unknown + " " + SM.TEXT['preformat-planet_unknown'] + '//, '; }
@@ -1977,6 +1977,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
+SM.version = "0.9.7.4";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox
