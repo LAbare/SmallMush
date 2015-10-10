@@ -856,8 +856,8 @@ SM.initCss = function() {
 		{ var zoom = screen.height / 424; }
 	else
 		{ var zoom = screen.width / 424; }
-	if (zoom > 4)
-		{ zoom = 4; }
+	if (zoom > 3)
+		{ zoom = 3; }
 	SM.addNewEl('meta', document.head, null, null, { name: 'viewport', content: 'width=424px, initial-scale=' + zoom });
 
 	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: SM.src + "ui/bottom.png" }), document.body, SM.sel('#tid_bar_down'));
