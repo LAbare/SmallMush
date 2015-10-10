@@ -4,8 +4,8 @@ var SM = {};
 /* FONCTIONS DÉVELOPPEUR */
 
 SM.sel = function(name) {
-	if (name[0] == "." && name.search(' ') == -1) { return document.getElementsByClassName(name.slice(1))[0]; }
-	else if (name[0] == '#' && name.search(' ') == -1) { return document.getElementById(name.slice(1)); }
+	if (name[0] == "." && name.search(' |:') == -1) { return document.getElementsByClassName(name.slice(1))[0]; }
+	else if (name[0] == '#' && name.search(' |:') == -1) { return document.getElementById(name.slice(1)); }
 	else { return document.querySelector(name); }
 };
 
@@ -165,13 +165,13 @@ SM.generateMinimap = function() {
 	}
 	//Portes
 	for (var i = 0; i < doors.length; i++)
-		{ SM.addNewEl('path', svg, null, null, { d: 'm' + doors[i][0], dataMapdoor: doors[i][1], class: 'SMmapdoor' }); }
+		{ SM.addNewEl('path', svg, null, null, { d: 'm' + doors[i][0], 'data-mapdoor': doors[i][1], class: 'SMmapdoor' }); }
 	var it = Main.items.iterator();
 	while (it.hasNext())
 	{
 		var i = it.next();
 		if (i.iid == 'DOOR')
-			{ SM.sel('[dataMapdoor="' + i.key + '"]').setAttribute('class', 'SMmapdoorbroken'); }
+			{ SM.sel('[data-mapdoor="' + i.key + '"]').setAttribute('class', 'SMmapdoorbroken'); }
 	}
 };
 
@@ -186,19 +186,15 @@ SM.changeTab = function(newtab) {
 	}
 	else
 	{
-		if (char.parentNode.getAttribute('data-visible-tab') == 'room_col') /* Si on vient de l'onglet Flash */
-		{
-			SM.sel('#content').scrollLeft = 0;
-			SM.sel('#topinfo_bar').style.left = '0';
-			SM.sel('.mxhead').style.left = '0';
-		}
+		SM.sel('#content').scrollLeft = 0;
+		SM.sel('#topinfo_bar').style.left = '0';
+		SM.sel('.mxhead').style.left = '0';
 		char.style.display = 'none';
 		SM.sel('#ship_tab').style.display = 'none';
 		SM.sel('#room_tab').style.display = 'none';
 		SM.sel('#chat_col').style.display = 'none';
 		SM.sel('#' + newtab).style.display = 'block';
 	}
-	char.parentNode.setAttribute('data-visible-tab', newtab);
 	SM.sel('.SMtabselected').className = '';
 	SM.sel('#SMtab-' + newtab).className = 'SMtabselected';
 };
@@ -329,6 +325,13 @@ SM.changeRoom = function(el) {
 
 SM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment; 3: chat; 5: drone
 	var herohalo = SM.sel('#SMheroselected'); //Halo autour d'un personnage, de Schrödinger ou d'un drone
+	if (herohalo)
+	{
+		var halopar = herohalo.parentNode;
+		halopar.removeChild(herohalo);
+	}
+	else
+		{ var halopar = ''; }
 	var itemhalo = SM.sel('.SMselected'); //Halo autour d'un item de l'inventaire SM
 	if (itemhalo)
 		{ itemhalo.parentNode.removeChild(itemhalo); }
@@ -337,69 +340,40 @@ SM.displayRoomActions = function(type, serial) { //0: personnage; 1: équipment;
 	{
 		case 0: //Personnage
 			SM.sel('#equipmentselect').selectedIndex = 0;
-			var selectedhero = SM.sel('[data-serial="' + serial + '"]');
+			var selhero = SM.sel('[data-serial="' + serial + '"]');
 
-			if (herohalo)
-			{
-				if (herohalo.parentNode == selectedhero)
-				{
-					selectedhero.removeChild(herohalo);
-					SM.updateRoomActions(4);
-					break;
-				}
-				else
-					{ herohalo.parentNode.removeChild(herohalo); }
-			}
+			if (halopar == selhero)
+				{ SM.updateRoomActions(4); break; }
 			var hero = Main.heroes.get(serial);
-			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, { src: selectedhero.lastElementChild.getAttribute('src').replace(/\.png/, '_selected.png') }), selectedhero, selectedhero.lastElementChild);
-			SM.updateRoomActions(type, serial);
+			var srcsel = selhero.lastElementChild.getAttribute('src').replace(/\.png/, '_selected.png');
+			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, { src: srcsel }), selhero, selhero.lastElementChild);
+			SM.updateRoomActions(0, serial);
 			break;
 
 		case 1: //Équipement
-			if (herohalo)
-				{ herohalo.parentNode.removeChild(herohalo); }
-				
 			var serial = SM.sel('#equipmentselect').value;
 			if (serial == 'NULL')
 				{ SM.updateRoomActions(4); }
 			else
-				{ SM.updateRoomActions(type, serial); }
+				{ SM.updateRoomActions(1, serial); }
 			break;
 
 		case 3: //Chat
 			SM.sel('#equipmentselect').selectedIndex = 0;
 			var cat = SM.sel('[data-serial="' + serial + '"]');
 
-			if (herohalo)
-			{
-				if (herohalo.parentNode == cat)
-				{
-					cat.removeChild(herohalo);
-					SM.updateRoomActions(4);
-					break;
-				}
-				else
-					{ herohalo.parentNode.removeChild(herohalo); }
-			}
+			if (halopar == cat)
+				{ SM.updateRoomActions(4); break; }
 			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, { src: SM.src + "ui/chars/schrodinger_selected.png" }), cat, cat.lastElementChild);
-			SM.updateRoomActions(type, serial);
+			SM.updateRoomActions(3, serial);
 			break;
 
 		case 5: //Drone
 			SM.sel('#equipmentselect').selectedIndex = 0;
 			var drone = SM.sel('[data-serial="' + serial + '"]');
 
-			if (herohalo)
-			{
-				if (herohalo.parentNode == drone)
-				{
-					drone.removeChild(herohalo);
-					SM.updateRoomActions(4);
-					break;
-				}
-				else
-					{ herohalo.parentNode.removeChild(herohalo); }
-			}
+			if (halopar == drone)
+				{ SM.updateRoomActions(4); break; }
 			SM.moveEl(SM.addNewEl('img', null, 'SMheroselected', null, { src: SM.src + "ui/chars/drone_selected.png" }), drone, drone.lastElementChild);
 			SM.updateRoomActions(1, serial);
 			break;
@@ -531,7 +505,7 @@ SM.changeChatTab = function(el) {
 		SM.sel('#SMeditortab').className = 'tab taboff';
 		SM.sel('#SMeditor').style.display = 'none';
 		Main.selChat(parseInt(el.getAttribute('data-tab')));
-		SM.sel('#chatBlock').style.height = '550px';
+		SM.sel('#chatBlock').style.height = '80vh';
     }
     
     else //Onglet Éditeur de messages
@@ -675,6 +649,7 @@ SM.reInit = function() {
 	SM.roomTab();
 	SM.chatTab();
 	SM.gameTab();
+	SM.topStats();
 	SM.messageEditor();
 	SM.changeActionFunctions();
 	SM.sel("#SMbar .cycletime").textContent = SM.sel("#chat_col .cycletime").textContent;
@@ -710,43 +685,43 @@ SM.selectItem = function(item) {
 	}
 
 	SM.sel('#equipmentselect').selectedIndex = 0;
-	var heroselection = SM.sel('#SMheroselected');
-	if (heroselection)
-		{ heroselection.parentNode.removeChild(heroselection); }
+	var herosel = SM.sel('#SMheroselected');
+	if (herosel)
+		{ herosel.parentNode.removeChild(herosel); }
 };
 
 
 SM.itemLeft = function() {
-	var inventory = SM.sel('#SMroom');
+	var inv = SM.sel('#SMroom');
 	var arrowleft = SM.sel('#SMtt_itemname').previousElementSibling;
 	var arrowright = SM.sel('#SMtt_itemname').nextElementSibling;
-	var shift = -parseInt(inventory.style.marginLeft) || 0;
+	var shift = -parseInt(inv.style.marginLeft) || 0;
 	if (shift > 0)
 	{
 		var newshift = shift - 56;
 		if (newshift == 0)
-			{ arrowleft.className += " off"; }
-		if (inventory.children.length - (newshift / 56) > 7)
+			{ arrowleft.className += ' off'; }
+		if (inv.children.length - (newshift / 56) > 7)
 			{ arrowright.className = arrowright.className.replace(/ off/, ''); }
 		else
 			{ arrowright.className += ' off'; }
-		inventory.style.marginLeft = '-' + newshift + 'px';
+		inv.style.marginLeft = '-' + newshift + 'px';
 	}
 };
 
 
 SM.itemRight = function() {
-	var inventory = SM.sel('#SMroom');
+	var inv = SM.sel('#SMroom');
 	var arrowleft = SM.sel('#SMtt_itemname').previousElementSibling;
 	var arrowright = SM.sel('#SMtt_itemname').nextElementSibling;
-	var shift = -parseInt(inventory.style.marginLeft) || 0;
-	if (shift < ((inventory.children.length - 7) * 56))
+	var shift = -parseInt(inv.style.marginLeft) || 0;
+	if (shift < ((inv.children.length - 7) * 56))
 	{
 		var newshift = shift + 56;
-		if (newshift == ((inventory.children.length - 7) * 56))
-			{ arrowright.className += " off"; }
+		if (newshift == ((inv.children.length - 7) * 56))
+			{ arrowright.className += ' off'; }
 		arrowleft.className = arrowleft.className.replace(/ off/, '');
-		inventory.style.marginLeft = '-' + newshift + 'px';
+		inv.style.marginLeft = '-' + newshift + 'px';
 	}
 };
 
@@ -760,12 +735,12 @@ SM.getSMParameters = function() {
 	SM.parameters['confirm-action'] = false;
 	SM.parameters['food-desc'] = true;
 	SM.parameters['forced-locale'] = false;
-	SM.parameters['locale'] = '0'; //0: non forcé ; 1: français ; 2: anglais ; 3: espagnol
+	SM.parameters['locale'] = '0'; //0: non forcé ; 1: FR ; 2: EN ; 3: ES
 
 	var offset = document.cookie.search('SMparams');
 	if (offset != -1)
 	{
-		var parameters = document.cookie.slice(offset + 9); //Pas de fin en cas d'ajout de paramètres ; les nouveaux prendront simplement la valeur false
+		var parameters = document.cookie.slice(offset + 9);
 		SM.parameters['first-time'] = ((parameters[0] == '1') ? true : false);
 		SM.parameters['confirm-action'] = ((parameters[1] == '1') ? true : false);
 		SM.parameters['food-desc'] = ((parameters[2] == '1') ? true : false);
@@ -781,9 +756,6 @@ SM.getSMParameters = function() {
 	}
 	else
 		{ SM.setSMParameters(); }
-
-	//SMparams=011
-	//0123456789AB
 };
 
 
@@ -860,7 +832,13 @@ SM.buildParamsMenu = function() {
 
 SM.initCss = function() {
 	SM.addNewEl('link', document.head, null, null, { rel: 'stylesheet', href: SM.src + "SmallMush.css", type: 'text/css' });
-	SM.addNewEl('meta', document.head, null, null, { name: 'viewport', content: 'width=424px, initial-scale=' + screen.width / 424 });
+	if (screen.width > screen.height) //Mode paysage
+		{ var zoom = screen.height / 424; }
+	else
+		{ var zoom = screen.width / 424; }
+	if (zoom > 4)
+		{ zoom = 4; }
+	SM.addNewEl('meta', document.head, null, null, { name: 'viewport', content: 'width=424px, initial-scale=' + zoom });
 
 	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: SM.src + "ui/bottom.png" }), document.body, SM.sel('#tid_bar_down'));
 
@@ -880,6 +858,15 @@ SM.initCss = function() {
 	relcss.innerHTML += '.gold_skill .container { background-image: url("' + SM.src + 'ui/gold_skill.png"); }\n';
 	//Énergie
 	relcss.innerHTML += '#SMenergybar td { background: transparent url("' + SM.src + 'ui/pabar.png") no-repeat left top; }';
+	//Popups
+	if (screen.width > screen.height) //Mode paysage
+		{ var left = (window.innerWidth * zoom - 400) / 2; }
+	else
+		{ var left = 12; }
+	relcss.innerHTML += '.poptop { left: ' + left + 'px !important; }';
+	relcss.innerHTML += '#SMpopup { left: ' + left + 'px; }';
+	relcss.innerHTML += '.cdLevelDialog { left: ' + left + 'px !important; }';
+	
 };
 
 
@@ -888,26 +875,23 @@ SM.initMenubar = function() {
 
 	// BARRE SMALL(MUSH) //
 	//Rechargement interne de la page
-	var butr = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />");
+	var butr = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />", { 'data-SMtip': SM.TEXT['buttontip-reload'] });
 	butr.addEventListener('click', function() {
 		SM.loadingScreen();
 		Main.ajax('/', null, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
-	butr.setAttribute('data-SMtip', SM.TEXT['buttontip-reload']);
 
-	var butrall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />");
+	var butrall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />", { 'data-SMtip': SM.TEXT['buttontip-reloadall'] });
 	butrall.addEventListener('click', function() {
 		SM.loadingScreen();
 		Main.ajax('/', Main.SMupdtArr, function() { SM.reInit(); SM.changeTab('char_col'); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
-	butrall.setAttribute('data-SMtip', SM.TEXT['buttontip-reloadall']);
 
 	SM.addNewEl('div', document.body, 'SMloadscreen', "<img src='/img/icons/ui/loading1.gif' />").addEventListener('click', function() { this.style.display = 'none'; });
 
 	//Aide
-	var buthelp = SM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?");
+	var buthelp = SM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?", { 'data-SMtip': SM.TEXT['buttontip-help'] });
 	buthelp.addEventListener('click', function() { SM.sel('#SMhelpscreenA').style.display = 'block'; });
-	buthelp.setAttribute('data-SMtip', SM.TEXT['buttontip-help']);
 	//Premier écran noir : sélectionner l'élément ; second écran noir : cacher l'infobulle (sinon elle reste)
 	SM.addNewEl('div', document.body, 'SMhelpscreenA', SM.TEXT['help_screen_A']).addEventListener('click', function(e) { this.style.display = 'none'; SM.SMhelp(e); });
 	SM.addNewEl('div', document.body, 'SMhelpscreenB', SM.TEXT['help_screen_B']).addEventListener('click', function(e) { this.style.display = 'none'; Main.hideTip(); });
@@ -928,23 +912,23 @@ SM.initMenubar = function() {
 
 	//Onglets Small(Mush)
 	var menu = SM.addNewEl('ul', SM.sel('.mxhead'), 'SMtabs');
-	var chartab = SM.addNewEl('li', menu, 'SMtab-char_col', "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char']);
+	var chartab = SM.addNewEl('li', menu, 'SMtab-char_col', "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char'], { 'data-SMtip': SM.TEXT['tabtip-chartab'] });
 	chartab.addEventListener('click', function() { SM.changeTab('char_col'); });
-	chartab.setAttribute('data-SMtip', SM.TEXT['tabtip-chartab']);
 	chartab.className = 'SMtabselected';
-	var shiptab = SM.addNewEl('li', menu, 'SMtab-ship_tab', "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship']);
+
+	var shiptab = SM.addNewEl('li', menu, 'SMtab-ship_tab', "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship'], { 'data-SMtip': SM.TEXT['tabtip-shiptab'] });
 	shiptab.addEventListener('click', function() { SM.changeTab('ship_tab'); });
-	shiptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shiptab']);
-	var roomtab = SM.addNewEl('li', menu, 'SMtab-room_tab', "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room']);
+
+	var roomtab = SM.addNewEl('li', menu, 'SMtab-room_tab', "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room'], { 'data-SMtip': SM.TEXT['tabtip-roomtab'] });
 	roomtab.addEventListener('click', function() { SM.changeTab('room_tab'); });
-	roomtab.setAttribute('data-SMtip', SM.TEXT['tabtip-roomtab']);
-	var chattab = SM.addNewEl('li', menu, 'SMtab-chat_col', "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat']);
+
+	var chattab = SM.addNewEl('li', menu, 'SMtab-chat_col', "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat'], { 'data-SMtip': SM.TEXT['tabtip-chattab'] });
 	chattab.addEventListener('click', function() { SM.changeTab('chat_col'); });
-	chattab.setAttribute('data-SMtip', SM.TEXT['tabtip-chattab']);
-	var gametab = SM.addNewEl('li', menu, 'SMtab-room_col', "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game']);
+
+	var gametab = SM.addNewEl('li', menu, 'SMtab-room_col', "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game'], { 'data-SMtip': SM.TEXT['tabtip-gametab'] });
 	gametab.addEventListener('click', function() { SM.changeTab('room_col'); });
-	gametab.setAttribute('data-SMtip', SM.TEXT['tabtip-gametab']);
-	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'])
+
+	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'], { 'data-SMtip': SM.TEXT['tabtip-shoptab'] });
 	shoptab.addEventListener('click', function() {
 		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs_shop'];
 		Main.ajax('/vending', null, function() {
@@ -953,7 +937,6 @@ SM.initMenubar = function() {
 			SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'];
 		});
 	});
-	shoptab.setAttribute('data-SMtip', SM.TEXT['tabtip-shoptab']);
 
 	SM.addNewEl('div', document.body, 'SMpopup').style.display = 'none';
 	SM.buildParamsMenu();
@@ -961,25 +944,25 @@ SM.initMenubar = function() {
 
 
 SM.initTabs = function() {
-	var tabs_box = SM.sel('#char_col').parentNode; //table.inter > tr
-	tabs_box.setAttribute('data-visible-tab', 'char_col');
-	tabs_box.id = 'tabs_box';
+	var tabs = SM.sel('#char_col').parentNode; //table.inter > tr
+	tabs.setAttribute('data-visible-tab', 'char_col');
+	tabs.id = 'tabs_box';
 
-	var char_tab = SM.sel('#char_col');
-	var ship_tab = SM.addNewEl('td', tabs_box, 'ship_tab');
-	var room_tab = SM.addNewEl('td', tabs_box, 'room_tab');
-	var chat_tab = SM.sel('#chat_col');
-	var game_tab = SM.sel('#room_col');
+	var chartab = SM.sel('#char_col');
+	var shiptab = SM.addNewEl('td', tabs, 'ship_tab');
+	var roomtab = SM.addNewEl('td', tabs, 'room_tab');
+	var chattab = SM.sel('#chat_col');
+	var gametab = SM.sel('#room_col');
 
 	//#room_col doit être à droite pour que le .scrollLeft fonctionne correctement ; sinon il est directement après #char_col
-	SM.moveEl(ship_tab, tabs_box, game_tab);
-	SM.moveEl(room_tab, tabs_box, game_tab);
-	SM.moveEl(chat_tab, tabs_box, game_tab);
+	SM.moveEl(shiptab, tabs, gametab);
+	SM.moveEl(roomtab, tabs, gametab);
+	SM.moveEl(chattab, tabs, gametab);
 
-	char_tab.style.display = 'block';
-	ship_tab.style.display = 'none';
-	room_tab.style.display = 'none';
-	chat_tab.style.display = 'none';
+	chartab.style.display = 'block';
+	shiptab.style.display = 'none';
+	roomtab.style.display = 'none';
+	chattab.style.display = 'none';
 	//Ne pas cacher game_tab (#room_col), ou le jeu Flash ne fonctionnera pas ; utiliser .scrollLeft
 };
 
@@ -1360,10 +1343,10 @@ SM.chatTab = function() {
 			var input = SM.sel(wallinputs[i][1]);
 			input.setAttribute('onfocus', '$(this).addClass("chatboxfocus"); return true;'); //Main.onChatFocus ne fait qu'empêcher le collage… -_-
 			input.value = '';
-			SM.addButton(SM.sel(wallinputs[i][0]), SM.TEXT['paste'], { class: 'SMpastebutton', dataId: wallinputs[i][1] }).addEventListener('click', function() {
+			SM.addButton(SM.sel(wallinputs[i][0]), SM.TEXT['paste'], { class: 'SMpastebutton', 'data-id': wallinputs[i][1] }).addEventListener('click', function() {
 				if (SM.previewtext)
 				{
-					var t = SM.sel(this.getAttribute('dataId'));
+					var t = SM.sel(this.getAttribute('data-id'));
 					t.value = SM.previewtext;
 					t.focus();
 				}
@@ -1378,10 +1361,10 @@ SM.chatTab = function() {
 	{
 		if (units[i].lastElementChild.className != 'but SMpastebutton')
 		{
-			SM.addButton(units[i], SM.TEXT['paste'], { class: 'SMpastebutton', dataId: units[i].getAttribute('data-k') }).addEventListener('click', function() {
+			SM.addButton(units[i], SM.TEXT['paste'], { class: 'SMpastebutton', 'data-id': units[i].getAttribute('data-k') }).addEventListener('click', function() {
 				if (SM.previewtext)
 				{
-					var t = SM.sel('#wall_reply_' + this.getAttribute('dataId'));
+					var t = SM.sel('#wall_reply_' + this.getAttribute('data-id'));
 					t.value = SM.previewtext;
 					t.parentNode.parentNode.parentNode.className = 'blockreply';
 					t.focus();
@@ -1433,6 +1416,20 @@ SM.gameTab = function() {
 	var egg = SM.sel('#calcModule [style*="display:none"]');
 	if (egg)
 		{ egg.textContent = "nuqDaq ’oH eDen. " + egg.textContent; } //Dédicace à BM ! ^_^
+};
+
+
+SM.topStats = function() {
+	var hp = SM.sel('.pvsmbar:not(.barmoral) span').textContent.trim();
+	var pmo = SM.sel('.barmoral span').textContent.trim();
+	var pmatip = SM.getTipContent(SM.sel('#cdPaBloc .bar').onmouseover).match(/[0-9]+ <img/g);
+	var pa = pmatip[0].slice(0, 1);
+	var pm = pmatip[1].slice(0, 1);
+	var td = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('#topinfo_bar .genstatus tbody')), 'SMtopstats', SM.TEXT['stats-perso'], { colspan: '2' });
+	SM.addNewEl('span', td, null, hp + " <img src='/img/icons/ui/lp.png' />");
+	SM.addNewEl('span', td, null, pmo + " <img src='/img/icons/ui/moral.png' />");
+	SM.addNewEl('span', td, null, pa + " <img src='/img/icons/ui/pa_slot1.png' />");
+	SM.addNewEl('span', td, null, pm + " <img src='/img/icons/ui/pa_slot2.png' />");
 };
 
 
@@ -1516,8 +1513,8 @@ SM.messageEditor = function() {
 		s.style.display = 'none';
 		for (var i = 0; i < SM.smileys.length; i++) //Smileys Mush
 		{
-			SM.addNewEl('img', s, null, null, { src: '/img/icons/ui/' + SM.smileys[i][1], dataSmiley: SM.smileys[i][0].split('|')[0] }).addEventListener('click', function() {
-				SM.sel('#tid_wallPost').value += ':' + this.getAttribute('dataSmiley') + ':';
+			SM.addNewEl('img', s, null, null, { src: '/img/icons/ui/' + SM.smileys[i][1], 'data-smiley': SM.smileys[i][0].split('|')[0] }).addEventListener('click', function() {
+				SM.sel('#tid_wallPost').value += ':' + this.getAttribute('data-smiley') + ':';
 				setTimeout(function() { SM.refreshPreview(); }, 100);
 			});
 		}
@@ -1820,6 +1817,7 @@ SM.buildMessage = function() {
 			message += SM.TEXT['preformat-comms_bases'];
 			var bases = SM.toArray(document.querySelectorAll('#trackerModule .bases [data-id]')).reverse();
 			var anysignal = false;
+			var writedesc = confirm(SM.TEXT['preformat-comms_basesdesc']);
 			for (var i = 0; i < bases.length; i++)
 			{
 				var id = bases[i].getAttribute('data-id');
@@ -1836,7 +1834,17 @@ SM.buildMessage = function() {
 
 				message += "- //" + name + " (" + SM.TEXT['abbr-day'] + (i + 2) + ") : //"; //Nom de la base
 				if (decoded) //Décodée
-					{ message += SM.TEXT['preformat-comms_basedecoded'] + "\n"; }
+				{
+					var text = SM.reformat(SM.getTipContent(bases[i].onmouseover));
+					if (writedesc)
+					{
+						var desc = ", //" + text.match(/<li>(.*)<\/li>/)[1] + "//";
+						desc = SM.reformat(desc.replace(/<img(?:.*)alt=['"]([a-zA-Z]+)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1"));
+					}
+					else
+						{ var desc = ""; }
+					message += SM.TEXT['preformat-comms_basedecoded'] + desc + "\n";
+				}
 				else
 				{
 					if (span.className == 'percent') //En décodage
@@ -1947,6 +1955,7 @@ SM.init = function() {
 	SM.roomTab();
 	SM.chatTab();
 	SM.gameTab();
+	SM.topStats();
 	SM.messageEditor();
 	SM.changeActionFunctions();
 	SM.sel('#content').scrollLeft = 0;
@@ -1977,7 +1986,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
-SM.version = "0.9.7.4";
+SM.version = "0.9.7.5";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox

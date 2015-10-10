@@ -1,3 +1,4 @@
+SM.TEXT['stats-perso'] = "<b>Your current statistics:</b> "
 SM.TEXT['AP-general'] = "action point(s)";
 SM.TEXT['AP-eng'] = "tech point(s)";
 SM.TEXT['AP-garden'] = "gardening point(s)";
@@ -122,6 +123,7 @@ SM.TEXT['preformat-comms_Xylophdesc'] = "Do you want to share Xyloph databases d
 SM.TEXT['preformat-comms_bases'] = "**Rebel bases progress:** ";
 SM.TEXT['preformat-comms_basedecoded'] = "decoded";
 SM.TEXT['preformat-comms_baselost'] = "signal lost";
+SM.TEXT['preformat-comms_basesdesc'] = "Do you want to share decoded bases descriptions along with their names?";
 SM.TEXT['preformat-comms_basesnone'] = "none";
 SM.TEXT['preformat-comms_neron'] = "**NERON version:** ";
 SM.TEXT['abbr-day'] = "D";

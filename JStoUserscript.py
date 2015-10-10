@@ -6,6 +6,8 @@ dest = open('SmallMush.user.js', 'w')
 replacing = False;
 functions = []
 
+print("Check that you changed the source!")
+
 dest.write('// ==UserScript==\n')
 dest.write('// @name      Small(Mush)\n')
 dest.write('// @version   ' + input('Version : ') + '\n')

@@ -1,3 +1,4 @@
+SM.TEXT['stats-perso'] = "<b>Vos statistiques actuelles :</b> ";
 SM.TEXT['AP-general'] = "point(s) d'action";
 SM.TEXT['AP-eng'] = "point(s) de mécanique";
 SM.TEXT['AP-garden'] = "point(s) de jardinage";
@@ -122,6 +123,7 @@ SM.TEXT['preformat-comms_Xylophdesc'] = "Voulez-vous inclure la description des 
 SM.TEXT['preformat-comms_bases'] = "**Décodage des bases rebelles :** ";
 SM.TEXT['preformat-comms_basedecoded'] = "décodée";
 SM.TEXT['preformat-comms_baselost'] = "signal perdu";
+SM.TEXT['preformat-comms_basesdesc'] = "Voulez-vous inclure la description des bases décodées à côté de leur nom ?";
 SM.TEXT['preformat-comms_basesnone'] = "aucune";
 SM.TEXT['preformat-comms_neron'] = "**Version de NERON :** ";
 SM.TEXT['abbr-day'] = "J";
