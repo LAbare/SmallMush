@@ -139,7 +139,6 @@ SM.TEXT['tabtip-chattab'] = "<h1>Onglet Chat</h1>Cet onglet comprend le chat et 
 SM.TEXT['tabtip-gametab'] = "<h1>Onglet Module/Flash</h1>Cet onglet contient le jeu Flash et les terminaux auxquels vous accédez, ainsi que la minimap Small(Mush).";
 SM.TEXT['tabtip-shoptab'] = "<h1>Onglet Distributeur</h1>Cet onglet vous permet d'accéder au distributeur.";
 SM.TEXT['buttontip-reload'] = "<h1>Rafraîchir</h1>Rafraîchit le jeu pour les actions courantes.";
-SM.TEXT['buttontip-reloadall'] = "<h1>Rechargement complet</h1>Rafraîchit tout le cadre de jeu (plus lent). Utile lors d'un nouveau cycle ou d'une nouvelle étape d'exploration.";
 SM.TEXT['buttontip-help'] = "<h1>Aide</h1>Affiche les infobulles (dont certaines récalcitrantes sur mobile) ainsi que de l'aide pour les éléments ajoutés par le script Small(Mush).";
 
 SM.loadingTexts = ["Photobirouillage des métaplores…", "Tir aux poulets intergalactiques…", "Test chat / micro-ondes…", "Recherche de Charlie…", "Tournée d'arrays de bool…", "Rechargement des blasters à la confiture…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du lutin des annonces vocodées…", "Localisation des drones…", "Schématisation des Terminatransistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Surchauffe des modules persos…", "Détartrage du matou…", "Cueillette des champignons…"];

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.7.5
+// @version   0.9.7.6
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -18,6 +18,13 @@ var Main = unsafeWindow.Main || Main;
 var unsafeSM = createObjectIn(unsafeWindow, {defineAs: "SM"});
 
 
+/**—————————————————————————————**\
+ *          SMALL(MUSH)          *
+ *           by LAbare           *
+ *  Script pour Mush sur mobile  *
+\**—————————————————————————————**/
+
+
 var SM = {};
 
 
@@ -29,7 +36,6 @@ SM.sel = function(name) {
 	else { return document.querySelector(name); }
 };
 
-
 SM.getAttributesList = function(el) {
 	var attrs = {};
 	for (var i = 0; i < el.attributes.length; i++)
@@ -39,7 +45,6 @@ SM.getAttributesList = function(el) {
 	};
 	return attrs;
 };
-
 
 SM.addNewEl = function(type, parent, id, content, attrs) {
 	if (['svg', 'path', 'rect', 'text'].indexOf(type) != -1)
@@ -52,7 +57,6 @@ SM.addNewEl = function(type, parent, id, content, attrs) {
 	if (parent) { parent.appendChild(el); }
 	return el;
 };
-
 
 SM.addButton = function(parent, text, attrs) {
 	var butattrs = { class: 'but' };
@@ -70,14 +74,12 @@ SM.addButton = function(parent, text, attrs) {
 	return a;
 };
 
-
 SM.moveEl = function(el, dest, bef) {
 	if (el.parentNode) { el.parentNode.removeChild(el); }
 	if (bef) { dest.insertBefore(el, bef); }
 	else { dest.appendChild(el); }
 	return el;
 };
-
 
 SM.copyEl = function (el, dest, bef) {
 	var newEl = SM.addNewEl(el.nodeName, null, ((el.id) ? 'SM' + el.id : ''), el.innerHTML, SM.getAttributesList(el));
@@ -89,14 +91,12 @@ SM.copyEl = function (el, dest, bef) {
 	return newEl;
 };
 
-
 SM.getTipContent = function(tipFunction) {
 	tipFunction();
 	var tipContent = SM.sel('.tipcontent').innerHTML;
 	Main.hideTip();
 	return tipContent;
 };
-
 
 SM.toArray = function(obj) {
 	return [].slice.call(obj);
@@ -788,9 +788,6 @@ SM.setSMParameters = function() {
 	var date = new Date();
 	date.setTime(date.getTime() + 31536000000);
 	document.cookie = 'SMparams=' + parameters + '; expires=' + date.toGMTString() + '; path=/';
-
-	SM.getSMParameters();
-	SM.buildParamsMenu();
 };
 
 
@@ -809,12 +806,20 @@ SM.buildParamsMenu = function() {
 		if (SM.parameters[parameter])
 		{
 			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', checked: 'true', 'data-parameter': parameter })
-			input.addEventListener('change', function() { SM.parameters[this.getAttribute('data-parameter')] = false; SM.setSMParameters(); });
+			input.addEventListener('change', function() {
+				SM.parameters[this.getAttribute('data-parameter')] = false;
+				SM.setSMParameters();
+				SM.buildParamsMenu();
+			});
 		}
 		else
 		{
 			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', 'data-parameter': parameter })
-			input.addEventListener('change', function() { SM.parameters[this.getAttribute('data-parameter')] = true; SM.setSMParameters(); });
+			input.addEventListener('change', function() {
+				SM.parameters[this.getAttribute('data-parameter')] = true;
+				SM.setSMParameters();
+				SM.buildParamsMenu();
+			});
 		}
 		SM.addNewEl('label', div, null, SM.TEXT['SMparams_' + parameter], { 'for': 'SMlabel_' + parameter });
 		div.className = 'SMparamsdiv';
@@ -839,7 +844,7 @@ SM.buildParamsMenu = function() {
 	SM.addButton(popup, "BETA : reset cookies").addEventListener('click', function() {
 		var date = new Date();
 		date.setTime(date.getTime() + 31536000000);
-		document.cookie = 'SMparams=0000; expires=' + date.toGMTString() + '; path=/';
+		document.cookie = 'SMparams=1000; expires=' + date.toGMTString() + '; path=/';
 	});
 
 	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits'], { class: 'SMnospace' });
@@ -879,14 +884,7 @@ SM.initCss = function() {
 	//Énergie
 	relcss.innerHTML += '#SMenergybar td { background: transparent url("' + SM.src + 'ui/pabar.png") no-repeat left top; }';
 	//Popups
-	if (screen.width > screen.height) //Mode paysage
-		{ var left = (window.innerWidth * zoom - 400) / 2; }
-	else
-		{ var left = 12; }
-	relcss.innerHTML += '.poptop { left: ' + left + 'px !important; }';
-	relcss.innerHTML += '#SMpopup { left: ' + left + 'px; }';
-	relcss.innerHTML += '.cdLevelDialog { left: ' + left + 'px !important; }';
-	
+	relcss.innerHTML += '.cdLevelDialog { left: ' + (((window.innerWidth - 424) / 2) + 12) + 'px; }';
 };
 
 
@@ -900,13 +898,6 @@ SM.initMenubar = function() {
 		SM.loadingScreen();
 		Main.ajax('/', null, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
 	});
-
-	var butrall = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mushall.png' />", { 'data-SMtip': SM.TEXT['buttontip-reloadall'] });
-	butrall.addEventListener('click', function() {
-		SM.loadingScreen();
-		Main.ajax('/', Main.SMupdtArr, function() { SM.reInit(); SM.changeTab('char_col'); SM.sel('#SMloadscreen').style.display = 'none'; });
-	});
-
 	SM.addNewEl('div', document.body, 'SMloadscreen', "<img src='/img/icons/ui/loading1.gif' />").addEventListener('click', function() { this.style.display = 'none'; });
 
 	//Aide
@@ -958,7 +949,7 @@ SM.initMenubar = function() {
 		});
 	});
 
-	SM.addNewEl('div', document.body, 'SMpopup').style.display = 'none';
+	SM.addNewEl('div', SM.sel('#content'), 'SMpopup').style.display = 'none';
 	SM.buildParamsMenu();
 };
 
@@ -1078,7 +1069,7 @@ SM.shipTab = function() {
 				alert.onmouseout = '';
 			}
 
-			if (alert.innerHTML.match(/simulator.png/))
+			if (alert.innerHTML.match(/simulator\.png/))
 				{ SM.GRAVITY = false; }
 		}
 
@@ -1192,14 +1183,15 @@ SM.roomTab = function() {
 
 	// ÉQUIPEMENTS //
 	SM.addNewEl('p', room_tab, null, SM.TEXT['equipments'], { style: 'margin-top: 20px;' });
-	var equipmentlist = SM.addNewEl('select', room_tab, 'equipmentselect');
-	equipmentlist.addEventListener('change', function() { SM.displayRoomActions(1); });
-	SM.addNewEl('option', equipmentlist, null, "—", { value: 'NULL' });
+	var eqlist = SM.addNewEl('select', room_tab, 'equipmentselect');
+	eqlist.addEventListener('change', function() { SM.displayRoomActions(1); });
+	SM.addNewEl('option', eqlist, null, "—", { value: 'NULL' });
 
 	var items = Main.items.iterator();
 	while (items.hasNext())
 	{
 		var item = items.next();
+		var eqname;
 		switch (item.iid)
 		{
 			case 'DOOR': //Portes cassées
@@ -1233,7 +1225,7 @@ SM.roomTab = function() {
 				if (actions[i].innerHTML.indexOf('REPAIR_OBJECT') != -1 || actions[i].innerHTML.indexOf('REPAIR_PATROL_SHIP') != -1)
 					{ eqname += ((item.iid == 'DOOR') ? SM.TEXT['broken_door'] : SM.TEXT['broken']); break; }
 			}
-			SM.addNewEl('option', equipmentlist, null, eqname, { value: item.serial });
+			SM.addNewEl('option', eqlist, null, eqname, { value: item.serial });
 		}
 	}
 
@@ -1247,7 +1239,7 @@ SM.roomTab = function() {
 		var statuses = hero.statuses.iterator();
 		var berzerk = false;
 		var laid = false;
-		
+
 		if (hero.me == 'true')
 		{
 			var titles = hero.titles.iterator();
@@ -1277,7 +1269,6 @@ SM.roomTab = function() {
 
 		var block = SM.addNewEl('li', herolist, null, null, { class: 'SMheroblock', 'data-serial': hero.serial });
 		block.addEventListener('click', function() { SM.displayRoomActions(0, this.getAttribute('data-serial')); });
-
 
 		if (berzerk)
 			{ SM.addNewEl('img', block, null, null, { src: SM.src + "ui/chars/berzerk.png" }); }
@@ -1334,9 +1325,9 @@ SM.roomTab = function() {
 	//Changement des fonctions Main par les fonctions SM
 	SM.sel('#SMtt_itemname').previousElementSibling.setAttribute('onclick', 'SM.itemLeft();');
 	SM.sel('#SMtt_itemname').nextElementSibling.setAttribute('onclick', 'SM.itemRight();');
-	var inventory = SM.sel('#SMroom');
-	for (var i = 0; i < inventory.children.length; i++)
-		{ inventory.children[i].setAttribute('onclick', 'SM.selectItem(this);'); }
+	var inv = SM.sel('#SMroom');
+	for (var i = 0; i < inv.children.length; i++)
+		{ inv.children[i].setAttribute('onclick', 'SM.selectItem(this);'); }
 
 	SM.moveEl(SM.addNewEl('div', null, 'SMitemdesc', null), invblock, invblock.lastElementChild);
 };
@@ -1443,9 +1434,13 @@ SM.topStats = function() {
 	var hp = SM.sel('.pvsmbar:not(.barmoral) span').textContent.trim();
 	var pmo = SM.sel('.barmoral span').textContent.trim();
 	var pmatip = SM.getTipContent(SM.sel('#cdPaBloc .bar').onmouseover).match(/[0-9]+ <img/g);
-	var pa = pmatip[0].slice(0, 1);
-	var pm = pmatip[1].slice(0, 1);
-	var td = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('#topinfo_bar .genstatus tbody')), 'SMtopstats', SM.TEXT['stats-perso'], { colspan: '2' });
+	var pa = pmatip[0].slice(0, -5);
+	var pm = pmatip[1].slice(0, -5);
+	var td = SM.sel('#SMtopstats');
+	if (!td)
+		{ td = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('#topinfo_bar .genstatus tbody')), 'SMtopstats', SM.TEXT['stats-perso'], { colspan: '2' }); }
+	else
+		{ td.innerHTML = ''; }
 	SM.addNewEl('span', td, null, hp + " <img src='/img/icons/ui/lp.png' />");
 	SM.addNewEl('span', td, null, pmo + " <img src='/img/icons/ui/moral.png' />");
 	SM.addNewEl('span', td, null, pa + " <img src='/img/icons/ui/pa_slot1.png' />");
@@ -1823,7 +1818,7 @@ SM.buildMessage = function() {
 					if (writedesc)
 					{
 						var desc = " : //" + text.match(/<p><strong>(.*)<\/strong><\/p>/)[1] + "//";
-						desc = SM.reformat(desc.replace(/<img(?:.*)alt=['"]([a-zA-Z]+)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1"));
+						desc = SM.reformat(desc.replace(/<img(?:.*)alt=['"]([a-zA-Z]*)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1"));
 					}
 					else
 						{ var desc = ""; }
@@ -1859,7 +1854,7 @@ SM.buildMessage = function() {
 					if (writedesc)
 					{
 						var desc = ", //" + text.match(/<li>(.*)<\/li>/)[1] + "//";
-						desc = SM.reformat(desc.replace(/<img(?:.*)alt=['"]([a-zA-Z]+)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1"));
+						desc = SM.reformat(desc.replace(/<img(?:.*)alt=['"]([a-zA-Z]*)['"](?:.*)\/?>/g, "$1").replace(/<strong>(.*)<\/strong>/g, "$1"));
 					}
 					else
 						{ var desc = ""; }
@@ -2094,7 +2089,6 @@ SM.locale = function(func) {
 		SM.TEXT['tabtip-gametab'] = "<h1>Onglet Module/Flash</h1>Cet onglet contient le jeu Flash et les terminaux auxquels vous accédez, ainsi que la minimap Small(Mush).";
 		SM.TEXT['tabtip-shoptab'] = "<h1>Onglet Distributeur</h1>Cet onglet vous permet d'accéder au distributeur.";
 		SM.TEXT['buttontip-reload'] = "<h1>Rafraîchir</h1>Rafraîchit le jeu pour les actions courantes.";
-		SM.TEXT['buttontip-reloadall'] = "<h1>Rechargement complet</h1>Rafraîchit tout le cadre de jeu (plus lent). Utile lors d'un nouveau cycle ou d'une nouvelle étape d'exploration.";
 		SM.TEXT['buttontip-help'] = "<h1>Aide</h1>Affiche les infobulles (dont certaines récalcitrantes sur mobile) ainsi que de l'aide pour les éléments ajoutés par le script Small(Mush).";
 		
 		SM.loadingTexts = ["Photobirouillage des métaplores…", "Tir aux poulets intergalactiques…", "Test chat / micro-ondes…", "Recherche de Charlie…", "Tournée d'arrays de bool…", "Rechargement des blasters à la confiture…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du lutin des annonces vocodées…", "Localisation des drones…", "Schématisation des Terminatransistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Surchauffe des modules persos…", "Détartrage du matou…", "Cueillette des champignons…"];
@@ -2244,7 +2238,6 @@ SM.locale = function(func) {
 		SM.TEXT['tabtip-gametab'] = "<h1>Game/Terminal tab</h1>This tab contains the Flash game and the terminals you access.";
 		SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
 		SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
-		SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
 		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
 		
 		SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
@@ -2433,12 +2426,12 @@ SM.init = function() {
 	//Première fois : alerte à lire
 	if (SM.parameters['first-time'])
 	{
-		SM.copyEl(SM.sel('#dialog'), document.body).style.display = 'block';
+		SM.copyEl(SM.sel('#dialog'), SM.sel('#content')).style.display = 'block';
 		SM.sel('#SMdialog_title').innerHTML = "<img src='" + SM.src + "ico.png' />  " + SM.TEXT['warning_title'];
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_1']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_2']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_3']);
-		SM.sel('#SMdialog_ok').addEventListener('click', function() { document.body.removeChild(SM.sel('#SMdialog')); });
+		SM.sel('#SMdialog_ok').addEventListener('click', function() { SM.sel('#content').removeChild(SM.sel('#SMdialog')); });
 		SM.parameters['first-time'] = false;
 		SM.setSMParameters();
 	}
@@ -2504,7 +2497,7 @@ exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 /* VARIABLES */
 
-SM.version = "0.9.7.5";
+SM.version = "0.9.7.5c";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox
@@ -2519,9 +2512,7 @@ SM.GUARDIAN = false;
 SM.GRAVITY = true;
 
 
-
 /** INITIALISATION **/
-
 if (SM.sel('#SMbar') == null) //Une seule initialisation suffit, sinon ça casse !
 {
 	SM.getSMParameters();

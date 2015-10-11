@@ -139,7 +139,6 @@ SM.TEXT['tabtip-chattab'] = "<h1>Chat tab</h1>This tab is for the chat and logs 
 SM.TEXT['tabtip-gametab'] = "<h1>Game/Terminal tab</h1>This tab contains the Flash game and the terminals you access.";
 SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
 SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
-SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
 SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
 
 SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
