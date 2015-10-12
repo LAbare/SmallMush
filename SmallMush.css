@@ -222,7 +222,12 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 }
 
 /* Fenêtre d'alerte Small(Mush), copiée depuis #dialog */
-#SMdialog_body { font-size: 10pt; }
+#SMdialog_title { margin-top: 20px; }
+
+#SMdialog_body {
+	font-size: 10pt;
+	text-align: justify;
+}
 
 /* Barre de liens */
 #SMlinks {
@@ -948,8 +953,16 @@ input.tid_withFriends, { color: black; }
 	stroke-width: 3;
 }
 
-.SMmapalertd { color: #FA0; }
+.SMmapalertd { color: #F60; }
 
 .SMmapalerte { color: #0AF; }
 
 #SMmapselected { fill: #0FA; }
+
+.SMmyroom {
+	fill: #FF7;
+	background-color: #FF7;
+	color: black;
+}
+
+.SMlegend { margin-left: 15px; }

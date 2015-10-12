@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.7.6
+// @version   0.9.7.7
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -117,8 +117,12 @@ SM.generateMinimap = function() {
 
 	var popup = SM.sel('#SMpopup');
 	popup.innerHTML = '';
-	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
+	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() {
+		SM.sel('#SMpopup').style.display = 'none';
+		SM.sel('#content').style.height = 'auto';
+	});
 	popup.style.display = 'block';
+	SM.sel('#content').style.height = '1000px'; //Sinon barre de scroll forcée
 
 	SM.addNewEl('h4', popup, null, "<img src='" + SM.src + "ico.png' /> " + SM.TEXT['minimap-title']);
 	SM.addNewEl('p', popup, null, SM.TEXT['minimap-warning']);
@@ -134,6 +138,7 @@ SM.generateMinimap = function() {
 
 	var bloc = SM.addNewEl('div', popup, 'SMminimapbloc');
 	var svg = SM.addNewEl('svg', bloc, 'SMminimap', null, { width: '320', height: '530' });
+	var myroom = SM.rooms.indexOf(SM.sel('#input').getAttribute('d_name'));
 
 	for (var i = 0; i < rooms.length; i++)
 	{
@@ -146,6 +151,8 @@ SM.generateMinimap = function() {
 			{ var roomclass = 'SMmaproom SMmapfire'; }
 		else
 			{ var roomclass = 'SMmaproom'; }
+		if (i == myroom)
+			{ roomclass += ' SMmyroom'; }
 		if (r.length == 2) //Pièce non rectangulaire
 		{
 			SM.addNewEl('path', svg, null, null, { d: r[0], 'data-maproom': i, class: roomclass }).addEventListener('click', function() {
@@ -203,12 +210,14 @@ SM.changeTab = function(newtab) {
 		SM.sel('#content').scrollLeft = 424;
 		SM.sel('#topinfo_bar').style.left = '424px';
 		SM.sel('.mxhead').style.left = '424px';
+		SM.sel('#SMpopup').style.left = '436px';
 	}
 	else
 	{
 		SM.sel('#content').scrollLeft = 0;
 		SM.sel('#topinfo_bar').style.left = '0';
 		SM.sel('.mxhead').style.left = '0';
+		SM.sel('#SMpopup').style.left = '12px';
 		char.style.display = 'none';
 		SM.sel('#ship_tab').style.display = 'none';
 		SM.sel('#room_tab').style.display = 'none';
@@ -520,12 +529,17 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 
 
 SM.changeChatTab = function(el) {
-	if (el.getAttribute('data-tab')) //Onglet original
+	var tab = el.getAttribute('data-tab');
+	if (tab) //Onglet original
 	{
 		SM.sel('#SMeditortab').className = 'tab taboff';
 		SM.sel('#SMeditor').style.display = 'none';
-		Main.selChat(parseInt(el.getAttribute('data-tab')));
+		Main.selChat(parseInt(tab));
 		SM.sel('#chatBlock').style.height = '80vh';
+		//On force le cookie curChat pour les cas de message dans le mauvais canal (rare et intestable…)
+		var date = new Date();
+		date.setTime(date.getTime() + 31536000000);
+		document.cookie = 'curChat=' + tab + '; expires=' + date.toGMTString() + '; path=/';
     }
     
     else //Onglet Éditeur de messages
@@ -587,6 +601,13 @@ SM.changeActionFunctions = function() {
 		if (!actions[i].getAttribute('onclick').match(/SM\./))
 			{ actions[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + actions[i].getAttribute('onclick')); }
 	}
+	//Distributeur (et autres modules ?)
+	var shop = document.querySelectorAll('[onclick*="Main.ajaxModule("]');
+	for (var i = 0; i < shop.length; i++)
+	{
+		if (!shop[i].getAttribute('onclick').match(/SM\./))
+			{ shop[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + shop[i].getAttribute('onclick')); }
+	}
 	//En cas d'accès à un terminal, changement de Main.exitModule() en SM.SMexitModule()
 	var exitmodule = SM.sel('.cdExitModuleButton');
 	if (exitmodule)
@@ -616,6 +637,7 @@ SM.beforeAction = function(el) {
 				case 'pa_pilgred': pa = 'pilgred'; break;
 				case 'pa_shoot': pa = 'shoot'; break;
 				case 'pa_cook': pa = 'cook'; break;
+				case 'credit_small': pa = 'klix'; break;
 				default: pa = 'general'; break;
 			}
 			return SM.TEXT['AP-' + pa] + " :";
@@ -845,6 +867,18 @@ SM.buildParamsMenu = function() {
 		var date = new Date();
 		date.setTime(date.getTime() + 31536000000);
 		document.cookie = 'SMparams=1000; expires=' + date.toGMTString() + '; path=/';
+		SM.getSMParameters();
+		SM.buildParamsMenu();
+	});
+
+	SM.addButton(popup, SM.TEXT['SMparams_chat-unload']).addEventListener('click', function() {
+		var date = new Date();
+		date.setTime(new Date().getTime() - 42000);
+		document.cookie = 'sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
+		document.cookie = 'mush_sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
+		SM.sel('#SMloadscreen').innerHTML = SM.TEXT['SMparams_chat-unload-reload'];
+		SM.sel('#SMloadscreen').style.display = 'block';
+		window.setTimeout(function() { window.location = '/'; }, 3000);
 	});
 
 	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits'], { class: 'SMnospace' });
@@ -1433,14 +1467,14 @@ SM.gameTab = function() {
 SM.topStats = function() {
 	var hp = SM.sel('.pvsmbar:not(.barmoral) span').textContent.trim();
 	var pmo = SM.sel('.barmoral span').textContent.trim();
-	var pmatip = SM.getTipContent(SM.sel('#cdPaBloc .bar').onmouseover).match(/[0-9]+ <img/g);
-	var pa = pmatip[0].slice(0, -5);
-	var pm = pmatip[1].slice(0, -5);
+	var pmatip = SM.getTipContent(SM.sel('#cdPaBloc .bar').onmouseover).match(/[0-9]+\s*<img/g);
+	var pa = pmatip[0].slice(0, -4).trim();
+	var pm = pmatip[1].slice(0, -4).trim();
 	var td = SM.sel('#SMtopstats');
 	if (!td)
 		{ td = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('#topinfo_bar .genstatus tbody')), 'SMtopstats', SM.TEXT['stats-perso'], { colspan: '2' }); }
 	else
-		{ td.innerHTML = ''; }
+		{ td.innerHTML = SM.TEXT['stats-perso']; }
 	SM.addNewEl('span', td, null, hp + " <img src='/img/icons/ui/lp.png' />");
 	SM.addNewEl('span', td, null, pmo + " <img src='/img/icons/ui/moral.png' />");
 	SM.addNewEl('span', td, null, pa + " <img src='/img/icons/ui/pa_slot1.png' />");
@@ -1717,7 +1751,7 @@ SM.buildMessage = function() {
 
 			//Création du message
 			SM.addButton(popup, SM.TEXT['preformat-researches++_submit']).addEventListener('click', function() {
-				var message = ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
+				message += ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
 				var researches = document.getElementsByClassName('SMresearch');
 				for (var i = 0; i < researches.length; i++)
 				{
@@ -1773,24 +1807,28 @@ SM.buildMessage = function() {
 
 				case 2:
 					popup.style.display = 'block';
+					popup.style.top = '200px';
 					SM.addNewEl('h3', popup, null, SM.TEXT['preformat-planet_title']);
 					SM.addButton(popup, planets[0].firstElementChild.textContent).addEventListener('click', function() {
 						message += SM.preformatPlanet(planets[0]);
 						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
+						SM.sel('#SMpopup').style.top = '100px';
 					}); //Première planète
 					SM.addButton(popup, planets[1].firstElementChild.textContent).addEventListener('click', function() {
 						message += SM.preformatPlanet(planets[1]);
 						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
+						SM.sel('#SMpopup').style.top = '100px';
 					}); //Seconde planète
 					SM.addButton(popup, SM.TEXT['preformat-planet_both']).addEventListener('click', function() {
 						message += SM.preformatPlanet(planets[0]) + "\n\n\n\n" + SM.preformatPlanet(planets[1]);
 						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
 						SM.sel('#SMpopup').style.display = 'none';
+						SM.sel('#SMpopup').style.top = '100px';
 					}); //Les deux planètes
 					break;
 			}
@@ -1890,12 +1928,12 @@ SM.preformatPlanet = function(planet) {
 
 	//Détection orbite ou espace infini
 	if (SM.sel('.planet .pllist').firstElementChild.firstChild.tagName == 'IMG') //En orbite
-		{ var message = SM.TEXT['preformat-planet_orbiting'] + " **" + name + " :** "; }
+		{ var mess = SM.TEXT['preformat-planet_orbiting'] + " **" + name + " :** "; }
 	else //Dans l'espace infini, donc fuel et direction nécessaires
 	{
 		var direction = planet.children[2].children[1].children[0].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
 		var fuel = planet.children[2].children[1].children[1].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
-		var message = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
+		var mess = "**" + name + " :** //" + direction + "//, " + fuel + " :fuel: ; ";
 	}
 
 	//Regroupement des zones identiques
@@ -1905,13 +1943,13 @@ SM.preformatPlanet = function(planet) {
 		if (zone == '???')
 			{ unknown += 1; }
 		else
-			{ message += zone + ', '; }
+			{ mess += zone + ', '; }
 	}
 	if (unknown)
-		{ message += "//" + unknown + " " + SM.TEXT['preformat-planet_unknown'] + '//, '; }
-	message = message.slice(0, -2) + '.';
+		{ mess += "//" + unknown + " " + SM.TEXT['preformat-planet_unknown'] + '//, '; }
+	mess = mess.slice(0, -2) + '.';
 
-	return message;
+	return mess;
 };
 
 
@@ -1958,6 +1996,7 @@ SM.locale = function(func) {
 		SM.TEXT['AP-pilgred'] = "point(s) de PILGRED";
 		SM.TEXT['AP-shoot'] = "point(s) de tir";
 		SM.TEXT['AP-cook'] = "point(s) de cuisine";
+		SM.TEXT['AP-klix'] = "Klix";
 		SM.TEXT['hide_alert_reports'] = "Cacher les rapports";
 		SM.TEXT['show_alert_reports'] = "Lister les rapports";
 		SM.TEXT['unvalid_move'] = "Cette porte est cassée, vous ne pouvez pas vous déplacer !";
@@ -1973,6 +2012,8 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_food-desc'] = "Afficher les effets des aliments sous l'inventaire";
 		SM.TEXT['SMparams_forced-locale'] = "Forcer la langue de Small(Mush)";
 		SM.TEXT['SMparams_lang-title'] = "Langue de l'interface Small(Mush) :";
+		SM.TEXT['SMparams_chat-unload'] = "Délester le chat";
+		SM.TEXT['SMparams_chat-unload-reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher votre ceinture.";
 		SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
 		SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 		SM.TEXT['tabs_char'] = "Perso";
@@ -2011,9 +2052,9 @@ SM.locale = function(func) {
 		SM.TEXT['PATROL_INTERFACE_unknown'] = "Patrouilleur inconnu";
 		SM.TEXT['warning_title'] = "Small(Mush) — chargé";
 		SM.TEXT['warning_1'] = "<strong>ATTENTION :</strong> ce script adapte l'interface de Mush. Si vous rencontrez un bug en jeu, <em>reproduisez le bug sur ordinateur</em> afin de vérifier que c'est bien le jeu, et non pas ce script, qui est en cause. Ne reportez sur les forums que les bugs <em>reproduits en jeu sur ordinateur sans script</em>.";
-		SM.TEXT['warning_2'] = "Si vous rencontrez un bug à cause du script, contactez son auteur à partir des paramètres. Ni l'auteur ni le script ne sont affiliés à Motion Twin et ne sauraient être responsables d'un quelconque problème (bien que le script soit codé et testé de manière à ne pas générer de bug pouvant influer sur le jeu lui-même).";
+		SM.TEXT['warning_2'] = "Si vous rencontrez un bug à cause du script, contactez son auteur à partir des paramètres. Ni l'auteur ni le script ne sont affiliés à Motion Twin et ne sauraient être responsables d'un quelconque problème (bien que le script a été codé et testé de manière à ne pas générer de bug pouvant influer sur le jeu lui-même).";
 		SM.TEXT['warning_3'] = "Bon jeu !";
-		SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) : Licence MIT</h4><p>Copyright (c) 2015 LAbare</p><p>L'autorisation est accordée, gracieusement, à toute personne acquérant une copie de ce script et des fichiers de documentation associés (le « Script »), de commercialiser le Script sans restriction, notamment les droits d'utiliser, de copier, de modifier, de fusionner, de publier, de distribuer, de sous-licencier et/ou de vendre des copies du Script, ainsi que d'autoriser les personnes auxquelles le Script est fourni à le faire, sous réserve des conditions suivantes :</p><p>La déclaration de copyright ci-dessus et la présente autorisation doivent être incluses dans toute copie ou partie substantielle du Script.</p><p>Le Script est fourni « tel quel », sans garantie d'aucune sorte, explicite ou implicite, notamment sans garantie de qualité marchande, d’adéquation à un usage particulier et d'absence de contrefaçon. En aucun cas les auteurs ou titulaires du droit d'auteur ne seront responsables de tout dommage, réclamation ou autre responsabilité, que ce soit dans le cadre d'un contrat, d'un délit ou autre, en provenance de, consécutif à ou en relation avec le Script ou son utilisation, ou avec d'autres éléments du Script. Bref, si ça casse, c'est pas ma faute. Mais ça va pas casser, normalement. À peine. Moi, j'y crois.</p>";
+		SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) : Licence MIT</h4><p>Copyright © 2015 LAbare</p><p>L'autorisation est accordée, gracieusement, à toute personne acquérant une copie de ce script et des fichiers de documentation associés (le « Script »), de commercialiser le Script sans restriction, notamment les droits d'utiliser, de copier, de modifier, de fusionner, de publier, de distribuer, de sous-licencier et/ou de vendre des copies du Script, ainsi que d'autoriser les personnes auxquelles le Script est fourni à le faire, sous réserve des conditions suivantes :</p><p>La déclaration de copyright ci-dessus et la présente autorisation doivent être incluses dans toute copie ou partie substantielle du Script.</p><p>Le Script est fourni « tel quel », sans garantie d'aucune sorte, explicite ou implicite, notamment sans garantie de qualité marchande, d’adéquation à un usage particulier et d'absence de contrefaçon. En aucun cas les auteurs ou titulaires du droit d'auteur ne seront responsables de tout dommage, réclamation ou autre responsabilité, que ce soit dans le cadre d'un contrat, d'un délit ou autre, en provenance de, consécutif à ou en relation avec le Script ou son utilisation, ou avec d'autres éléments du Script. Bref, si ça casse, c'est pas ma faute. Mais ça va pas casser, normalement. À peine. Moi, j'y crois.</p>";
 		SM.TEXT['help_screen_A'] = "Cliquez pour afficher une infobulle.<br />Aucune action ne sera faite.";
 		SM.TEXT['help_screen_B'] = "Cliquez pour cacher l'infobulle.";
 		SM.TEXT['show_inventory'] = "Afficher l'inventaire";
@@ -2080,7 +2121,7 @@ SM.locale = function(func) {
 		SM.TEXT['minimap-button'] = "Afficher la minimap Small(Mush)";
 		SM.TEXT['minimap-title'] = "Minimap Small(Mush)";
 		SM.TEXT['minimap-warning'] = "<b>ATTENTION :</b> cette minimap n'est pas celle du jeu Flash ; elle ne sert que de repère avec quelques indications. Il se peut que certaines avaries signalées n'y apparaissent pas.";
-		SM.TEXT['minimap-legend'] = "<b>Légende :</b> <span class='SMmapfire'>Incendie signalé</span> <span class='SMmapalertd'>Portes signalées</span> <span class='SMmapalerte'>Équipements signalés</span>";
+		SM.TEXT['minimap-legend'] = "<b>Légende :</b><br /><span class='SMmapfire SMlegend'>Incendie signalé</span><br /><span class='SMmapalertd SMlegend'>Portes signalées</span><br /><span class='SMmapalerte SMlegend'>Équipements signalés</span><br /><span class='SMmyroom SMlegend'>Vous êtes ici !</span>";
 		SM.TEXT['minimap-room'] = "Vous avez sélectionné : <b><span id='SMminimaproom'>rien</span></b>.";
 		SM.TEXT['tabtip-chartab'] = "<h1>Onglet Personnage</h1>Cet onglet contient toutes les informations sur votre personnage.";
 		SM.TEXT['tabtip-shiptab'] = "<h1>Onglet Vaisseau</h1>Cet onglet contient les informations relatives à l'état et l'avancement du vaisseau : alertes, expédition, projets et recherches terminés.";
@@ -2107,6 +2148,7 @@ SM.locale = function(func) {
 		SM.TEXT['AP-pilgred'] = "PILGRED point(s)";
 		SM.TEXT['AP-shoot'] = "shooting point(s)";
 		SM.TEXT['AP-cook'] = "cooking point(s)";
+		SM.TEXT['AP-klix'] = "Klix";
 		SM.TEXT['hide_alert_reports'] = "Hide reports";
 		SM.TEXT['show_alert_reports'] = "Show reports";
 		SM.TEXT['unvalid_move'] = "This door is broken, you cannot move there!";
@@ -2122,6 +2164,8 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_food-desc'] = "Show consumables effects under inventory";
 		SM.TEXT['SMparams_forced-locale'] = "Force Small(Mush) language";
 		SM.TEXT['SMparams_lang-title'] = "Small(Mush) language:";
+		SM.TEXT['SMparams_chat-unload'] = "Unload chat";
+		SM.TEXT['SMparams_chat-unload-reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
@@ -2160,9 +2204,9 @@ SM.locale = function(func) {
 		SM.TEXT['PATROL_INTERFACE_unknown'] = "Unknown patrol ship";
 		SM.TEXT['warning_title'] = "Small(Mush) — loaded";
 		SM.TEXT['warning_1'] = "<strong>WARNING:</strong> this script reshapes the game's interface. In case of an unfortunate bug, <em>reproduce it on a computer</em> to make sure that it is an in-game bug, and not a script bug. Only warn the forums in case of a <em>computer-reproduced in-game bug in a scriptless browser</em>.";
-		SM.TEXT['warning_2'] = "In case of a script bug, contact its author from the parameters menu. Neither the author nor the script have any link to Motion Twin, and they cannot be held responsible in case of a bug (although this script has been developed and tested in order not to generate any game-breaking bug).";
-		SM.TEXT['warning_3'] = "Have a good game!";
-		SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) — MIT License</h4><p>Copyright (c) 2015 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I'm not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
+		SM.TEXT['warning_2'] = "In case of a script bug, contact its author from the parameters menu. Neither the author nor the script have any link with Motion Twin, and they cannot be held responsible in case of a bug (although this script has been thoroughly developed and tested in order not to generate any game-breaking bug).";
+		SM.TEXT['warning_3'] = "Have a nice game!";
+		SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) — MIT License</h4><p>Copyright © 2015 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I'm not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
 		SM.TEXT['help_screen_A'] = "Click on an element to show its tooltip.<br />This won't make you do any action.";
 		SM.TEXT['help_screen_B'] = "Click again to hide the tooltip.";
 		SM.TEXT['show_inventory'] = "Show inventory";
@@ -2229,7 +2273,7 @@ SM.locale = function(func) {
 		SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 		SM.TEXT['minimap-title'] = "Small(Mush) minimap";
 		SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
-		SM.TEXT['minimap-legend'] = "<b>Legend:</b> <span class='SMmapfire'>Reported fire</span> <span class='SMmapalertd'>Reported doors</span> <span class='SMmapalerte'>Reported equipments</span>";
+		SM.TEXT['minimap-legend'] = "<b>Legend:</b><br /><span class='SMmapfire SMlegend'>Reported fire</span><br /><span class='SMmapalertd SMlegend'>Reported doors</span><br /><span class='SMmapalerte SMlegend'>Reported equipments</span><br /><span class='SMmyroom SMlegend'>You are here!</span>";
 		SM.TEXT['minimap-room'] = "You selected: <b><span id='SMminimaproom'>nothing</span></b>.";
 		SM.TEXT['tabtip-chartab'] = "<h1>Character tab</h1>This tab contains all information relative to your character.";
 		SM.TEXT['tabtip-shiptab'] = "<h1>Ship tab</h1>This tab contains all information relative to the ship in general: current alerts, exploration, projects and researches done…";
@@ -2256,6 +2300,7 @@ SM.locale = function(func) {
 		SM.TEXT['AP-pilgred'] = "PILGRED point(s)";
 		SM.TEXT['AP-shoot'] = "shooting point(s)";
 		SM.TEXT['AP-cook'] = "cooking point(s)";
+		SM.TEXT['AP-klix'] = "Klix";
 		SM.TEXT['hide_alert_reports'] = "Hide reports";
 		SM.TEXT['show_alert_reports'] = "Show reports";
 		SM.TEXT['unvalid_move'] = "This door is broken, you cannot move there!";
@@ -2271,6 +2316,8 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_food-desc'] = "Show consumables effects under inventory";
 		SM.TEXT['SMparams_forced-locale'] = "Force Small(Mush) language";
 		SM.TEXT['SMparams_lang-title'] = "Small(Mush) language:";
+		SM.TEXT['SMparams_chat-unload'] = "Unload chat";
+		SM.TEXT['SMparams_chat-unload-reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
@@ -2309,9 +2356,9 @@ SM.locale = function(func) {
 		SM.TEXT['PATROL_INTERFACE_unknown'] = "Unknown patrol ship";
 		SM.TEXT['warning_title'] = "Small(Mush) — loaded";
 		SM.TEXT['warning_1'] = "<strong>WARNING:</strong> this script reshapes the game's interface. In case of an unfortunate bug, <em>reproduce it on a computer</em> to make sure that it is an in-game bug, and not a script bug. Only warn the forums in case of a <em>computer-reproduced in-game bug in a scriptless browser</em>.";
-		SM.TEXT['warning_2'] = "In case of a script bug, contact its author from the parameters menu. Neither the author nor the script have any link to Motion Twin, and they cannot be held responsible in case of a bug (although this script has been developed and tested in order not to generate any game-breaking bug).";
-		SM.TEXT['warning_3'] = "Have a good game!";
-		SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) — MIT License</h4><p>Copyright (c) 2015 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I'm not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
+		SM.TEXT['warning_2'] = "In case of a script bug, contact its author from the parameters menu. Neither the author nor the script have any link with Motion Twin, and they cannot be held responsible in case of a bug (although this script has been thoroughly developed and tested in order not to generate any game-breaking bug).";
+		SM.TEXT['warning_3'] = "Have a nice game!";
+		SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) — MIT License</h4><p>Copyright © 2015 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I'm not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
 		SM.TEXT['help_screen_A'] = "Click on an element to show its tooltip.<br />This won't make you do any action.";
 		SM.TEXT['help_screen_B'] = "Click again to hide the tooltip.";
 		SM.TEXT['show_inventory'] = "Show inventory";
@@ -2378,7 +2425,7 @@ SM.locale = function(func) {
 		SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 		SM.TEXT['minimap-title'] = "Small(Mush) minimap";
 		SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
-		SM.TEXT['minimap-legend'] = "<b>Legend:</b> <span class='SMmapfire'>Reported fire</span> <span class='SMmapalertd'>Reported doors</span> <span class='SMmapalerte'>Reported equipments</span>";
+		SM.TEXT['minimap-legend'] = "<b>Legend:</b><br /><span class='SMmapfire SMlegend'>Reported fire</span><br /><span class='SMmapalertd SMlegend'>Reported doors</span><br /><span class='SMmapalerte SMlegend'>Reported equipments</span><br /><span class='SMmyroom SMlegend'>You are here!</span>";
 		SM.TEXT['minimap-room'] = "You selected: <b><span id='SMminimaproom'>nothing</span></b>.";
 		SM.TEXT['tabtip-chartab'] = "<h1>Character tab</h1>This tab contains all information relative to your character.";
 		SM.TEXT['tabtip-shiptab'] = "<h1>Ship tab</h1>This tab contains all information relative to the ship in general: current alerts, exploration, projects and researches done…";
@@ -2387,7 +2434,6 @@ SM.locale = function(func) {
 		SM.TEXT['tabtip-gametab'] = "<h1>Game/Terminal tab</h1>This tab contains the Flash game and the terminals you access.";
 		SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
 		SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
-		SM.TEXT['buttontip-reloadall'] = "<h1>Complete refresh</h1>Refreshes the whole game (slower). Useful when changing cycles or exploration steps.";
 		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
 		
 		SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
@@ -2404,7 +2450,7 @@ SM.locale = function(func) {
 /* FONCTION D'INITIALISATION */
 
 SM.init = function() {
-	var inlineJS = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' })); Main.SMupdtArr = ['maincontainer']; Main.normalSelUpdtArr = Main.selUpdtArr;";
+	var inlineJS = "document.body.setAttribute('data-SM-src', _tid.makeUrl('/mod/wall/post', { _id: 'tabreply_content', jsm: '1', lang: 'FR' })); Main.SMupdtArr = ['maincontainer'];";
 	SM.addNewEl('script', document.head, null, inlineJS); //Compatibilité avec userscript, sinon _tid.makeUrl est inaccessible et Main.SMupdtArr ne marche pas
 
 	if (SM.sel('#SMbar') == null)
@@ -2421,12 +2467,13 @@ SM.init = function() {
 	SM.topStats();
 	SM.messageEditor();
 	SM.changeActionFunctions();
-	SM.sel('#content').scrollLeft = 0;
+	window.setTimeout(function() { SM.sel('#content').scrollLeft = 0; }, 500);
 
 	//Première fois : alerte à lire
 	if (SM.parameters['first-time'])
 	{
 		SM.copyEl(SM.sel('#dialog'), SM.sel('#content')).style.display = 'block';
+		SM.sel('#dialog').style.left = '12px !important';
 		SM.sel('#SMdialog_title').innerHTML = "<img src='" + SM.src + "ico.png' />  " + SM.TEXT['warning_title'];
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_1']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_2']);
@@ -2497,7 +2544,7 @@ exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 /* VARIABLES */
 
-SM.version = "0.9.7.5c";
+SM.version = "0.9.7.7";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox
