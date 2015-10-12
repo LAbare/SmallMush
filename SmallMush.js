@@ -2022,7 +2022,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
-SM.version = "0.9.7.7";
+SM.version = "0.9.7.8";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox
