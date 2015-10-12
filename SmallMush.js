@@ -898,7 +898,7 @@ SM.initCss = function() {
 	//Énergie
 	relcss.innerHTML += '#SMenergybar td { background: transparent url("' + SM.src + 'ui/pabar.png") no-repeat left top; }';
 	//Popups
-	relcss.innerHTML += '.cdLevelDialog { left: ' + (((window.innerWidth - 424) / 2) + 12) + 'px; }';
+	relcss.innerHTML += '.cdLevelDialog { left: ' + (((window.innerWidth - 424) / 2) + 12) + 'px !important; }';
 };
 
 
@@ -1455,10 +1455,10 @@ SM.topStats = function() {
 		{ td = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('#topinfo_bar .genstatus tbody')), 'SMtopstats', SM.TEXT['stats-perso'], { colspan: '2' }); }
 	else
 		{ td.innerHTML = SM.TEXT['stats-perso']; }
-	SM.addNewEl('span', td, null, hp + " <img src='/img/icons/ui/lp.png' />");
-	SM.addNewEl('span', td, null, pmo + " <img src='/img/icons/ui/moral.png' />");
-	SM.addNewEl('span', td, null, pa + " <img src='/img/icons/ui/pa_slot1.png' />");
-	SM.addNewEl('span', td, null, pm + " <img src='/img/icons/ui/pa_slot2.png' />");
+	SM.addNewEl('span', td, null, hp + " <img src='/img/icons/ui/lp.png' alt='hp' />");
+	SM.addNewEl('span', td, null, pmo + " <img src='/img/icons/ui/moral.png' alt='moral' />");
+	SM.addNewEl('span', td, null, pa + " <img src='/img/icons/ui/pa_slot1.png' alt='pa' />");
+	SM.addNewEl('span', td, null, pm + " <img src='/img/icons/ui/pa_slot2.png' alt='pm' />");
 };
 
 
@@ -1996,8 +1996,10 @@ SM.init = function() {
 	//Première fois : alerte à lire
 	if (SM.parameters['first-time'])
 	{
-		SM.copyEl(SM.sel('#dialog'), SM.sel('#content')).style.display = 'block';
-		SM.sel('#dialog').style.left = '12px !important';
+		var SMdialog = SM.copyEl(SM.sel('#dialog'), SM.sel('#content'));
+		SMdialog.style.display = 'block';
+		SMdialog.style.left = '12px !important';
+		SMdialog.style.top = '100px';
 		SM.sel('#SMdialog_title').innerHTML = "<img src='" + SM.src + "ico.png' />  " + SM.TEXT['warning_title'];
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_1']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_2']);

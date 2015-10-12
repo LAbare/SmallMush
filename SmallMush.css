@@ -213,11 +213,10 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 #content .but { margin-bottom: 30px; }
 
 /* Fenêtre d'alerte (« Vous vous êtes sali… ») */
-.poptop {
-	position: absolute;
-	top: 100px !important;
+.ui_overlay #dialog, .poptop {
+	position: absolute !important;
+	top: 0 !important;
 	left: 12px !important;
-	left: calc((100vw - 400px) / 2) !important;
 	width: 400px;
 }
 
