@@ -214,8 +214,6 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 
 /* Fenêtre d'alerte (« Vous vous êtes sali… ») */
 .ui_overlay #dialog, .poptop {
-	position: absolute !important;
-	top: 0 !important;
 	left: 12px !important;
 	width: 400px;
 }
@@ -529,7 +527,7 @@ p.SMfire {
 /* Fenêtre d'up de niveau en cours de jeu */
 .cdLevelDialog {
 	max-width: 400px;
-	left: calc((100vw - 400px) / 2) !important;
+	left: 12px !important;
 }
 
 .ui-dialog .ui-dialog-content { overflow: visible; }

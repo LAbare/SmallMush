@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.7.8
+// @version   0.9.7.9
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -598,8 +598,9 @@ SM.changeActionFunctions = function() {
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
 	for (var i = 0; i < actions.length; i++)
 	{
-		if (!actions[i].getAttribute('onclick').match(/SM\./))
-			{ actions[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + actions[i].getAttribute('onclick')); }
+		var onclick = actions[i].getAttribute('onclick');
+		if (!/SM\./.test(onclick) && !/Main\.confirmAjaxAction/.test(onclick)) //On ne demande pas de confirmation pour ce qui se confirme déjà…
+			{ actions[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + onclick); }
 	}
 	//Distributeur (et autres modules ?)
 	var shop = document.querySelectorAll('[onclick*="Main.ajaxModule("]');
@@ -917,8 +918,6 @@ SM.initCss = function() {
 	relcss.innerHTML += '.gold_skill .container { background-image: url("' + SM.src + 'ui/gold_skill.png"); }\n';
 	//Énergie
 	relcss.innerHTML += '#SMenergybar td { background: transparent url("' + SM.src + 'ui/pabar.png") no-repeat left top; }';
-	//Popups
-	relcss.innerHTML += '.cdLevelDialog { left: ' + (((window.innerWidth - 424) / 2) + 12) + 'px !important; }';
 };
 
 
@@ -2013,7 +2012,7 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_forced-locale'] = "Forcer la langue de Small(Mush)";
 		SM.TEXT['SMparams_lang-title'] = "Langue de l'interface Small(Mush) :";
 		SM.TEXT['SMparams_chat-unload'] = "Délester le chat";
-		SM.TEXT['SMparams_chat-unload-reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher votre ceinture.";
+		SM.TEXT['SMparams_chat-unload-reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
 		SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
 		SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 		SM.TEXT['tabs_char'] = "Perso";
@@ -2546,7 +2545,7 @@ exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 /* VARIABLES */
 
-SM.version = "0.9.7.7";
+SM.version = "0.9.7.9";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox

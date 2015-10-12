@@ -578,8 +578,9 @@ SM.changeActionFunctions = function() {
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
 	for (var i = 0; i < actions.length; i++)
 	{
-		if (!actions[i].getAttribute('onclick').match(/SM\./))
-			{ actions[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + actions[i].getAttribute('onclick')); }
+		var onclick = actions[i].getAttribute('onclick');
+		if (!/SM\./.test(onclick) && !/Main\.confirmAjaxAction/.test(onclick)) //On ne demande pas de confirmation pour ce qui se confirme déjà…
+			{ actions[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + onclick); }
 	}
 	//Distributeur (et autres modules ?)
 	var shop = document.querySelectorAll('[onclick*="Main.ajaxModule("]');
@@ -897,8 +898,6 @@ SM.initCss = function() {
 	relcss.innerHTML += '.gold_skill .container { background-image: url("' + SM.src + 'ui/gold_skill.png"); }\n';
 	//Énergie
 	relcss.innerHTML += '#SMenergybar td { background: transparent url("' + SM.src + 'ui/pabar.png") no-repeat left top; }';
-	//Popups
-	relcss.innerHTML += '.cdLevelDialog { left: ' + (((window.innerWidth - 424) / 2) + 12) + 'px !important; }';
 };
 
 
@@ -2022,7 +2021,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
-SM.version = "0.9.7.8";
+SM.version = "0.9.7.9";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox

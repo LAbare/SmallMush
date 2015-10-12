@@ -25,7 +25,7 @@ SM.TEXT['SMparams_food-desc'] = "Afficher les effets des aliments sous l'inventa
 SM.TEXT['SMparams_forced-locale'] = "Forcer la langue de Small(Mush)";
 SM.TEXT['SMparams_lang-title'] = "Langue de l'interface Small(Mush) :";
 SM.TEXT['SMparams_chat-unload'] = "Délester le chat";
-SM.TEXT['SMparams_chat-unload-reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher votre ceinture.";
+SM.TEXT['SMparams_chat-unload-reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
 SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
 SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 SM.TEXT['tabs_char'] = "Perso";
