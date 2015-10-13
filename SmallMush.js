@@ -643,7 +643,7 @@ SM.hidePaste = function() {
 
 SM.loadingScreen = function() {
 	var screen = SM.sel('#SMloadscreen');
-	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br /><img src="/img/icons/ui/pa_core.png" /> ' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
+	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br /><img src="/img/icons/ui/pa_core.png" style="vertical-align: middle;" /> ' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
 	screen.style.display = 'block';
 };
 

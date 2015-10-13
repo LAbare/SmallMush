@@ -663,7 +663,7 @@ SM.hidePaste = function() {
 
 SM.loadingScreen = function() {
 	var screen = SM.sel('#SMloadscreen');
-	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br /><img src="/img/icons/ui/pa_core.png" /> ' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
+	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br /><img src="/img/icons/ui/pa_core.png" style="vertical-align: middle;" /> ' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
 	screen.style.display = 'block';
 };
 
@@ -2306,6 +2306,7 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_chat-unload'] = "Unload chat";
 		SM.TEXT['SMparams_chat-unload-reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
+		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol in the middle of the beta";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
 		SM.TEXT['tabs_ship'] = "Ship";
