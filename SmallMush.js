@@ -514,6 +514,17 @@ SM.changeChatTab = function(el) {
 		var date = new Date();
 		date.setTime(date.getTime() + 31536000000);
 		document.cookie = 'curChat=' + tab + '; expires=' + date.toGMTString() + '; path=/';
+		//Avertissement
+		var regtab = Main.curChat()[1];
+		var bug = SM.sel('#SMchatBug');
+		if (!bug)
+		{
+			var bloc = SM.sel('#chat_col .rightbg');
+			bug = SM.moveEl(SM.addNewEl('div', null, 'SMchatBug', null, { style: 'color: red;' }), bloc, bloc.firstChild);
+		}
+		bug.innerHTML = SM.TEXT['chat-bug'] + SM.TEXT['chat-bug_' + ['local', null, 'mush', null, 'obj', 'wall', 'fav', 'p', 'p', 'p', 'p', 'p'][regtab]];
+		if (regtab >= 7)
+			{ bug.innerHTML += (regtab - 6) + "."; }
     }
     
     else //Onglet Éditeur de messages
@@ -2007,7 +2018,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
-SM.version = "1.0";
+SM.version = "1.0.1";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox

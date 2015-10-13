@@ -144,6 +144,14 @@ SM.TEXT['tabtip-gametab'] = "<h1>Game/Terminal tab</h1>This tab contains the Fla
 SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
 SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
 SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
+SM.TEXT['chat-bug'] = "You are in the tab: ";
+SM.TEXT['chat-bug_local'] = "logs.";
+SM.TEXT['chat-bug_mush'] = "Mush channel.";
+SM.TEXT['chat-bug_obj'] = "objectives.";
+SM.TEXT['chat-bug_wall'] = "main wall.";
+SM.TEXT['chat-bug_fav'] = "favorites.";
+SM.TEXT['chat-bug_p'] = "private channel #";
+SM.TEXT['chat-bug_'] = "UNKNOWN";
 
 SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
 

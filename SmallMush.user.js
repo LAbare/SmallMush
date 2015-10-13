@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   1.0
+// @version   1.0.1
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -534,6 +534,17 @@ SM.changeChatTab = function(el) {
 		var date = new Date();
 		date.setTime(date.getTime() + 31536000000);
 		document.cookie = 'curChat=' + tab + '; expires=' + date.toGMTString() + '; path=/';
+		//Avertissement
+		var regtab = Main.curChat()[1];
+		var bug = SM.sel('#SMchatBug');
+		if (!bug)
+		{
+			var bloc = SM.sel('#chat_col .rightbg');
+			bug = SM.moveEl(SM.addNewEl('div', null, 'SMchatBug', null, { style: 'color: red;' }), bloc, bloc.firstChild);
+		}
+		bug.innerHTML = SM.TEXT['chat-bug'] + SM.TEXT['chat-bug_' + ['local', null, 'mush', null, 'obj', 'wall', 'fav', 'p', 'p', 'p', 'p', 'p'][regtab]];
+		if (regtab >= 7)
+			{ bug.innerHTML += (regtab - 6) + "."; }
     }
     
     else //Onglet Éditeur de messages
@@ -2117,6 +2128,14 @@ SM.locale = function(func) {
 		SM.TEXT['tabtip-shoptab'] = "<h1>Onglet Distributeur</h1>Cet onglet vous permet d'accéder au distributeur.";
 		SM.TEXT['buttontip-reload'] = "<h1>Rafraîchir</h1>Rafraîchit le jeu pour les actions courantes.";
 		SM.TEXT['buttontip-help'] = "<h1>Aide</h1>Affiche les infobulles (dont certaines récalcitrantes sur mobile) ainsi que de l'aide pour les éléments ajoutés par le script Small(Mush).";
+		SM.TEXT['chat-bug'] = "Vous êtes sur le canal ";
+		SM.TEXT['chat-bug_local'] = "des logs.";
+		SM.TEXT['chat-bug_mush'] = "Mush.";
+		SM.TEXT['chat-bug_obj'] = "des objectifs.";
+		SM.TEXT['chat-bug_wall'] = "principal.";
+		SM.TEXT['chat-bug_fav'] = "des favoris.";
+		SM.TEXT['chat-bug_p'] = "privé n°";
+		SM.TEXT['chat-bug_'] = "INCONNU";
 		
 		SM.loadingTexts = ["Photobirouillage des métaplores…", "Tir aux poulets intergalactiques…", "Test chat / micro-ondes…", "Recherche de Charlie…", "Tournée d'arrays de bool…", "Rechargement des blasters à la confiture…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du lutin des annonces vocodées…", "Localisation des drones…", "Schématisation des Terminatransistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Surchauffe des modules persos…", "Détartrage du matou…", "Cueillette des champignons…"];
 		
@@ -2270,6 +2289,14 @@ SM.locale = function(func) {
 		SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
 		SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
 		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
+		SM.TEXT['chat-bug'] = "You are in the tab: ";
+		SM.TEXT['chat-bug_local'] = "logs.";
+		SM.TEXT['chat-bug_mush'] = "Mush channel.";
+		SM.TEXT['chat-bug_obj'] = "objectives.";
+		SM.TEXT['chat-bug_wall'] = "main wall.";
+		SM.TEXT['chat-bug_fav'] = "favorites.";
+		SM.TEXT['chat-bug_p'] = "private channel #";
+		SM.TEXT['chat-bug_'] = "UNKNOWN";
 		
 		SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
 		
@@ -2423,6 +2450,14 @@ SM.locale = function(func) {
 		SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
 		SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
 		SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
+		SM.TEXT['chat-bug'] = "You are in the tab: ";
+		SM.TEXT['chat-bug_local'] = "logs.";
+		SM.TEXT['chat-bug_mush'] = "Mush channel.";
+		SM.TEXT['chat-bug_obj'] = "objectives.";
+		SM.TEXT['chat-bug_wall'] = "main wall.";
+		SM.TEXT['chat-bug_fav'] = "favorites.";
+		SM.TEXT['chat-bug_p'] = "private channel #";
+		SM.TEXT['chat-bug_'] = "UNKNOWN";
 		
 		SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…"];
 		
@@ -2534,7 +2569,7 @@ exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 /* VARIABLES */
 
-SM.version = "1.0";
+SM.version = "1.0.1";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox
