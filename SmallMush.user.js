@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   0.9.7.9
+// @version   1.0
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -117,12 +117,8 @@ SM.generateMinimap = function() {
 
 	var popup = SM.sel('#SMpopup');
 	popup.innerHTML = '';
-	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() {
-		SM.sel('#SMpopup').style.display = 'none';
-		SM.sel('#content').style.height = 'auto';
-	});
+	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
 	popup.style.display = 'block';
-	SM.sel('#content').style.height = '1000px'; //Sinon barre de scroll forcée
 
 	SM.addNewEl('h4', popup, null, "<img src='" + SM.src + "ico.png' /> " + SM.TEXT['minimap-title']);
 	SM.addNewEl('p', popup, null, SM.TEXT['minimap-warning']);
@@ -210,14 +206,12 @@ SM.changeTab = function(newtab) {
 		SM.sel('#content').scrollLeft = 424;
 		SM.sel('#topinfo_bar').style.left = '424px';
 		SM.sel('.mxhead').style.left = '424px';
-		SM.sel('#SMpopup').style.left = '436px';
 	}
 	else
 	{
 		SM.sel('#content').scrollLeft = 0;
 		SM.sel('#topinfo_bar').style.left = '0';
 		SM.sel('.mxhead').style.left = '0';
-		SM.sel('#SMpopup').style.left = '12px';
 		char.style.display = 'none';
 		SM.sel('#ship_tab').style.display = 'none';
 		SM.sel('#room_tab').style.display = 'none';
@@ -669,7 +663,7 @@ SM.hidePaste = function() {
 
 SM.loadingScreen = function() {
 	var screen = SM.sel('#SMloadscreen');
-	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br />' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
+	screen.innerHTML = '<img src="/img/icons/ui/loading1.gif" /><br /><img src="/img/icons/ui/pa_core.png" /> ' + SM.loadingTexts[Math.floor(Math.random() * (SM.loadingTexts.length))];
 	screen.style.display = 'block';
 };
 
@@ -863,15 +857,6 @@ SM.buildParamsMenu = function() {
 		SM.sel('#roomActionList2').style.opacity = 1;
 	});
 
-	//BETA
-	SM.addButton(popup, "BETA : reset cookies").addEventListener('click', function() {
-		var date = new Date();
-		date.setTime(date.getTime() + 31536000000);
-		document.cookie = 'SMparams=1000; expires=' + date.toGMTString() + '; path=/';
-		SM.getSMParameters();
-		SM.buildParamsMenu();
-	});
-
 	SM.addButton(popup, SM.TEXT['SMparams_chat-unload']).addEventListener('click', function() {
 		var date = new Date();
 		date.setTime(new Date().getTime() - 42000);
@@ -884,6 +869,7 @@ SM.buildParamsMenu = function() {
 
 	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits'], { class: 'SMnospace' });
 	SM.addNewEl('p', popup, null, "<a href='http://github.com/LAbare/SmallMush/releases' target='_blank'>v" + SM.version + "</a>", { class: 'SMnospace' });
+	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits-beta'], { style: 'font-size: 0.7em; margin-bottom: 0;' });
 };
 
 
@@ -982,7 +968,7 @@ SM.initMenubar = function() {
 		});
 	});
 
-	SM.addNewEl('div', SM.sel('#content'), 'SMpopup').style.display = 'none';
+	SM.addNewEl('div', document.body, 'SMpopup').style.display = 'none';
 	SM.buildParamsMenu();
 };
 
@@ -2014,6 +2000,7 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_chat-unload'] = "Délester le chat";
 		SM.TEXT['SMparams_chat-unload-reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
 		SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
+		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Merci aux beta-testeurs :<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (bah ouais)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, que personne ni Windows n'aime<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> le poney de l'Apocalypse<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a> le paumé de l'espace<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> l'Augure stalker<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la plus beta des testeuses<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, dont vient le délestage du chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la pas bavarde<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, rentré sur Sol au milieu de la beta";
 		SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 		SM.TEXT['tabs_char'] = "Perso";
 		SM.TEXT['tabs_ship'] = "Général";
@@ -2166,6 +2153,7 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_chat-unload'] = "Unload chat";
 		SM.TEXT['SMparams_chat-unload-reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
+		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol in the middle of the beta";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
 		SM.TEXT['tabs_ship'] = "Ship";
@@ -2545,7 +2533,7 @@ exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 /* VARIABLES */
 
-SM.version = "0.9.7.9";
+SM.version = "1.0";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox

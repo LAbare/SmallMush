@@ -261,7 +261,7 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 /* Popup Small(Mush) (pour messages préformatés, paramètres et minimap) */
 #SMpopup {
 	display: none;
-	position: absolute;
+	position: fixed;
 	top: 100px;
 	left: 12px;
 	z-index: 200;
