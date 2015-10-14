@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   1.0.1
+// @version   1.0.2
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#
@@ -2011,7 +2011,7 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_chat-unload'] = "Délester le chat";
 		SM.TEXT['SMparams_chat-unload-reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
 		SM.TEXT['SMparams_credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span>";
-		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Merci aux beta-testeurs :<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (bah ouais)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, que personne ni Windows n'aime<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> le poney de l'Apocalypse<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a> le paumé de l'espace<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> l'Augure stalker<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la plus beta des testeuses<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, dont vient le délestage du chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la pas bavarde<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, rentré sur Sol au milieu de la beta";
+		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Merci aux beta-testeurs :<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (bah ouais)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, que personne ni Windows n'aime<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> le poney de l'Apocalypse<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a> le paumé de l'espace<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> l'Augure stalker<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la plus beta des testeuses<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, dont vient le délestage du chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la pas bavarde<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, rentré sur Sol en plein milieu de la beta";
 		SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 		SM.TEXT['tabs_char'] = "Perso";
 		SM.TEXT['tabs_ship'] = "Général";
@@ -2172,7 +2172,7 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_chat-unload'] = "Unload chat";
 		SM.TEXT['SMparams_chat-unload-reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
-		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol in the middle of the beta";
+		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol right in the middle of the beta";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
 		SM.TEXT['tabs_ship'] = "Ship";
@@ -2333,7 +2333,7 @@ SM.locale = function(func) {
 		SM.TEXT['SMparams_chat-unload'] = "Unload chat";
 		SM.TEXT['SMparams_chat-unload-reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
 		SM.TEXT['SMparams_credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
-		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol in the middle of the beta";
+		SM.TEXT['SMparams_credits-beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol right in the middle of the beta";
 		SM.TEXT['confirm_action'] = "Do you want to '";
 		SM.TEXT['tabs_char'] = "Myself";
 		SM.TEXT['tabs_ship'] = "Ship";
@@ -2495,7 +2495,7 @@ SM.init = function() {
 	//Première fois : alerte à lire
 	if (SM.parameters['first-time'])
 	{
-		var SMdialog = SM.copyEl(SM.sel('#dialog'), SM.sel('#content'));
+		var SMdialog = SM.copyEl(SM.sel('#dialog'), document.body);
 		SMdialog.style.display = 'block';
 		SMdialog.style.left = '12px !important';
 		SMdialog.style.top = '100px';
@@ -2503,7 +2503,7 @@ SM.init = function() {
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_1']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_2']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_3']);
-		SM.sel('#SMdialog_ok').addEventListener('click', function() { SM.sel('#content').removeChild(SM.sel('#SMdialog')); });
+		SM.sel('#SMdialog_ok').addEventListener('click', function() { document.body.removeChild(SM.sel('#SMdialog')); });
 		SM.parameters['first-time'] = false;
 		SM.setSMParameters();
 	}
@@ -2569,7 +2569,7 @@ exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 /* VARIABLES */
 
-SM.version = "1.0.1";
+SM.version = "1.0.2";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox

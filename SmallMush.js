@@ -1992,7 +1992,7 @@ SM.init = function() {
 	//Première fois : alerte à lire
 	if (SM.parameters['first-time'])
 	{
-		var SMdialog = SM.copyEl(SM.sel('#dialog'), SM.sel('#content'));
+		var SMdialog = SM.copyEl(SM.sel('#dialog'), document.body);
 		SMdialog.style.display = 'block';
 		SMdialog.style.left = '12px !important';
 		SMdialog.style.top = '100px';
@@ -2000,7 +2000,7 @@ SM.init = function() {
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_1']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_2']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_3']);
-		SM.sel('#SMdialog_ok').addEventListener('click', function() { SM.sel('#content').removeChild(SM.sel('#SMdialog')); });
+		SM.sel('#SMdialog_ok').addEventListener('click', function() { document.body.removeChild(SM.sel('#SMdialog')); });
 		SM.parameters['first-time'] = false;
 		SM.setSMParameters();
 	}
@@ -2018,7 +2018,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
-SM.version = "1.0.1";
+SM.version = "1.0.2";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox
