@@ -22,7 +22,7 @@
 .changeChatTab(el): change l'onglet de chat (remplace Main.chatTab pour inclure l'onglet Éditeur de messages)
 .SMexitModule(*func): remplace Main.exitModule() pour éviter le rechargement total de la page, peut exécuter une fonction ensuite (voir .changeRoom)
 .changeActionFunctions(): ajoute un appel à SM.beforeAction() avant chaque action
-.beforeAction(): appelée avant chaque action pour sauvegarder le message actuel de l'éditeur, demander confirmation de l'action si besoin et changer d'onglet Small(Mush) pour certaines actions
+.beforeAction(el): appelée avant chaque action pour sauvegarder le message actuel de l'éditeur, demander confirmation de l'action si besoin et changer d'onglet Small(Mush) pour certaines actions
 .hidePaste(): cache les boutons "Coller"
 .loadingScreen(): affiche l'écran de rechargement
 .reInit(): reconstruit l'interface Small(Mush) après mise à jour de la page
@@ -74,6 +74,7 @@
 .alertrooms: (list) nom des pièces du Daedalus telles qu'elles apparaissent dans les alertes (certaines sont mal écrites : « Jardin Hydoponique »)
 .localerooms: (list) nom des pièces du Daedalus dans la langue choisie par le joueur
 .TEXT: (object) textes de l'interface Small(Mush), générés par SM.locale()
+.INTERR: (string) point d'interrogation avec ou sans espace insécable selon la locale
 .ME_MODULING: (bool) le personnage est en train d'accéder à un terminal
 .ME_NERON: (bool) le personnage a le titre d'Administrateur NERON
 .ME_ALONE: (bool) le personnage est seul dans la pièce

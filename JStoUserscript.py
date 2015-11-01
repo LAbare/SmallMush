@@ -3,10 +3,17 @@ FR = open('SMlang-fr.js', 'r')
 EN = open('SMlang-en.js', 'r')
 ES = open('SMlang-es.js', 'r')
 dest = open('SmallMush.user.js', 'w')
-replacing = False;
+replacing = False
 functions = []
+goodsource = False
 
-print("Check that you changed the source!")
+for line in source:
+	if "//SM.src = \"http://labare.alwaysdata.net/SmallMush/\";" in line:
+		goodsource = True
+
+source.seek(0)
+if not goodsource:
+	print("Mauvaise source !")
 
 dest.write('// ==UserScript==\n')
 dest.write('// @name      Small(Mush)\n')
@@ -29,7 +36,7 @@ for line in source:
 		functions.append(line.split(' = ')[0].split('.')[1])
 
 	if 'BEGIN PYTHON REPLACE' in line:
-		replacing = True;
+		replacing = True
 		dest.write('\tswitch (lang)\n')
 		dest.write('\t{\n')
 
@@ -52,7 +59,7 @@ for line in source:
 		dest.write('\tfunc();\n')
 
 	elif 'END PYTHON REPLACE' in line:
-		replacing = False;
+		replacing = False
 
 	elif 'PYTHON USERSCRIPT' in line:
 		for function in functions:

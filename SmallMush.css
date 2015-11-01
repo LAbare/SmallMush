@@ -358,6 +358,19 @@ p.SMfire {
 
 #chatBlock { min-height: 550px; height: 550px; height: 80vh; }
 
+.SMlogsbut {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
+#SMlogsarea {
+	width: 100%;
+	min-height: 250px;
+	max-height: 500px;
+	color: black;
+}
+
 #SMbottom {
 	display: block;
 	margin: 0 auto;

@@ -2,6 +2,7 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
+ *             v1.1              *
 \**—————————————————————————————**/
 
 
@@ -11,8 +12,9 @@ var SM = {};
 /* FONCTIONS DÉVELOPPEUR */
 
 SM.sel = function(name) {
-	if (name[0] == "." && name.search(' |:') == -1) { return document.getElementsByClassName(name.slice(1))[0]; }
-	else if (name[0] == '#' && name.search(' |:') == -1) { return document.getElementById(name.slice(1)); }
+	var qsl = name.search(' |:');
+	if (name[0] == "." && qsl == -1) { return document.getElementsByClassName(name.slice(1))[0]; }
+	else if (name[0] == '#' && qsl == -1) { return document.getElementById(name.slice(1)); }
 	else { return document.querySelector(name); }
 };
 
@@ -48,10 +50,9 @@ SM.addButton = function(parent, text, attrs) {
 			else { butattrs[i] = attrs[i]; }
 		}
 	}
-	var a = SM.addNewEl('div', ((parent) ? parent : null), null, null, butattrs);
-	var b = SM.addNewEl('div', a, null, null, { class: 'butright' });
-	var c = SM.addNewEl('div', b, null, text, { class: 'butbg' });
-	return a;
+	var but = SM.addNewEl('div', ((parent) ? parent : null), null, null, butattrs);
+	SM.addNewEl('div', SM.addNewEl('div', but, null, null, { class: 'butright' }), null, text, { class: 'butbg' });
+	return but;
 };
 
 SM.moveEl = function(el, dest, bef) {
@@ -122,7 +123,7 @@ SM.generateMinimap = function() {
 		if (!r.length)
 			{ continue; }
 
-		var regexp = RegExp(SM.alertrooms[i] + '\\s\*\[\^2\]', 'g'); //Attention à Baie Alpha et Baie Alpha 2
+		var regexp = RegExp(SM.alertrooms[i] + '\\s\*\[\^2\]\{0,10}\\s\*\\.', 'g'); //Attention à Baie Alpha et Baie Alpha 2
 		if (regexp.test(al.fAl))
 			{ var roomclass = 'SMmaproom SMmapfire'; }
 		else
@@ -151,7 +152,7 @@ SM.generateMinimap = function() {
 		}
 
 		//Avaries signalées
-		//<div> plutôt que <text> car ce dernier n'est bizarrement pas supporté sur tous les navigateurs mobiles (coucou Dolphin)
+		//<div> nécessaire, <text> pas supporté sur tous les navigateurs mobiles (coucou Dolphin)
 		var rd = al.dAl.match(regexp);
 		var re = al.eAl.match(regexp);
 		if (rd) { rd = rd.length; }
@@ -256,7 +257,7 @@ SM.changeRoom = function(el) {
 		{ alert(SM.TEXT['unvalid_move']); }
 	else
 	{
-		//Vérification (non-bloquante) d'énergie pour se déplacer
+		//Vérification (non-bloquante) d'énergie
 		var energy = false;
 		if (SM.sel('[src$="/pa1.png"]') || SM.sel('[src$="/pa2.png"]'))
 			{ energy = true; }
@@ -288,8 +289,8 @@ SM.changeRoom = function(el) {
 		}
 
 		/* Soit :
-		- on n'est pas handicapé et on n'a pas d'énergie ;
-		- on est handicapé, on est seul, et soit on n'a pas d'énergie, soit le Simulateur de gravité est en panne et ni compétence Sprinter, ni Trottinette ni Monture rocheuse fonctionnelle sur soi.
+		- pas handicapé et pas d'énergie ;
+		- handicapé, seul, et soit pas d'énergie, soit Simulateur de gravité en panne et ni Sprinter, ni Trottinette ni Monture rocheuse fonctionnelle sur soi.
 		Ne prend pas en compte les blessures ni les objets lourds. */
 		if ((!disabled && !energy) || (disabled && SM.ME_ALONE && (!energy || (!SM.GRAVITY && !sprinter && !scooter && !boulder))))
 		{
@@ -300,9 +301,9 @@ SM.changeRoom = function(el) {
 		if (SM.GUARDIAN && !confirm(SM.TEXT['move_guardian']))
 			{ return false; }
 		
-		if (SM.parameters['confirm-action'])
+		if (SM.parameters['confirm_action'])
 		{
-			if (!confirm(SM.TEXT['move_confirm'] + roomname + " ?"))
+			if (!confirm(SM.TEXT['move_confirm'] + roomname + SM.INTERR))
 				{ return false; }
 		}
 		el.firstChild.firstChild.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> " + SM.TEXT['move_button'];
@@ -476,7 +477,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 				? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour obtenir la compétence de l'apprenton dans le nom
 				: item.getAttribute('data-name') //Pour avoir les attributs (charges, objet lourd, caché…) dans les autres cas
 			);
-			if (SM.parameters['food-desc'] && item.getAttribute('data-id') == 'CONSUMABLE')
+			if (SM.parameters['food_desc'] && item.getAttribute('data-id') == 'CONSUMABLE')
 				{ SM.sel('#SMitemdesc').innerHTML = SM.reformat(item.getAttribute('data-desc')); }
 			else
 				{ SM.sel('#SMitemdesc').innerHTML = ''; }
@@ -522,7 +523,7 @@ SM.changeChatTab = function(el) {
 			var bloc = SM.sel('#chat_col .rightbg');
 			bug = SM.moveEl(SM.addNewEl('div', null, 'SMchatBug', null, { style: 'color: red;' }), bloc, bloc.firstChild);
 		}
-		bug.innerHTML = SM.TEXT['chat-bug'] + SM.TEXT['chat-bug_' + ['local', null, 'mush', null, 'obj', 'wall', 'fav', 'p', 'p', 'p', 'p', 'p'][regtab]];
+		bug.innerHTML = SM.TEXT['chat_bug'] + SM.TEXT['chat_bug-' + ['local', null, 'mush', null, 'obj', 'wall', 'fav', 'p', 'p', 'p', 'p', 'p'][regtab]];
 		if (regtab >= 7)
 			{ bug.innerHTML += (regtab - 6) + "."; }
     }
@@ -541,6 +542,7 @@ SM.changeChatTab = function(el) {
 		SM.sel('#SMeditor').style.display = 'block';
 
 		//Entrées de texte
+		SM.sel('#mushform').style.display = 'none';
 		SM.sel('#wall').style.display = 'none';
 		SM.sel('#privateform').style.display = 'none';
 
@@ -552,9 +554,9 @@ SM.changeChatTab = function(el) {
 SM.SMexitModule = function(func) {
 	var button = SM.sel(".cdExitModuleButton");
 	//Confirmation d'action
-	if (SM.parameters['confirm-action'])
+	if (SM.parameters['confirm_action'])
 	{
-		if (!confirm(SM.TEXT['confirm_action'] + button.textContent.trim() + "' ?"))
+		if (!confirm(SM.TEXT['confirm_action'] + button.textContent.trim() + "'" + SM.INTERR))
 			{ return false; }
 	}
 	SM.loadingScreen();
@@ -579,6 +581,8 @@ SM.changeActionFunctions = function() {
 	//Boutons Nouveau cycle et Nouvelle étape
 	SM.sel('#txt_new_cycle a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); SM.changeTab("char_col"); }); return false;');
 	SM.sel('#txt_new_step a').setAttribute('onclick', 'SM.loadingScreen(); Main.ajax("/", Main.SMupdtArr, function() { SM.reInit(); SM.changeTab("room_col"); }); return false;');
+	SM.sel('#txt_new_cycle a').setAttribute('data-SMreload', 'full');
+	SM.sel('#txt_new_step a').setAttribute('data-SMreload', 'full');
 	//Boutons d'action
 	var actions = document.querySelectorAll('.but:not(.fake) [href^="?action="]');
 	for (var i = 0; i < actions.length; i++)
@@ -594,6 +598,14 @@ SM.changeActionFunctions = function() {
 		if (!shop[i].getAttribute('onclick').match(/SM\./))
 			{ shop[i].setAttribute('onclick', 'if (!SM.beforeAction(this)) { return false; } ' + shop[i].getAttribute('onclick')); }
 	}
+	//Missions et actions à rechargement discret : écran + rechargement forcé
+	var mis = document.querySelectorAll('[onclick*="Main.ajaxDiscrete("]');
+	for (var i = 0; i < mis.length; i++)
+	{
+		var onclick = mis[i].getAttribute('onclick');
+		if (!/SM\./.test(onclick)) //On ne demande pas de confirmation pour ce qui se confirme déjà…
+			{ mis[i].setAttribute('onclick', onclick + ' SM.loadingScreen(); Main.ajax("/", null, function() { SM.reInit(); });'); }
+	}
 	//En cas d'accès à un terminal, changement de Main.exitModule() en SM.SMexitModule()
 	var exitmodule = SM.sel('.cdExitModuleButton');
 	if (exitmodule)
@@ -608,7 +620,7 @@ SM.beforeAction = function(el) {
 		{ SM.previewtext = wallpost.value.slice(0, 2500); }
 
 	//Confirmation d'action
-	if (SM.parameters['confirm-action'])
+	if (SM.parameters['confirm_action'])
 	{
 		var name = SM.reformat(el.innerHTML.trim().replace(/<\/?span>/g, ''));
 		name = name.replace(/<img(?:.*)\/(.*)\.png(?:.*)\/?>/g, function (s, p) {
@@ -628,18 +640,18 @@ SM.beforeAction = function(el) {
 			}
 			return SM.TEXT['AP-' + pa] + " :";
 		});
-		if (!confirm(SM.TEXT['confirm_action'] + name + "' ?"))
+		if (!confirm(SM.TEXT['confirm_action'] + name + "'" + SM.INTERR))
 			{ return false; }
 	}
 	SM.loadingScreen();
 
 	//Changement d'onglet Small(Mush)
 	var action = Main.extractAction(el.getAttribute('href'));
-	//Accéder à un terminal ou au Bloc de post-it, Radio du Daedalus, Envoyer une mission, Annonce générale
-	if (['ACCESS', 'ACCESS_SECONDARY', 'COMMANDER_ORDER', 'DAILY_ORDER'].indexOf(action) != -1)
+	//Accéder à un terminal ou au Bloc de post-it, Radio du Daedalus, Envoyer une mission, Annonce générale, Décoller en Icarus
+	if (['ACCESS', 'ACCESS_SECONDARY', 'COMMANDER_ORDER', 'DAILY_ORDER', 'ICARUS_TAKEOFF'].indexOf(action) != -1)
 		{ SM.changeTab('room_col'); }
-	//Examiner, Lire, Vérifier son niveau pré-fongique, Lister l'équipage, Lire le niveau de fuel dans la Chambre de combustion
-	else if (['INSPECT', 'CONSULT_DOC', 'CHECK_FOR_INFECTION', 'CHECK_CREW_LIST', 'CHECK_LEVEL'].indexOf(action) != -1)
+	//Examiner, Lire, Passage au Mycoscan, Lister l'équipage, Lire le niveau de la Chambre de combustion, Torturer, Prémonition, Kube, Chuchoter, Fouiner (Métalo)
+	else if (['INSPECT', 'CONSULT_DOC', 'CHECK_FOR_INFECTION', 'CHECK_CREW_LIST', 'CHECK_LEVEL', 'TORTURE', 'PREMONITION', 'TRY_KUBE', 'WHISPER', 'GEN_METAL'].indexOf(action) != -1)
 		{ SM.changeTab('chat_col'); }
 
 	return true;
@@ -681,6 +693,12 @@ SM.reInit = function() {
 	SM.messageEditor();
 	SM.changeActionFunctions();
 	SM.sel("#SMbar .cycletime").textContent = SM.sel("#chat_col .cycletime").textContent;
+	if (SM.sel('.SMtabselected') == SM.sel('#SMtab-room_col'))
+	{
+		SM.sel('#content').scrollLeft = 424;
+		SM.sel('#topinfo_bar').style.left = '424px';
+		SM.sel('.mxhead').style.left = '424px';
+	}
 	SM.sel('#SMloadscreen').style.display = 'none';
 };
 
@@ -759,21 +777,21 @@ SM.itemRight = function() {
 
 SM.getSMParameters = function() {
 	SM.parameters = {};
-	SM.parameters['first-time'] = true;
-	SM.parameters['confirm-action'] = false;
-	SM.parameters['food-desc'] = true;
-	SM.parameters['forced-locale'] = false;
+	SM.parameters['first_time'] = true;
+	SM.parameters['confirm_action'] = false;
+	SM.parameters['food_desc'] = true;
+	SM.parameters['forced_locale'] = false;
 	SM.parameters['locale'] = '0'; //0: non forcé ; 1: FR ; 2: EN ; 3: ES
 
 	var offset = document.cookie.search('SMparams');
 	if (offset != -1)
 	{
 		var parameters = document.cookie.slice(offset + 9);
-		SM.parameters['first-time'] = ((parameters[0] == '1') ? true : false);
-		SM.parameters['confirm-action'] = ((parameters[1] == '1') ? true : false);
-		SM.parameters['food-desc'] = ((parameters[2] == '1') ? true : false);
-		SM.parameters['forced-locale'] = ((['1', '2', '3'].indexOf(parameters[3]) != -1) ? true : false);
-		if (SM.parameters['forced-locale'])
+		SM.parameters['first_time'] = ((parameters[0] == '1') ? true : false);
+		SM.parameters['confirm_action'] = ((parameters[1] == '1') ? true : false);
+		SM.parameters['food_desc'] = ((parameters[2] == '1') ? true : false);
+		SM.parameters['forced_locale'] = ((['1', '2', '3'].indexOf(parameters[3]) != -1) ? true : false);
+		if (SM.parameters['forced_locale'])
 			{ SM.parameters['locale'] = parseInt(parameters[3]); }
 		else
 		{
@@ -789,9 +807,9 @@ SM.getSMParameters = function() {
 
 SM.setSMParameters = function() {
 	var parameters = '0'; //paramètre 'first-time' passant forcément à false
-	parameters += ((SM.parameters['confirm-action']) ? 1 : 0);
-	parameters += ((SM.parameters['food-desc']) ? 1 : 0);
-	parameters += ((SM.parameters['forced-locale']) ? SM.parameters['locale'] : 0);
+	parameters += ((SM.parameters['confirm_action']) ? 1 : 0);
+	parameters += ((SM.parameters['food_desc']) ? 1 : 0);
+	parameters += ((SM.parameters['forced_locale']) ? SM.parameters['locale'] : 0);
 
 	var date = new Date();
 	date.setTime(date.getTime() + 31536000000);
@@ -804,9 +822,9 @@ SM.buildParamsMenu = function() {
 	popup.innerHTML = '';
 
 	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
-	SM.addNewEl('h4', popup, null, SM.TEXT['SMparams_title'] + "  <img src='" + SM.src + "ico.png' />");
+	SM.addNewEl('h4', popup, null, SM.TEXT['SMparams-title'] + "  <img src='" + SM.src + "ico.png' />");
 
-	var parameters = ['confirm-action', 'food-desc', 'forced-locale'];
+	var parameters = ['confirm_action', 'food_desc', 'forced_locale'];
 	for (i in parameters)
 	{
 		var parameter = parameters[i];
@@ -815,9 +833,21 @@ SM.buildParamsMenu = function() {
 		{
 			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', checked: 'true', 'data-parameter': parameter })
 			input.addEventListener('change', function() {
-				SM.parameters[this.getAttribute('data-parameter')] = false;
-				SM.setSMParameters();
-				SM.buildParamsMenu();
+				var p = this.getAttribute('data-parameter');
+				SM.parameters[p] = false;
+				if (p == 'forced_locale')
+				{
+					SM.parameters['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
+					SM.locale(function() {
+						SM.setSMParameters();
+						SM.buildParamsMenu();
+					});
+				}
+				else
+				{
+					SM.setSMParameters();
+					SM.buildParamsMenu();
+				}
 			});
 		}
 		else
@@ -829,18 +859,28 @@ SM.buildParamsMenu = function() {
 				SM.buildParamsMenu();
 			});
 		}
-		SM.addNewEl('label', div, null, SM.TEXT['SMparams_' + parameter], { 'for': 'SMlabel_' + parameter });
+		SM.addNewEl('label', div, null, SM.TEXT['SMparams-' + parameter], { 'for': 'SMlabel_' + parameter });
 		div.className = 'SMparamsdiv';
 	}
 
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_lang-title']);
-	var langs = SM.addNewEl('select', popup, 'SMlangselect');
-	SM.addNewEl('option', langs, null, "Français", ((SM.parameters['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
-	SM.addNewEl('option', langs, null, "English", ((SM.parameters['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
-	langs.addEventListener('change', function() { SM.parameters['locale'] = this.value; SM.locale(function() { SM.setSMParameters(); }); });
+	if (SM.parameters['forced_locale'])
+	{
+		SM.addNewEl('p', popup, null, SM.TEXT['SMparams-lang_title']);
+		var langs = SM.addNewEl('select', popup, 'SMlangselect');
+		SM.addNewEl('option', langs, null, "Français", ((SM.parameters['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
+		SM.addNewEl('option', langs, null, "English", ((SM.parameters['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
+		SM.addNewEl('option', langs, null, "Español", ((SM.parameters['locale'] == 3) ? { value: '3', selected: 'selected' } : { value: '3' }));
+		langs.addEventListener('change', function() {
+			SM.parameters['locale'] = this.value;
+			SM.locale(function() {
+				SM.setSMParameters();
+				SM.buildParamsMenu();
+			});
+		});
+	}
 
 	//Affichage de l'inventaire dans l'onglet Module
-	SM.addButton(popup, SM.TEXT['show-flash-inventory']).addEventListener('click', function() {
+	SM.addButton(popup, SM.TEXT['show_flash_inventory']).addEventListener('click', function() {
 		SM.changeTab('room_col');
 		SM.sel('#cdInventory').style.visibility = 'visible';
 		SM.sel('#cdInventory').firstElementChild.style.display = 'block';
@@ -848,19 +888,19 @@ SM.buildParamsMenu = function() {
 		SM.sel('#roomActionList2').style.opacity = 1;
 	});
 
-	SM.addButton(popup, SM.TEXT['SMparams_chat-unload']).addEventListener('click', function() {
+	SM.addButton(popup, SM.TEXT['SMparams-chat_unload'], { 'data-tip': SM.TEXT['SMparams-chat_unload_tip'] }).addEventListener('click', function() {
 		var date = new Date();
 		date.setTime(new Date().getTime() - 42000);
 		document.cookie = 'sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
 		document.cookie = 'mush_sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
-		SM.sel('#SMloadscreen').innerHTML = SM.TEXT['SMparams_chat-unload-reload'];
+		SM.sel('#SMloadscreen').innerHTML = SM.TEXT['SMparams-chat_unload_reload'];
 		SM.sel('#SMloadscreen').style.display = 'block';
 		window.setTimeout(function() { window.location = '/'; }, 3000);
 	});
 
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits'], { class: 'SMnospace' });
+	SM.addNewEl('p', popup, null, SM.TEXT['SMparams-credits'], { class: 'SMnospace' });
 	SM.addNewEl('p', popup, null, "<a href='http://github.com/LAbare/SmallMush/releases' target='_blank'>v" + SM.version + "</a>", { class: 'SMnospace' });
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams_credits-beta'], { style: 'font-size: 0.7em; margin-bottom: 0;' });
+	SM.addNewEl('p', popup, null, SM.TEXT['SMparams-credits_beta'], { style: 'font-size: 0.7em; margin-bottom: 0;' });
 };
 
 
@@ -906,7 +946,10 @@ SM.initMenubar = function() {
 	var butr = SM.addButton(bar, "<img src='" + SM.src + "ui/reload_Mush.png' />", { 'data-SMtip': SM.TEXT['buttontip-reload'] });
 	butr.addEventListener('click', function() {
 		SM.loadingScreen();
-		Main.ajax('/', null, function() { SM.reInit(); SM.sel('#SMloadscreen').style.display = 'none'; });
+		if (SM.sel('#SMbar [data-SMreload]') || SM.sel('#room_col [data-SMreload]')) //Nouveau cycle ou nouvelle étape
+			{ Main.ajax('/', Main.SMupdtArr, function() { SM.reInit(); }); }
+		else
+			{ Main.ajax('/', null, function() { SM.reInit(); }); }
 	});
 	SM.addNewEl('div', document.body, 'SMloadscreen', "<img src='/img/icons/ui/loading1.gif' />").addEventListener('click', function() { this.style.display = 'none'; });
 
@@ -914,8 +957,8 @@ SM.initMenubar = function() {
 	var buthelp = SM.addButton(bar, "<img src='http://mush.vg/img/icons/ui/infoalert.png' />?", { 'data-SMtip': SM.TEXT['buttontip-help'] });
 	buthelp.addEventListener('click', function() { SM.sel('#SMhelpscreenA').style.display = 'block'; });
 	//Premier écran noir : sélectionner l'élément ; second écran noir : cacher l'infobulle (sinon elle reste)
-	SM.addNewEl('div', document.body, 'SMhelpscreenA', SM.TEXT['help_screen_A']).addEventListener('click', function(e) { this.style.display = 'none'; SM.SMhelp(e); });
-	SM.addNewEl('div', document.body, 'SMhelpscreenB', SM.TEXT['help_screen_B']).addEventListener('click', function(e) { this.style.display = 'none'; Main.hideTip(); });
+	SM.addNewEl('div', document.body, 'SMhelpscreenA', SM.TEXT['help_screen-A']).addEventListener('click', function(e) { this.style.display = 'none'; SM.SMhelp(e); });
+	SM.addNewEl('div', document.body, 'SMhelpscreenB', SM.TEXT['help_screen-B']).addEventListener('click', function(e) { this.style.display = 'none'; Main.hideTip(); });
 
 	SM.copyEl(SM.sel('.cycletime'), bar); //Jour et cycle
 	SM.copyEl(SM.sel('.cdShipCasio'), bar); //Horloge
@@ -933,29 +976,29 @@ SM.initMenubar = function() {
 
 	//Onglets Small(Mush)
 	var menu = SM.addNewEl('ul', SM.sel('.mxhead'), 'SMtabs');
-	var chartab = SM.addNewEl('li', menu, 'SMtab-char_col', "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs_char'], { 'data-SMtip': SM.TEXT['tabtip-chartab'] });
+	var chartab = SM.addNewEl('li', menu, 'SMtab-char_col', "<img src='/img/icons/ui/noob.png' />" + SM.TEXT['tabs-char'], { 'data-SMtip': SM.TEXT['tabtip-chartab'] });
 	chartab.addEventListener('click', function() { SM.changeTab('char_col'); });
 	chartab.className = 'SMtabselected';
 
-	var shiptab = SM.addNewEl('li', menu, 'SMtab-ship_tab', "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs_ship'], { 'data-SMtip': SM.TEXT['tabtip-shiptab'] });
+	var shiptab = SM.addNewEl('li', menu, 'SMtab-ship_tab', "<img src='/img/icons/ui/pa_core.png' />" + SM.TEXT['tabs-ship'], { 'data-SMtip': SM.TEXT['tabtip-shiptab'] });
 	shiptab.addEventListener('click', function() { SM.changeTab('ship_tab'); });
 
-	var roomtab = SM.addNewEl('li', menu, 'SMtab-room_tab', "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs_room'], { 'data-SMtip': SM.TEXT['tabtip-roomtab'] });
+	var roomtab = SM.addNewEl('li', menu, 'SMtab-room_tab', "<img src='/img/icons/ui/door.png' />" + SM.TEXT['tabs-room'], { 'data-SMtip': SM.TEXT['tabtip-roomtab'] });
 	roomtab.addEventListener('click', function() { SM.changeTab('room_tab'); });
 
-	var chattab = SM.addNewEl('li', menu, 'SMtab-chat_col', "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs_chat'], { 'data-SMtip': SM.TEXT['tabtip-chattab'] });
+	var chattab = SM.addNewEl('li', menu, 'SMtab-chat_col', "<img src='/img/icons/ui/wall.png' />" + SM.TEXT['tabs-chat'], { 'data-SMtip': SM.TEXT['tabtip-chattab'] });
 	chattab.addEventListener('click', function() { SM.changeTab('chat_col'); });
 
-	var gametab = SM.addNewEl('li', menu, 'SMtab-room_col', "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs_game'], { 'data-SMtip': SM.TEXT['tabtip-gametab'] });
+	var gametab = SM.addNewEl('li', menu, 'SMtab-room_col', "<img src='/img/icons/ui/moduling.png' />" + SM.TEXT['tabs-game'], { 'data-SMtip': SM.TEXT['tabtip-gametab'] });
 	gametab.addEventListener('click', function() { SM.changeTab('room_col'); });
 
-	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'], { 'data-SMtip': SM.TEXT['tabtip-shoptab'] });
+	var shoptab = SM.addNewEl('li', menu, 'SMvending', "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs-shop'], { 'data-SMtip': SM.TEXT['tabtip-shoptab'] });
 	shoptab.addEventListener('click', function() {
-		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs_shop'];
+		SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/loading1.gif' />" + SM.TEXT['tabs-shop'];
 		Main.ajax('/vending', null, function() {
 			SM.reInit();
 			SM.changeTab('room_col');
-			SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs_shop'];
+			SM.sel('#SMvending').innerHTML = "<img src='/img/icons/ui/credit_small.png' />" + SM.TEXT['tabs-shop'];
 		});
 	});
 
@@ -1101,7 +1144,7 @@ SM.shipTab = function() {
 
 	// PROJETS, RECHERCHES & PILGRED //
 	//.SMcardsbreak : saut de ligne
-	SM.addNewEl('h4', ship_tab, null, SM.TEXT['cards-title']);
+	SM.addNewEl('h4', ship_tab, null, SM.TEXT['cards_title']);
 	var newcards = SM.copyEl(SM.sel('#cdBottomBlock'), ship_tab).firstElementChild;
 	if (SM.sel('#SMcdBottomBlock .research'))
 		{ SM.moveEl(SM.addNewEl('li'), newcards, SM.sel('#SMcdBottomBlock .research').parentNode).className = 'SMcardsbreak'; }
@@ -1116,7 +1159,7 @@ SM.shipTab = function() {
 		if (typeof plasmalevel[1] != 'undefined')
 		{
 			var li = SM.addNewEl('li', null, null, plasmalevel[1].slice(2) + ' <img src="/img/icons/ui/plasma.png" />');
-			li.onmouseover = function() { Main.showTip(this, SM.TEXT['plasma-onmouseover']); };
+			li.onmouseover = function() { Main.showTip(this, SM.TEXT['plasma_onmouseover']); };
 			li.onmouseout = function() { Main.hideTip(); };
 			SM.moveEl(li, levels, levels.children[3]);
 		}
@@ -1131,7 +1174,7 @@ SM.roomTab = function() {
 
 	if (SM.sel('.statuses [src$="moduling.png"]'))
 	{
-		SM.addNewEl('p', room_tab, null, SM.TEXT['roomtab-focused']).className = 'SMcenter';
+		SM.addNewEl('p', room_tab, null, SM.TEXT['roomtab_focused']).className = 'SMcenter';
 		return;
 	}
 
@@ -1140,7 +1183,7 @@ SM.roomTab = function() {
 	var fireroom = SM.alertrooms[SM.rooms.indexOf(SM.sel('#input').getAttribute('d_name'))]; //Voir .alertrooms
 	if (SM.sel('[href^="?action=SIGNAL_FIRE"]') //Pas encore signalé
 		|| (document.querySelector('.alarm [src$="fire.png"]') //Signalé
-		   && RegExp(fireroom + '\\s\*\[\^2\]').test(SM.getTipContent(document.querySelector('.alarm [src$="fire.png"]').parentNode.onmouseover)))
+		   && RegExp(fireroom + '\\s\*\[\^2\]\{0,10}\\s\*\\.').test(SM.getTipContent(document.querySelector('.alarm [src$="fire.png"]').parentNode.onmouseover)))
 	)
 	{
 		infobar.className += ' SMfire'; //Changement du fond de la barre d'info
@@ -1348,34 +1391,41 @@ SM.chatTab = function() {
 
 	//Liens d'exploration
 	var bubbles = SM.toArray(document.querySelectorAll('.bubble:not(.SMlinked)'));
+	var exp = /https?:\/\/mush\.(vg|twinoid\.(com|es))\/expPerma\/[0-9]+/g;
 	for (var i = 0; i < bubbles.length; i++)
 	{
-		bubbles[i].innerHTML = bubbles[i].innerHTML.replace(/https?:\/\/mush\.(vg|twinoid\.(com|es))\/expPerma\/[0-9]+/g, "<a target='_blank' href='$&'>$&</a>");
-		bubbles[i].className += ' SMlinked';
-	}
-
-	if (chat.className.search(/SM(hide|show)paste/) == -1)
-	{
-		chat.className = 'SMhidepaste';
-		//#wall : création d'un nouveau topic général ; #privateform : création d'un message privé
-		var wallinputs = [['#wall', '#cdChatInput5'], ['#privateform', '#cdChatInput7']];
-		for (i in wallinputs)
+		if (exp.test(bubbles[i].textContent))
 		{
-			var input = SM.sel(wallinputs[i][1]);
-			input.setAttribute('onfocus', '$(this).addClass("chatboxfocus"); return true;'); //Main.onChatFocus ne fait qu'empêcher le collage… -_-
-			input.value = '';
-			SM.addButton(SM.sel(wallinputs[i][0]), SM.TEXT['paste'], { class: 'SMpastebutton', 'data-id': wallinputs[i][1] }).addEventListener('click', function() {
-				if (SM.previewtext)
-				{
-					var t = SM.sel(this.getAttribute('data-id'));
-					t.value = SM.previewtext;
-					t.focus();
-				}
-				SM.hidePaste();
-			});
+			bubbles[i].innerHTML = bubbles[i].innerHTML.replace(exp, "<a target='_blank' href='$&'>$&</a>");
+			bubbles[i].className += ' SMlinked';
 		}
 	}
 
+	// BOUTONS COLLER //
+	if (chat.className.search(/SM(hide|show)paste/) == -1)
+	{
+		chat.className = 'SMhidepaste';
+		//Canaux : Mush, général, privé
+		var wallinputs = [['#mushform', '#cdChatInput2'], ['#wall', '#cdChatInput5'], ['#privateform', '#cdChatInput7']];
+		for (i in wallinputs)
+		{
+			var input = SM.sel(wallinputs[i][1]);
+			if (input)
+			{
+				input.setAttribute('onfocus', '$(this).addClass("chatboxfocus"); return true;'); //Main.onChatFocus ne fait qu'empêcher le collage… -_-
+				input.value = '';
+				SM.addButton(SM.sel(wallinputs[i][0]), SM.TEXT['paste'], { class: 'SMpastebutton', 'data-id': wallinputs[i][1] }).addEventListener('click', function() {
+					if (SM.previewtext)
+					{
+						var t = SM.sel(this.getAttribute('data-id'));
+						t.value = SM.previewtext;
+						t.focus();
+					}
+					SM.hidePaste();
+				});
+			}
+		}
+	}
 	//Topics
 	var units = document.getElementsByClassName('unit');
 	for (var i = 0; i < units.length; i++)
@@ -1395,7 +1445,12 @@ SM.chatTab = function() {
 		}
 	}
 
-	//Favori/défavori
+	//Messages non lus
+	var unread = document.querySelectorAll('.treereply .not_read');
+	for (var i = 0; i < unread.length; i++)
+		{ unread[i].setAttribute('style', 'display: table-row;'); }
+
+	//Favoris
 	var unfavs = SM.toArray(document.querySelectorAll('[onclick^="Main.onUnfavClick"]'));
 	for (var i = 0; i < unfavs.length; i++)
 		{ unfavs[i].setAttribute('onclick', "SM.loadingScreen(); Main.onUnfavClick($(this)); return false;"); }
@@ -1403,8 +1458,42 @@ SM.chatTab = function() {
 	for (var i = 0; i < favs.length; i++)
 		{ favs[i].setAttribute('onclick', "SM.loadingScreen(); Main.onFavClick($(this)); return false;"); }
 
-	//Fonction répétée lors du chargement de nouveaux messages pour relancer SM.chatTab() une fois ces messages chargés
-	SM.sel('#chatBlock').setAttribute('onscroll', 'Main.onChatScroll( $(this) ); var chatloading = window.setInterval(function() { if (!Main.lmwProcessing) { clearInterval(chatloading); SM.chatTab(); } }, 200); return true;');
+	//Relancement de SM.chatTab() une fois les messages chargés
+	SM.sel('#chatBlock').setAttribute('onscroll', 'Main.onChatScroll( $(this) ); if (Main.lmwProcessing) { var chatloading = window.setInterval(function() { if (!Main.lmwProcessing) { clearInterval(chatloading); SM.chatTab(); } }, 100); return true; }');
+
+	//Aide à la copie des logs
+	var cycles = document.querySelectorAll('#localChannel .cdChatPack:not(.SMtextlog)');
+	for (var i = 0; i < cycles.length; i++)
+	{
+		cycles[i].style.position = 'relative';
+		cycles[i].className = cycles[i].className + ' SMtextlog'
+		SM.addNewEl('a', cycles[i], null, SM.TEXT['copy_logs-button'], { class: 'butmini SMlogsbut' }).addEventListener('click', function() {
+			var par = this.parentNode;
+			var cycle = par.firstElementChild.textContent.trim().toUpperCase();
+
+			var popup = SM.sel('#SMpopup');
+			popup.innerHTML = '';
+			SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
+			popup.style.display = 'block';
+			SM.addNewEl('h4', popup, null, cycle);
+			var area = SM.addNewEl('textarea', popup, 'SMlogsarea');
+			area.value = cycle + "\n\n";
+
+			var logs = par.getElementsByClassName('what_happened');
+			for (var j = 0; j < logs.length; j++)
+			{
+				var log = "";
+				var parts = logs[j].childNodes;
+				for (var k = 0; k < parts.length; k++)
+				{
+					var l = parts[k].textContent.trim();
+					if (l)
+						{ log += l + " "; }
+				}
+				area.value += log + "\n";
+			}
+		});
+	}
 };
 
 
@@ -1420,7 +1509,7 @@ SM.gameTab = function() {
 		});
 	});
 	
-	//Annonce : /submitDailyOrder ; TODO: marche peut-être aussi pour les missions ?
+	//Bouton Coller pour annonces et missions
 	var writeblock = SM.sel('#msg_write_form'); //Formulaire d'annonce / ordre
 	if (writeblock)
 	{
@@ -1448,9 +1537,9 @@ SM.topStats = function() {
 	var pm = pmatip[1].slice(0, -4).trim();
 	var td = SM.sel('#SMtopstats');
 	if (!td)
-		{ td = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('#topinfo_bar .genstatus tbody')), 'SMtopstats', SM.TEXT['stats-perso'], { colspan: '2' }); }
+		{ td = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('#topinfo_bar .genstatus tbody')), 'SMtopstats', SM.TEXT['stats_perso'], { colspan: '2' }); }
 	else
-		{ td.innerHTML = SM.TEXT['stats-perso']; }
+		{ td.innerHTML = SM.TEXT['stats_perso']; }
 	SM.addNewEl('span', td, null, hp + " <img src='/img/icons/ui/lp.png' alt='hp' />");
 	SM.addNewEl('span', td, null, pmo + " <img src='/img/icons/ui/moral.png' alt='moral' />");
 	SM.addNewEl('span', td, null, pa + " <img src='/img/icons/ui/pa_slot1.png' alt='pa' />");
@@ -1479,14 +1568,14 @@ SM.messageEditor = function() {
 	}
 
 	var tab = SM.addNewEl('li', SM.sel('.tabschat'), 'SMeditortab', '<img src="http://mush.twinoid.com/img/icons/ui/conceptor.png" />');
-	tab.onmouseover = function() { Main.showTip(this, SM.TEXT['editor_tip']); };
+	tab.onmouseover = function() { Main.showTip(this, SM.TEXT['editor-tip']); };
 	tab.addEventListener('mouseout', function() { Main.hideTip(); });
 	tab.addEventListener('click', function() { SM.changeChatTab(this); });
 	tab.className = 'tab taboff';
 	var editor = SM.addNewEl('div', SM.sel('#chatBlock'), 'SMeditor');
 	SM.addNewEl('h4', editor, null, SM.TEXT['SM-added_tab']).className = 'SMtabwarning';
 	SM.addNewEl('p', editor, null, SM.TEXT['SM-added_tab_text']).className = 'SMtabwarning';
-	SM.addNewEl('p', editor, null, SM.TEXT['preview-tags-warning']).className = 'SMcenter';
+	SM.addNewEl('p', editor, null, SM.TEXT['editor-tags_warning']).className = 'SMcenter';
 	editor.style.display = 'none';
 
 	//On récupère le formulaire de post de message sur le Nexus de Twinoid pour avoir la prévisualisation Twinoid et les smileys
@@ -1510,9 +1599,9 @@ SM.messageEditor = function() {
 		buts.removeChild(buts.lastChild); //.tid_clear
 
 		//Ajout des boutons de prévisualisation Rafraîchir & Effacer
-		SM.addButton(buts, SM.TEXT['preview_refresh'], { class: 'SMsmallbut' }).addEventListener('click', function() { SM.refreshPreview(); });
-		SM.addButton(buts, SM.TEXT['preview_erase'], { class: 'SMsmallbut' }).addEventListener('click', function() {
-			if (confirm(SM.TEXT['preview_confirm_erase']))
+		SM.addButton(buts, SM.TEXT['preview-refresh'], { class: 'SMsmallbut' }).addEventListener('click', function() { SM.refreshPreview(); });
+		SM.addButton(buts, SM.TEXT['preview-erase'], { class: 'SMsmallbut' }).addEventListener('click', function() {
+			if (confirm(SM.TEXT['preview-confirm_erase']))
 			{
 				SM.sel('#tid_wallPost').value = '';
 				SM.refreshPreview();
@@ -1545,15 +1634,15 @@ SM.messageEditor = function() {
 		}
 
 		//Liste des messages préformatés
-		SM.addNewEl('p', form, null, SM.TEXT['premessages_title'], { style: 'color: black; margin-top: 20px;' });
+		SM.addNewEl('p', form, null, SM.TEXT['premessages-title'], { style: 'color: black; margin-top: 20px;' });
 		var premessages = SM.addNewEl('select', form, 'SMpremessages');
 		premessages.addEventListener('change', function() { SM.buildMessage(); });
 		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms'];
 		for (var i = 0; i < options.length; i++)
-			{ SM.addNewEl('option', premessages, null, SM.TEXT['premessages_' + options[i]], { value: options[i] }); }
+			{ SM.addNewEl('option', premessages, null, SM.TEXT['premessages-' + options[i]], { value: options[i] }); }
 
 		//Ajout des boutons de copie & sauvegarde
-		SM.addButton(form, SM.TEXT['preview_copy']).addEventListener('click', function() {
+		SM.addButton(form, SM.TEXT['preview-copy']).addEventListener('click', function() {
 			if (SM.sel('#tid_wallPost').value)
 			{
 				SM.previewtext = SM.sel('#tid_wallPost').value.slice(0, 2500);
@@ -1561,8 +1650,8 @@ SM.messageEditor = function() {
 				SM.sel('#cdModuleContent').className = SM.sel('#cdModuleContent').className.replace(/SMhidepaste/, 'SMshowpaste');
 			}
 		});
-		SM.addButton(form, SM.TEXT['preview_save']).addEventListener('click', function() { SM.savePreview(); });
-		SM.addButton(form, SM.TEXT['preview_retrieve']).addEventListener('click', function() { SM.retrievePreview(); });
+		SM.addButton(form, SM.TEXT['preview-save']).addEventListener('click', function() { SM.savePreview(); });
+		SM.addButton(form, SM.TEXT['preview-retrieve']).addEventListener('click', function() { SM.retrievePreview(); });
 
 		//Mise à jour de la prévisualisation avec surcouche de formatage Mush
 		SM.sel("#tid_wallPost_preview").className += ' talks'; //CSS « bulle »
@@ -1652,11 +1741,11 @@ SM.buildMessage = function() {
 					? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour avoir la compétence en cas d'apprenton
 					: item.getAttribute('data-name').trim() //Pour avoir les attributs (lourd, cassé, etc.) pour les autres objets
 				);
-				n = n.replace(/<img(?:[^<]*)plant_diseased\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory_diseased'] + "//");
-				n = n.replace(/<img(?:[^<]*)plant_thirsty\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory_thirsty'] + "//");
-				n = n.replace(/<img(?:[^<]*)plant_dry\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory_dry'] + "//");
-				n = n.replace(/<img(?:[^<]*)broken\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory_broken'] + "//"); //Objet cassé
-				n = n.replace(/<img(?:[^<]*)charge\.png(?:[^<]*)>x([0-9]+)/, " [$1 " + SM.TEXT['preformat-inventory_charge'] + "]"); //Charges
+				n = n.replace(/<img(?:[^<]*)plant_diseased\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory-diseased'] + "//");
+				n = n.replace(/<img(?:[^<]*)plant_thirsty\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory-thirsty'] + "//");
+				n = n.replace(/<img(?:[^<]*)plant_dry\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory-dry'] + "//");
+				n = n.replace(/<img(?:[^<]*)broken\.png(?:[^<]*)>/, " //" + SM.TEXT['preformat-inventory-broken'] + "//"); //Objet cassé
+				n = n.replace(/<img(?:[^<]*)charge\.png(?:[^<]*)>x([0-9]+)/, " [$1 " + SM.TEXT['preformat-inventory-charge'] + "]"); //Charges
 				n = n.replace(/ ?<img(?:.*)>/g, ''); //Les autres attributs n'importent pas
 				message += n;
 
@@ -1670,7 +1759,7 @@ SM.buildMessage = function() {
 			{
 				var e = it.next().iid;
 				if ((e == 'HELP_DRONE' || e == 'CAMERA') && !SM.sel('[serial="' + e.serial + '"]')) //Équipements seulement, pas en items (caméra installée)
-					{ message += "//" + SM.TEXT['preformat-inventory_' + e] + "//, "; }
+					{ message += "//" + SM.TEXT['preformat-inventory-' + e] + "//, "; }
 			}
 
 			var cat = Main.npc.iterator(); //Schrödinger
@@ -1684,9 +1773,9 @@ SM.buildMessage = function() {
 
 		case 'researches':
 			if (!SM.sel('#research_module'))
-				{ alert(SM.TEXT['preformat-researches_nomodule']); break; }
+				{ alert(SM.TEXT['preformat-researches-nomodule']); break; }
 
-			message += ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
+			message += ":pills: **//" + SM.TEXT['preformat-researches-title'] + " //**:pills:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (var i = 0; i < cards.length; i++)
 			{
@@ -1700,18 +1789,18 @@ SM.buildMessage = function() {
 
 		case 'researches++':
 			if (!SM.sel('#research_module'))
-				{ alert(SM.TEXT['preformat-researches_nomodule']); break; }
+				{ alert(SM.TEXT['preformat-researches-nomodule']); break; }
 
 			var researches = [];
 			popup.style.display = 'block';
-			SM.addNewEl('h3', popup, null, SM.TEXT['preformat-researches++_title']);
+			SM.addNewEl('h3', popup, null, SM.TEXT['preformat-researches++-title']);
 			var table = SM.addNewEl('table', popup);
 			var h = SM.addNewEl('thead', table);
-			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++_share']); //Partager ?
-			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++_name']); //Nom
-			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++_progress']); //Progression
-			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++_important']); //Prioritaire ?
-			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++_relay']); //Relais nécessaire ?
+			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++-share']); //Partager ?
+			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++-name']); //Nom
+			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++-progress']); //Progression
+			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++-important']); //Prioritaire ?
+			SM.addNewEl('td', h, null, SM.TEXT['preformat-researches++-relay']); //Relais nécessaire ?
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (var i = 0; i < cards.length; i++)
 			{
@@ -1726,8 +1815,8 @@ SM.buildMessage = function() {
 			}
 
 			//Création du message
-			SM.addButton(popup, SM.TEXT['preformat-researches++_submit']).addEventListener('click', function() {
-				message += ":pills: **//" + SM.TEXT['preformat-researches_title'] + " //**:pills:\n\n\n\n";
+			SM.addButton(popup, SM.TEXT['preformat-researches++-submit']).addEventListener('click', function() {
+				message += ":pills: **//" + SM.TEXT['preformat-researches-title'] + " //**:pills:\n\n\n\n";
 				var researches = document.getElementsByClassName('SMresearch');
 				for (var i = 0; i < researches.length; i++)
 				{
@@ -1737,9 +1826,9 @@ SM.buildMessage = function() {
 						message += '**' + children[1].textContent + ' :** ';
 						message += children[2].textContent;
 						if (children[3].firstChild.checked) //Prioritaire
-							{ message += ", **//" + SM.TEXT['preformat-researches++_text_important'] + "//**"; }
+							{ message += ", **//" + SM.TEXT['preformat-researches++-text_important'] + "//**"; }
 						if (children[4].firstChild.checked) //À relayer
-							{ message += ", //" + SM.TEXT['preformat-researches++_text_relay'] + "//"; }
+							{ message += ", //" + SM.TEXT['preformat-researches++-text_relay'] + "//"; }
 						message += ".\n";
 					}
 					SM.sel('#SMpopup').style.display = 'none';
@@ -1751,9 +1840,9 @@ SM.buildMessage = function() {
 
 		case 'projects':
 			if (!/img\/cards\/projects/.test(SM.sel('#cdModuleContent').innerHTML)) //Pas d'ID spécifique au Cœur de NERON :(
-				{ alert(SM.TEXT['preformat-projects_nomodule']); break; }
+				{ alert(SM.TEXT['preformat-projects-nomodule']); break; }
 
-			message += ":pa_core: **//" + SM.TEXT['preformat-projects_title'] + " //**:pa_core:\n\n\n\n";
+			message += ":pa_core: **//" + SM.TEXT['preformat-projects-title'] + " //**:pa_core:\n\n\n\n";
 			var cards = document.getElementsByClassName('cdProjCard');
 			for (var i = 0; i < cards.length; i++)
 			{
@@ -1767,13 +1856,13 @@ SM.buildMessage = function() {
 
 		case 'planet':
 			if (!SM.sel('#navModule'))
-				{ alert(SM.TEXT['preformat-planet_nomodule']); break; }
+				{ alert(SM.TEXT['preformat-planet-nomodule']); break; }
 
 			var planets = document.querySelectorAll('[class="planet"]');
 			switch (planets.length)
 			{
 				case 0:
-					alert(SM.TEXT['preformat-planet_none']);
+					alert(SM.TEXT['preformat-planet-none']);
 					break;
 
 				case 1:
@@ -1784,7 +1873,7 @@ SM.buildMessage = function() {
 				case 2:
 					popup.style.display = 'block';
 					popup.style.top = '200px';
-					SM.addNewEl('h3', popup, null, SM.TEXT['preformat-planet_title']);
+					SM.addNewEl('h3', popup, null, SM.TEXT['preformat-planet-title']);
 					SM.addButton(popup, planets[0].firstElementChild.textContent).addEventListener('click', function() {
 						message += SM.preformatPlanet(planets[0]);
 						SM.sel('#tid_wallPost').value = message;
@@ -1799,7 +1888,7 @@ SM.buildMessage = function() {
 						SM.sel('#SMpopup').style.display = 'none';
 						SM.sel('#SMpopup').style.top = '100px';
 					}); //Seconde planète
-					SM.addButton(popup, SM.TEXT['preformat-planet_both']).addEventListener('click', function() {
+					SM.addButton(popup, SM.TEXT['preformat-planet-both']).addEventListener('click', function() {
 						message += SM.preformatPlanet(planets[0]) + "\n\n\n\n" + SM.preformatPlanet(planets[1]);
 						SM.sel('#tid_wallPost').value = message;
 						SM.refreshPreview();
@@ -1812,20 +1901,20 @@ SM.buildMessage = function() {
 
 		case 'comms':
 			if (!SM.sel('#trackerModule'))
-				{ alert(SM.TEXT['preformat-comms_nomodule']); break; }
+				{ alert(SM.TEXT['preformat-comms-nomodule']); break; }
 
-			message += ":com: " + SM.TEXT['preformat-comms_title'] + ":com:\n\n\n\n";
+			message += ":com: " + SM.TEXT['preformat-comms-title'] + ":com:\n\n\n\n";
 
 			//Qualité du signal
-			message += SM.TEXT['preformat-comms_signal'] + SM.sel('#trackerModule .sensors p:first-of-type em').textContent.match(/[0-9]+\s*%/)[0] + "\n";
+			message += SM.TEXT['preformat-comms-signal'] + SM.sel('#trackerModule .sensors p:first-of-type em').textContent.match(/[0-9]+\s*%/)[0] + "\n";
 
 			//Xyloph
-			message += SM.TEXT['preformat-comms_Xyloph'];
+			message += SM.TEXT['preformat-comms-Xyloph'];
 			var dbs = SM.toArray(document.querySelectorAll('#trackerModule .perfor li:not(.undone)'));
 			if (dbs.length)
 			{
 				message += dbs.length + "/12\n";
-				var writedesc = confirm(SM.TEXT['preformat-comms_Xylophdesc']);
+				var writedesc = confirm(SM.TEXT['preformat-comms-Xylophdesc']);
 				for (var i = 0; i < dbs.length; i++)
 				{
 					var text = SM.reformat(SM.getTipContent(dbs[i].onmouseover));
@@ -1840,13 +1929,13 @@ SM.buildMessage = function() {
 				}
 			}
 			else
-				{ message += SM.TEXT['preformat-comms_Xylophnone'] + "\n"; }
+				{ message += SM.TEXT['preformat-comms-Xylophnone'] + "\n"; }
 
 			//Bases rebelles
-			message += SM.TEXT['preformat-comms_bases'];
+			message += SM.TEXT['preformat-comms-bases'];
 			var bases = SM.toArray(document.querySelectorAll('#trackerModule .bases [data-id]')).reverse();
 			var anysignal = false;
-			var writedesc = confirm(SM.TEXT['preformat-comms_basesdesc']);
+			var writedesc = confirm(SM.TEXT['preformat-comms-basesdesc']);
 			for (var i = 0; i < bases.length; i++)
 			{
 				var id = bases[i].getAttribute('data-id');
@@ -1872,21 +1961,21 @@ SM.buildMessage = function() {
 					}
 					else
 						{ var desc = ""; }
-					message += SM.TEXT['preformat-comms_basedecoded'] + desc + "\n";
+					message += SM.TEXT['preformat-comms-basedecoded'] + desc + "\n";
 				}
 				else
 				{
 					if (span.className == 'percent') //En décodage
 						{ message += span.textContent.trim() + "\n"; }
 					else //Perdue
-						{ message += SM.TEXT['preformat-comms_baselost'] + "\n"; }
+						{ message += SM.TEXT['preformat-comms-baselost'] + "\n"; }
 				}
 			}
 			if (!anysignal) //Aucun signal pour le moment
-				{ message += SM.TEXT['preformat-comms_basesnone'] + "\n"; }
+				{ message += SM.TEXT['preformat-comms-basesnone'] + "\n"; }
 
 			//MAJ NERON
-			message += SM.TEXT['preformat-comms_neron'] + SM.sel('#trackerModule .neron h2').textContent.match(/[0-9]+\.[0-9]+/)[0] + "\n\n\n\n//Over.//";
+			message += SM.TEXT['preformat-comms-neron'] + SM.sel('#trackerModule .neron h2').textContent.match(/[0-9]+\.[0-9]+/)[0] + "\n\n\n\n//Over.//";
 
 			wallpost.value = message;
 			SM.refreshPreview();
@@ -1904,7 +1993,7 @@ SM.preformatPlanet = function(planet) {
 
 	//Détection orbite ou espace infini
 	if (SM.sel('.planet .pllist').firstElementChild.firstChild.tagName == 'IMG') //En orbite
-		{ var mess = SM.TEXT['preformat-planet_orbiting'] + " **" + name + " :** "; }
+		{ var mess = SM.TEXT['preformat-planet-orbiting'] + " **" + name + " :** "; }
 	else //Dans l'espace infini, donc fuel et direction nécessaires
 	{
 		var direction = planet.children[2].children[1].children[0].innerHTML.replace(/<span>(?:.*)<\/span>/, '').trim();
@@ -1922,7 +2011,7 @@ SM.preformatPlanet = function(planet) {
 			{ mess += zone + ', '; }
 	}
 	if (unknown)
-		{ mess += "//" + unknown + " " + SM.TEXT['preformat-planet_unknown'] + '//, '; }
+		{ mess += "//" + unknown + " " + SM.TEXT['preformat-planet-unknown'] + '//, '; }
 	mess = mess.slice(0, -2) + '.';
 
 	return mess;
@@ -1990,18 +2079,18 @@ SM.init = function() {
 	window.setTimeout(function() { SM.sel('#content').scrollLeft = 0; }, 500);
 
 	//Première fois : alerte à lire
-	if (SM.parameters['first-time'])
+	if (SM.parameters['first_time'])
 	{
 		var SMdialog = SM.copyEl(SM.sel('#dialog'), document.body);
 		SMdialog.style.display = 'block';
 		SMdialog.style.left = '12px !important';
 		SMdialog.style.top = '100px';
-		SM.sel('#SMdialog_title').innerHTML = "<img src='" + SM.src + "ico.png' />  " + SM.TEXT['warning_title'];
-		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_1']);
-		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_2']);
-		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning_3']);
+		SM.sel('#SMdialog_title').innerHTML = "<img src='" + SM.src + "ico.png' />  " + SM.TEXT['warning-title'];
+		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning-1']);
+		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning-2']);
+		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning-3']);
 		SM.sel('#SMdialog_ok').addEventListener('click', function() { document.body.removeChild(SM.sel('#SMdialog')); });
-		SM.parameters['first-time'] = false;
+		SM.parameters['first_time'] = false;
 		SM.setSMParameters();
 	}
 
@@ -2018,7 +2107,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
-SM.version = "1.0.2";
+SM.version = "1.1";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 try { SM.src = self.options.baseUrl; } //Addon Firefox
@@ -2034,7 +2123,7 @@ SM.GRAVITY = true;
 
 
 /** INITIALISATION **/
-if (SM.sel('#SMbar') == null) //Une seule initialisation suffit, sinon ça casse !
+if (SM.sel('#SMbar') == null)
 {
 	SM.getSMParameters();
 	SM.locale(function() { SM.init(); });
