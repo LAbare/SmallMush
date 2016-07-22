@@ -132,6 +132,8 @@ SM.TEXT['preformat-comms-basesdesc'] = "¿Deseas compartir las descripciones y n
 SM.TEXT['preformat-comms-basesnone'] = "ninguno";
 SM.TEXT['preformat-comms-neron'] = "**Versión de NERON:** ";
 SM.TEXT['abbr-day'] = "D";
+SM.TEXT['astrotab-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>AstroPad</h1><p>Permite cargar el script AstroPad.</p></div></div></div></div>";
+SM.TEXT['astrotab-button'] = "Cargar el script AstroPad";
 SM.TEXT['minimap-button'] = "Mostrar el minimapa de Small(Mush)";
 SM.TEXT['minimap-title'] = "Minimapa de Small(Mush)";
 SM.TEXT['minimap-warning'] = "<b>ATENCIÓN:</b> Este minimapa no es el de Flash, meramente es un mapa del Daedalus conteniendo algo de información. Puede que muestre algunos reportes.";

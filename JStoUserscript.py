@@ -3,40 +3,45 @@ FR = open('SMlang-fr.js', 'r')
 EN = open('SMlang-en.js', 'r')
 ES = open('SMlang-es.js', 'r')
 dest = open('SmallMush.user.js', 'w')
-replacing = False
+replacingGreasemonkey = False
+replacingLocale = False
 functions = []
 goodsource = False
 
 for line in source:
-	if "//SM.src = \"http://labare.alwaysdata.net/SmallMush/\";" in line:
-		goodsource = True
+	if "//SM.src = " in line:
+		print("Not source : " + line)
 
 source.seek(0)
-if not goodsource:
-	print("Mauvaise source !")
 
 dest.write('// ==UserScript==\n')
 dest.write('// @name      Small(Mush)\n')
 dest.write('// @version   ' + input('Version : ') + '\n')
 dest.write('// @icon      http://labare.github.io/SmallMush/ico.png\n')
 dest.write('// @match     http://mush.vg/\n')
-dest.write('// @match     http://mush.vg/#\n')
+dest.write('// @match     http://mush.vg/#*\n')
+dest.write('// @match     http://mush.vg/?*\n')
+dest.write('// @match     http://mush.vg/play*\n')
 dest.write('// @match     http://mush.twinoid.com/\n')
-dest.write('// @match     http://mush.twinoid.com/#\n')
+dest.write('// @match     http://mush.twinoid.com/#*\n')
+dest.write('// @match     http://mush.twinoid.com/?*\n')
+dest.write('// @match     http://mush.twinoid.com/play*\n')
 dest.write('// @match     http://mush.twinoid.es/\n')
-dest.write('// @match     http://mush.twinoid.es/#\n')
+dest.write('// @match     http://mush.twinoid.es/#*\n')
+dest.write('// @match     http://mush.twinoid.es/?*\n')
+dest.write('// @match     http://mush.twinoid.es/play*\n')
 dest.write('// @grant     unsafeWindow\n')
 dest.write('// @author    LAbare\n')
 dest.write('// ==/UserScript==\n\n\n')
 dest.write('var Main = unsafeWindow.Main || Main;\n\n')
-dest.write('var unsafeSM = createObjectIn(unsafeWindow, {defineAs: "SM"});\n\n\n')
+dest.write('var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });\n\n\n')
 
 for line in source:
 	if line[0:3] == 'SM.' and '= function' in line:
 		functions.append(line.split(' = ')[0].split('.')[1])
 
-	if 'BEGIN PYTHON REPLACE' in line:
-		replacing = True
+	if 'BEGIN PYTHON REPLACE LOCALE' in line:
+		replacingLocale = True
 		dest.write('\tswitch (lang)\n')
 		dest.write('\t{\n')
 
@@ -56,10 +61,16 @@ for line in source:
 		dest.write('\n\t\tbreak;\n')
 
 		dest.write('\t}\n\n')
-		dest.write('\tfunc();\n')
+		dest.write('\tcallback();\n')
 
-	elif 'END PYTHON REPLACE' in line:
-		replacing = False
+	elif 'END PYTHON REPLACE LOCALE' in line:
+		replacingLocale = False
+	
+	elif 'BEGIN PYTHON REPLACE GREASEMONKEY VARIABLES' in line:
+		replacingGreasemonkey = True
+	
+	elif 'END PYTHON REPLACE GREASEMONKEY VARIABLES' in line:
+		replacingGreasemonkey = False
 
 	elif 'PYTHON USERSCRIPT' in line:
 		for function in functions:
@@ -67,7 +78,7 @@ for line in source:
 		dest.write('\n\n')
 
 	else:
-		if replacing == False:
+		if replacingLocale == False and replacingGreasemonkey == False:
 			dest.write(line)
 
 source.close()

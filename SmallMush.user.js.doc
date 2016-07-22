@@ -2,7 +2,7 @@
  
 *** Fonctions développeur : ***
 .sel(name): sélectionne un élément par ID, par classe ou par sélecteur CSS
-.getAttributesList(el): retourne un tableau d'attributs d'un élément [[nom, valeur]]
+.getAttributesDict(el): retourne un dictionnaire des attributs d'un élément { attribut: valeur }
 .addNewEl(type, *parent, *id, *content, *attrs): retourne un nouvel élément
 .addButton(parent, text, *attrs): retourne un bouton Mush, avec d'éventuels attributs
 .moveEl(el, dest, *bef): déplace un élément dans un autre ; possibilité de préciser avant quel enfant
@@ -57,14 +57,18 @@
 .buildMessage(): crée un message préformaté
 .preformatPlanet(planet, *Schmanet, *Janet): crée un message de partage de planète préformaté
 
+*** Chargement de l'AstroPad ***
+.astroTab(): si le script n'est pas un userscript, crée un onglet AstroPad avec un bouton permettant de charger le script
+
 *** Fonction de localisation : ***
-.locale(*func): fonction de localisation de l'interface, lance une fonction au chargement de la locale
+.locale(*callback): fonction de localisation de l'interface, lance une fonction de rappel au chargement de la locale
 
 *** Fonction d'initialisation : ***
 .init(): appelée après le chargement de la locale
 
 
 ***** VARIABLES *****
+.isUserscript: (bool) version script manuel ou userscript du script
 .version: (string) version du script
 .src: (string) adresse du dossier source du script
 .smileys: (list) couple raccourci/image des smileys Mush

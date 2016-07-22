@@ -2,26 +2,51 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *             v1.1              *
+ *             v1.2              *
 \**—————————————————————————————**/
 
 
-var SM = {};
+var SM = { isUserscript: true, version: "1.2" };
+
+//BEGIN PYTHON REPLACE GREASEMONKEY VARIABLES
+SM.isUserscript = false;
+var unsafeWindow = window;
+var GM_info = { script: { version: false } }; //AstroPad version
+function createObjectIn(a, b) { return {}; }
+function exportFunction(a, b, c) { return true; }
+function GM_xmlhttpRequest(object) {
+	var req = new XMLHttpRequest();
+	req.open(object.method, object.url, true);
+	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	req.onreadystatechange = function() {
+		if (req.readyState == 4 && req.status == 200) {
+			object.onload(req);
+		}
+	};
+	req.send(object.data);
+}
+//END PYTHON REPLACE GREASEMONKEY VARIABLES
 
 
 /* FONCTIONS DÉVELOPPEUR */
 
-SM.sel = function(name) {
-	var qsl = name.search(' |:');
-	if (name[0] == "." && qsl == -1) { return document.getElementsByClassName(name.slice(1))[0]; }
-	else if (name[0] == '#' && qsl == -1) { return document.getElementById(name.slice(1)); }
-	else { return document.querySelector(name); }
+SM.sel = function(name, parent) {
+	var context = parent || document;
+	var simple = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/.test(name);
+	if (name[0] == "." && simple) {
+		return context.getElementsByClassName(name.slice(1))[0];
+	}
+	else if (name[0] == '#' && simple) {
+		return document.getElementById(name.slice(1));
+	}
+	else {
+		return context.querySelector(name);
+	}
 };
 
-SM.getAttributesList = function(el) {
+SM.getAttributesDict = function(el) {
 	var attrs = {};
-	for (var i = 0; i < el.attributes.length; i++)
-	{
+	for (var i = 0; i < el.attributes.length; i++) {
 		if (el.attributes[i].name != 'id')
 			{ attrs[el.attributes[i].name] = el.attributes[i].value; }
 	};
@@ -63,7 +88,7 @@ SM.moveEl = function(el, dest, bef) {
 };
 
 SM.copyEl = function (el, dest, bef) {
-	var newEl = SM.addNewEl(el.nodeName, null, ((el.id) ? 'SM' + el.id : ''), el.innerHTML, SM.getAttributesList(el));
+	var newEl = SM.addNewEl(el.nodeName, null, ((el.id) ? 'SM' + el.id : ''), el.innerHTML, SM.getAttributesDict(el));
 	var children = newEl.getElementsByTagName("*");
 	for (var i = 0; i < children.length; i++)
 		{ if (children[i].id) { children[i].id = 'SM' + children[i].id; } }
@@ -94,6 +119,7 @@ SM.reformat = function(text) {
 SM.generateMinimap = function() {
 	var rooms = [['m129.5 10.5 0 20 -20 0 0 60 100 0 0 -60 -20 0 0 -20 -60 0z', [155, 50]], [60, 120, 249.5, 230.5], [60, 120, 9.5, 230.5], [60, 120, 249.5, 350.5], [60, 40, 129.5, 310.5], [80, 60, 69.5, 170.5], [80, 60, 69.5, 110.5], [100, 60, 109.5, 250.5], [80, 60, 169.5, 110.5], [180, 90, 69.5, 430.5], [40, 40, 209.5, 50.5], [40, 40, 249.5, 190.5], [40, 40, 249.5, 470.5], [40, 40, 69.5, 50.5], [40, 40, 29.5, 190.5], [40, 40, 29.5, 470.5], [], [], [], [], [], [], [], [], ['m69.5 90.5 0 20 80 0 0 120 20 0 0 -120 80 0 0 -20 -180 0z', [160, 92]], [180, 20, 69.5, 230.5], [220, 20, 29.5, 350.5], [], [60, 100, 9.5, 370.5], ['m209.5 290.5 0 20 -20 0 0 40 60 0 0 -60 -40 0z', [210, 320]], ['m69.5 290.5 0 60 60 0 0 -40 -20 0 0 -20 -40 0z', [100, 320]], [80, 60, 169.5, 170.5], [40, 40, 209.5, 250.5], [40, 60, 209.5, 370.5], [40, 40, 69.5, 250.5], [40, 60, 69.5, 370.5]];
 
+	//var doors = [[30.5, 104.5, 10, 0], [30.5, 54.5, 10, 0], [45.5, 74.5, 0, 10], [175.5, 129.5, 0, 10], [115.5, 129.5, 0, 10], [115.5, 124.5, 10, 0], [150.5, 124.5, 10, 0], [130.5, 124.5, 10, 0], [115.5, 19.5, 0, 10], [115.5, 34.5, 10, 0], [175.5, 19.5, 0, 10], [150.5, 34.5, 10, 0], [130.5, 34.5, 10, 0], [220.5, 124.5, 10, 0], [235.5, 129.5, 0, 10], [175.5, 124.5, 10, 0], [175.5, 74.5, 0, 10], [85.5, 59.5, 0, 10], [100.5, 34.5, 10, 0], [90.5, 74.5, 10, 0], [70.5, 74.5, 10, 0], [125.5, 74.5, 0, 10], [70.5, 84.5, 10, 0], [85.5, 89.5, 0, 10], [240.5, 124.5, 10, 0], [240.5, 34.5, 10, 0], [220.5, 34.5, 10, 0], [215.5, 109.5, 0, 10], [215.5, 39.5, 0, 10], [45.5, 109.5, 0, 10], [100.5, 124.5, 10, 0], [45.5, 39.5, 0, 10], [235.5, 19.5, 0, 10], [115.5, 74.5, 0, 10], [90.5, 84.5, 10, 0], [185.5, 19.5, 0, 10], [175.5, 109.5, 0, 10], [175.5, 39.5, 0, 10], [185.5, 109.5, 0, 10], [185.5, 39.5, 0, 10]];
 	var doors = [['209.5 60.5 0 20', '0-10'], ['109.5 60.5 0 20', '0-13'], ['149.5 90.5 20 0', '0-24'], ['259.5 350.5 20 0', '1-3'], ['259.5 230.5 20 0', '1-11'], ['249.5 230.5 0 20', '1-25'], ['249.5 300.5 0 20', '1-29'], ['249.5 260.5 0 20', '1-32'], ['39.5 230.5 20 0', '2-14'], ['69.5 230.5 0 20', '2-25'], ['39.5 350.5 20 0', '2-26'], ['69.5 300.5 0 20', '2-30'], ['69.5 260.5 0 20', '2-34'], ['249.5 440.5 0 20', '3-9'], ['259.5 470.5 20 0', '3-12'], ['249.5 350.5 0 20', '3-26'], ['149.5 350.5 20 0', '4-26'], ['119.5 170.5 20 0', '5-6'], ['69.5 200.5 0 20', '5-14'], ['149.5 180.5 0 20', '5-24'], ['149.5 140.5 0 20', '6-24'], ['149.5 250.5 20 0', '7-25'], ['169.5 140.5 0 20', '8-24'], ['179.5 170.5 20 0', '8-31'], ['249.5 480.5 0 20', '9-12'], ['69.5 480.5 0 20', '9-15'], ['69.5 440.5 0 20', '9-28'], ['219.5 430.5 20 0', '9-33'], ['79.5 430.5 20 0', '9-35'], ['219.5 90.5 20 0', '10-24'], ['249.5 200.5 0 20', '11-31'], ['79.5 90.5 20 0', '13-24'], ['39.5 470.5 20 0', '15-28'], ['149.5 230.5 20 0', '24-25'], ['169.5 180.5 0 20', '24-31'], ['39.5 370.5 20 0', '26-28'],  ['219.5 350.5 20 0', '26-29'], ['79.5 350.5 20 0', '26-30'], ['219.5 370.5 20 0', '26-33'], ['79.5 370.5 20 0', '26-35']];
 
 	var popup = SM.sel('#SMpopup');
@@ -505,10 +531,18 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1: équipment; 
 
 SM.changeChatTab = function(el) {
 	var tab = el.getAttribute('data-tab');
+	
+	var tabs = SM.sel('#cdTabsChat').children;
+	for (var i = 0; i < tabs.length; i++)
+		{ tabs[i].className = tabs[i].className.replace(/tabon/, 'taboff'); }
+
+	//Onglets
+	var walls = SM.sel('#chatBlock').children;
+	for (var i = 0; i < walls.length; i++)
+		{ walls[i].style.display = 'none'; }
+
 	if (tab) //Onglet original
 	{
-		SM.sel('#SMeditortab').className = 'tab taboff';
-		SM.sel('#SMeditor').style.display = 'none';
 		Main.selChat(parseInt(tab));
 		SM.sel('#chatBlock').style.height = '80vh';
 		//On force le cookie curChat pour les cas de message dans le mauvais canal (rare et intestable…)
@@ -528,23 +562,31 @@ SM.changeChatTab = function(el) {
 			{ bug.innerHTML += (regtab - 6) + "."; }
     }
     
-    else //Onglet Éditeur de messages
+    else //Onglet de scripts
 	{
-		var tabs = SM.sel('#cdTabsChat').children;
-		for (var i = 0; i < tabs.length; i++)
-			{ tabs[i].className = tabs[i].className.replace(/tabon/, 'taboff'); }
-		SM.sel('#SMeditortab').className = 'tab tabon';
-
-		//Onglets
-		var walls = SM.sel('#chatBlock').children;
-		for (var i = 0; i < walls.length; i++)
-			{ walls[i].style.display = 'none'; }
-		SM.sel('#SMeditor').style.display = 'block';
-
-		//Entrées de texte
-		SM.sel('#mushform').style.display = 'none';
-		SM.sel('#wall').style.display = 'none';
-		SM.sel('#privateform').style.display = 'none';
+		//Textareas
+		var t = ['#mushform', '#wall', '#privateform'];
+		for (i in t)
+		{
+			var area = SM.sel(t[i]);
+			if (area)
+				{ area.style.display = 'none'; }
+		}
+		
+		el.className = 'tab tabon';
+		var scriptTab = el.getAttribute('data-script-tab');
+		if (scriptTab) {
+			SM.sel(scriptTab).style.display = 'block';
+		}
+		var scriptFunc = el.getAttribute('data-script-function');
+		if (scriptFunc) {
+			scriptFunc = scriptFunc.split('.');
+			var func = unsafeWindow;
+			for (var i = 0; i < scriptFunc.length; i++) {
+				func = func[scriptFunc[i]];
+			}
+			func();
+		}
 
 		SM.sel('#chatBlock').style.height = 'auto';
 	}
@@ -691,6 +733,7 @@ SM.reInit = function() {
 	SM.gameTab();
 	SM.topStats();
 	SM.messageEditor();
+	SM.astroTab();
 	SM.changeActionFunctions();
 	SM.sel("#SMbar .cycletime").textContent = SM.sel("#chat_col .cycletime").textContent;
 	if (SM.sel('.SMtabselected') == SM.sel('#SMtab-room_col'))
@@ -1052,7 +1095,7 @@ SM.charTab = function() {
 	var characterdiv = SM.moveEl(SM.addNewEl('div', null, 'SMcharacterdiv'), sheetmain, sheetmain.firstChild);
 	SM.addNewEl('div', characterdiv, '', SM.sel('.who').parentNode.innerHTML).className = 'SMwho';
 	var triumphLi = SM.sel('.spaceshipstatus [src$="triumph.png"]').parentNode;
-	SM.moveEl(SM.addNewEl('div', null, 'SMtriumph', triumphLi.innerHTML.trim(), SM.getAttributesList(triumphLi)), characterdiv);
+	SM.moveEl(SM.addNewEl('div', null, 'SMtriumph', triumphLi.innerHTML.trim(), SM.getAttributesDict(triumphLi)), characterdiv);
 	SM.copyEl(SM.sel('.level'), characterdiv);
 	SM.moveEl(SM.sel('.avatar'), characterdiv).className = 'avatar SM' + SM.sel('.who').textContent.trim().replace(" ", "_").toLowerCase();
 	if (SM.sel('.gogold')) //Message « Achetez du mode Or »
@@ -1063,9 +1106,9 @@ SM.charTab = function() {
 	var SMenergybar = SM.addNewEl('tr', SM.sel('.pvsm').firstElementChild, 'SMenergybar');
 	var oldPa = SM.sel('#cdPaBloc');
 	var APbar = oldPa.children[2];
-	SM.addNewEl('td', SMenergybar, null, APbar.innerHTML, SM.getAttributesList(APbar));
+	SM.addNewEl('td', SMenergybar, null, APbar.innerHTML, SM.getAttributesDict(APbar));
 	var MPbar = oldPa.children[3];
-	SM.addNewEl('td', SMenergybar, null, MPbar.innerHTML, SM.getAttributesList(MPbar));
+	SM.addNewEl('td', SMenergybar, null, MPbar.innerHTML, SM.getAttributesDict(MPbar));
 
 	//Points d'action spéciaux : ont la forme Nombre:Image dans la structure HTML de base
 	var extraAPs = SM.toArray(document.getElementsByClassName('extrapa'));
@@ -1074,7 +1117,7 @@ SM.charTab = function() {
 		var extratd = SM.addNewEl('td', SM.addNewEl('tr', SM.sel('.pvsm').firstElementChild), 'SMextratd', null, { colspan: '2' });
 		for (var i = 0; i < extraAPs.length; i++)
 		{
-			var extrapoint = SM.addNewEl('span', extratd, null, null, SM.getAttributesList(extraAPs[i]));
+			var extrapoint = SM.addNewEl('span', extratd, null, null, SM.getAttributesDict(extraAPs[i]));
 			SM.moveEl(extraAPs[i].lastElementChild, extrapoint); //Image
 			SM.moveEl(extraAPs[i].firstElementChild, extrapoint); //Nombre
 		}
@@ -1275,7 +1318,8 @@ SM.roomTab = function() {
 			var actions = document.querySelectorAll('[webdata="' + item.serial + '"]');
 			for (var i = 0; i < actions.length; i++)
 			{
-				if (actions[i].innerHTML.indexOf('REPAIR_OBJECT') != -1 || actions[i].innerHTML.indexOf('REPAIR_PATROL_SHIP') != -1)
+				var html = actions[i].innerHTML
+				if (/REPAIR_OBJECT/.test(html) || (/REPAIR_PATROL_SHIP/.test(html) && !/PATROL_SHIP_TAKEOFF/.test(html))) //A patrol ship may be renovated but not fully broken
 					{ eqname += ((item.iid == 'DOOR') ? SM.TEXT['broken_door'] : SM.TEXT['broken']); break; }
 			}
 			SM.addNewEl('option', eqlist, null, eqname, { value: item.serial });
@@ -1313,10 +1357,10 @@ SM.roomTab = function() {
 				{ berzerk = true; }
 			else if (status.img == 'laid')
 				{ laid = true; }
-			else if (status.img == ('mastered' || 'guardian'))
+			else if (hero.me == 'false' && status.img == ('mastered' || 'guardian'))
 				{ SM.GUARDIAN = true; }
 				
-			if (hero.me && status.img == 'moduling')
+			if (hero.me == 'true' && status.img == 'moduling')
 				{ SM.ME_MODULING = true; }
 		}
 
@@ -1468,29 +1512,29 @@ SM.chatTab = function() {
 		cycles[i].style.position = 'relative';
 		cycles[i].className = cycles[i].className + ' SMtextlog'
 		SM.addNewEl('a', cycles[i], null, SM.TEXT['copy_logs-button'], { class: 'butmini SMlogsbut' }).addEventListener('click', function() {
-			var par = this.parentNode;
-			var cycle = par.firstElementChild.textContent.trim().toUpperCase();
+			var pr = this.parentNode;
+			var cycle = pr.firstElementChild.textContent.trim().toUpperCase();
 
 			var popup = SM.sel('#SMpopup');
 			popup.innerHTML = '';
 			SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
 			popup.style.display = 'block';
 			SM.addNewEl('h4', popup, null, cycle);
-			var area = SM.addNewEl('textarea', popup, 'SMlogsarea');
-			area.value = cycle + "\n\n";
+			var t = SM.addNewEl('textarea', popup, 'SMlogsarea');
+			t.value = cycle + "\n\n";
 
-			var logs = par.getElementsByClassName('what_happened');
+			var logs = pr.getElementsByClassName('what_happened');
 			for (var j = 0; j < logs.length; j++)
 			{
 				var log = "";
-				var parts = logs[j].childNodes;
-				for (var k = 0; k < parts.length; k++)
+				var ch = logs[j].childNodes;
+				for (var k = 0; k < ch.length; k++)
 				{
-					var l = parts[k].textContent.trim();
+					var l = ch[k].textContent.trim().replace(/\s+/g, ' ');
 					if (l)
 						{ log += l + " "; }
 				}
-				area.value += log + "\n";
+				t.value += log + "\n";
 			}
 		});
 	}
@@ -1567,7 +1611,8 @@ SM.messageEditor = function() {
 		return false;
 	}
 
-	var tab = SM.addNewEl('li', SM.sel('.tabschat'), 'SMeditortab', '<img src="http://mush.twinoid.com/img/icons/ui/conceptor.png" />');
+	var tab = SM.addNewEl('li', SM.sel('.tabschat'), 'SMeditortab', '<img src="http://' + document.domain + '/img/icons/ui/conceptor.png" />', { 'data-script-tab': '#SMeditor' });
+	tab.style.marginRight = '3px';
 	tab.onmouseover = function() { Main.showTip(this, SM.TEXT['editor-tip']); };
 	tab.addEventListener('mouseout', function() { Main.hideTip(); });
 	tab.addEventListener('click', function() { SM.changeChatTab(this); });
@@ -2019,13 +2064,38 @@ SM.preformatPlanet = function(planet) {
 
 
 
+/* CHARGEMENT DE L'ASTROPAD */
+SM.astroTab = function() {
+	return false; //Not yet!
+	if (SM.isUserscript) {
+		return false;
+	}
+	var tab = SM.addNewEl('li', SM.sel('.tabschat'), 'astrotab', '<img src="http://' + document.domain + '/img/icons/ui/pa_comp.png" />', { 'data-script-tab': '#astrotab_content' });
+	tab.style.marginRight = '3px';
+	tab.onmouseover = function() { Main.showTip(this, SM.TEXT['astrotab-tip']); };
+	tab.addEventListener('mouseout', function() { Main.hideTip(); });
+	tab.addEventListener('click', function() { SM.changeChatTab(this); });
+	tab.className = 'tab taboff';
+	var content = SM.addNewEl('div', SM.sel('#chatBlock'), 'astrotab_content');
+	content.style.display = 'none';
+	SM.addButton(content, SM.TEXT['astrotab-button']).addEventListener('click', function() {
+		SM.sel('#astrotab').setAttribute('data-script-function', 'Main.AstroPad.getInventory');
+		SM.addNewEl('script', document.body, null, null, { src: 'https://github.com/badconker/astropad/raw/master/astropad.user.js', async: 'true' }).onload = function() {
+			unsafeWindow.Main.AstroPad.fill(''); //In case there's no pad attached yet
+			unsafeWindow.Main.AstroPad.getInventory();
+		};
+	});
+}
+
+
+
 /* FONCTION DE LOCALISATION */
 
-SM.locale = function(func) {
+SM.locale = function(callback) {
 	SM.TEXT = {};
 	var lang = parseInt(SM.parameters['locale']);
-	if (typeof func == 'undefined')
-		{ var func = function() { var x; }; }
+	if (typeof callback == 'undefined')
+		{ var callback = function() { return true; }; }
 
 	//Doit rester indépendant de la locale choisie puisqu'en interaction avec la page elle-même
 	//.alertroom : certaines pièces (ex. Jardin) sont mal écrites dans les rapports d'alerte
@@ -2048,10 +2118,10 @@ SM.locale = function(func) {
 			SM.alertrooms = SM.toArray(SM.rooms);
 	}
 
-	/* BEGIN PYTHON REPLACE */
+	//BEGIN PYTHON REPLACE LOCALE
 	var l = ['', 'fr', 'en', 'es'];
-	SM.addNewEl('script', document.head, null, null, { src: SM.src + 'SMlang-' + l[lang] + '.js' }).onload = func;
-	/* END PYTHON REPLACE */
+	SM.addNewEl('script', document.head, null, null, { src: SM.src + 'SMlang-' + l[lang] + '.js' }).onload = callback;
+	//END PYTHON REPLACE LOCALE
 };
 
 
@@ -2075,6 +2145,7 @@ SM.init = function() {
 	SM.gameTab();
 	SM.topStats();
 	SM.messageEditor();
+	SM.astroTab();
 	SM.changeActionFunctions();
 	window.setTimeout(function() { SM.sel('#content').scrollLeft = 0; }, 500);
 
@@ -2107,11 +2178,8 @@ SM.init = function() {
 
 /* VARIABLES */
 
-SM.version = "1.1";
 //SM.src = "http://labare.alwaysdata.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
-try { SM.src = self.options.baseUrl; } //Addon Firefox
-catch(e) { console.log('Small(Mush) & FF addon: ' + e); }
 
 SM.smileys = [['pa_pm', 'pslots.png'], ['pa', 'pa_slot1.png'], ['pm', 'pa_slot2.png'], ['pv|hp', 'lp.png'], ['xp', 'xp.png'], ['xpbig', 'xpbig.png'], ['pa_heal', 'pa_heal.png'], ['asocial', 'status/unsociable.png'], ['disabled', 'status/disabled.png'], ['hungry', 'status/hungry.png'], ['hurt', 'status/hurt.png'], ['ill', 'status/disease.png'], ['psy_disease', 'status/psy_disease.png'], ['commander', 'title_01.png'], ['admin_neron', 'title_02.png'], ['resp_comm', 'title_03.png'], ['alert', 'alert.png'], ['com', 'comm.png'], ['door', 'door.png'], ['plant_youngling', 'plant_youngling.png'], ['plant_thirsty', 'plant_thirsty.png'], ['plant_dry', 'plant_dry.png'], ['plant_diseased', 'plant_diseased.png'], ['bin', 'bin.png'], ['next', 'pageright.png'], ['ship_triumph', 'daedalus_triumph.png'], ['pa_comp', 'pa_comp.png'], ['pa_cook', 'pa_cook.png'], ['pa_core', 'pa_core.png'], ['pa_eng|eng', 'pa_eng.png'], ['pa_garden', 'pa_garden.png'], ['pa_pilgred', 'pa_pilgred.png'], ['pa_shoot', 'pa_shoot.png'], ['laid', 'status/laid.png'], ['mastered', 'status/mastered.png'], ['mush', 'mush.png'], ['stink', 'status/stinky.png'], ['fuel', 'fuel.png'], ['o2', 'o2.png'], ['moral|pmo', 'moral.png'], ['eat', 'sat.png'], ['pills', 'demoralized2.png'], ['dead', 'dead.png'], ['hunter', 'hunter.png'], ['fire', 'fire.png'], ['more', 'more.png'], ['less', 'less.png'], ['chut', 'discrete.png'], ['talk', 'talk.gif'], ['talky', 'talkie.png'], ['cat', 'cat.png'], ['time', 'casio.png'], ['tip', 'tip.png'], ['triumph', 'triumph.png']];
 

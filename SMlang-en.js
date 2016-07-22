@@ -27,7 +27,7 @@ SM.TEXT['SMparams-lang_title'] = "Small(Mush) language:";
 SM.TEXT['SMparams-chat_unload'] = "Unload chat";
 SM.TEXT['SMparams-chat_unload_tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Unload chat</h1>The main channel will be lighter to reload.</div></div></div></div>";
 SM.TEXT['SMparams-chat_unload_reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
-SM.TEXT['SMparams-credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span>";
+SM.TEXT['SMparams-credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span><br />Spanish translation by <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> and <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (thanks!).";
 SM.TEXT['SMparams-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol right in the middle of the beta";
 SM.TEXT['confirm_action'] = "Do you want to '";
 SM.TEXT['tabs-char'] = "Myself";
@@ -132,6 +132,8 @@ SM.TEXT['preformat-comms-basesdesc'] = "Do you want to share decoded bases descr
 SM.TEXT['preformat-comms-basesnone'] = "none";
 SM.TEXT['preformat-comms-neron'] = "**NERON version:** ";
 SM.TEXT['abbr-day'] = "D";
+SM.TEXT['astrotab-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>AstroPad</h1><p>This tab loads the AstroPad script.</p></div></div></div></div>";
+SM.TEXT['astrotab-button'] = "Load the AstroPad script";
 SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 SM.TEXT['minimap-title'] = "Small(Mush) minimap";
 SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
