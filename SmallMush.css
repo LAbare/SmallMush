@@ -1,22 +1,29 @@
-/**——————————————————————**\
- *    SMALL(MUSH) - CSS   *
-\**——————————————————————**/
+/**—————————————————————————————**\
+ * SMALL(MUSH) *
+ * by LAbare *
+ * Script pour Mush sur mobile *
+ * CSS *
+\**—————————————————————————————**/
 
 
 
 /*--------------------*\
-  AJUSTEMENTS
+ AJUSTEMENTS
 \*--------------------*/
 
 /* Le viewport et certains éléments sont réglés à 424 pixels de large : il s'agit de la largeur du jeu Flash, autour duquel est basé l'interface Small(Mush). */
 /* Retrait de nombreuses marges internes et externes pour éviter les trous et avoir une interface propre. */
 
 /* Canaux privés invisibles : pas encore bien corrigé sur les serveurs anglais et espagnol */
-.tid_editorContent { visibility: visible !important; }
+.tid_editorContent {
+	visibility: visible !important;
+}
 
 /* Barre Twinoid : panneaux latéraux */
 /* Les raccourcis et la recherche d'utilisateurs sont automatiquement cachés par le bar.css de Twinoid quand le viewport est réduit. */
-.tid_sidePanel { z-index: 500 !important; }
+.tid_sidePanel {
+	z-index: 500 !important;
+}
 
 /* Liens */
 .mainmenu {
@@ -50,15 +57,19 @@
 	z-index: -1;
 }
 
-.mxhead, #container_inside, #container_topright, #container_bg { padding: 0; }
+.mxhead, #container_inside, #container_topright, #container_bg {
+	padding: 0;
+}
 
 /* Conteneur du logo, des liens, de la barre Small(Mush) et des onglets */
 .mxhead {
 	position: relative;
-	background-color: rgba(15, 52, 119, 0.2);
+	background-color: rgba(15, 52, 119, 0.5);
 }
 
-#chat_col .cycletime { display: none; }
+#chat_col .cycletime {
+	display: none;
+}
 
 /* Conteneurs de base créant le fond et la forme « cadre à angles coupés » de Mush ; ils se superposent hideusement avec un viewport à 424px, donc à cacher */
 #container_topright, #container_bottomleft, #container_bottomright, #container_bg, #container_bgleft, #container_inside, #maincontainer {
@@ -68,7 +79,9 @@
 	background-color: transparent;
 }
 
-body { overflow-x: hidden; }
+body {
+	overflow-x: hidden;
+}
 
 /* Blocs conteneurs */
 #content {
@@ -76,19 +89,24 @@ body { overflow-x: hidden; }
 	width: 424px;
 	overflow-x: hidden;
 	position: relative;
+	background: none;
 }
 
-.inter { margin-top: 0 !important; }
+.inter {
+	margin-top: 0 !important;
+}
 
 /* Blocs entourant le jeu Flash */
-#swf_ISO_MODULE, #room_col, #cdMainContent, #cdContent, .cdIsoModule, .tracker { width: 424px !important; }
+#swf_ISO_MODULE, #room_col, #cdMainContent, #cdContent, .cdIsoModule, .tracker {
+	width: 424px !important;
+}
 
 
 
 
 
 /*--------------------*\
-  BARRE D'INFO
+ BARRE D'INFO
 \*--------------------*/
 
 #topinfo_bar {
@@ -99,7 +117,9 @@ body { overflow-x: hidden; }
 }
 
 /* Alertes autres que « Alertes ! », nom du personnage et horloge */
-#topinfo_bar .alarm ul li:not(:first-child), #topinfo_bar .hero, #topinfo_bar .casio { display: none !important; }
+#topinfo_bar .alarm ul li:not(:first-child), #topinfo_bar .hero, #topinfo_bar .casio {
+	display: none !important;
+}
 
 /* Alertes, variables et équipage */
 .spaceshipstatus {
@@ -115,21 +135,29 @@ table.genstatus td.spaceshipstatus ul li {
 	margin-left: 3px;
 }
 
-.people { font-size: 0; }
+.people {
+	font-size: 0;
+}
 
-.spaceshipstatus img { margin-left: -1px; }
+.spaceshipstatus img {
+	margin-left: -1px;
+}
 
-.alarm { margin-right: 3px; }
+.alarm {
+	margin-right: 3px;
+}
 
 /* Icône de planète en cas d'exploration */
-.alarm_bg li:first-of-type img { margin-right: 5px; }
+.alarm_bg li:first-of-type img {
+	margin-right: 5px;
+}
 
 
 
 
 
 /*--------------------*\
-  ONGLETS
+ ONGLETS
 \*--------------------*/
 
 #char_col, #ship_tab, #room_col, #chat_col, #room_tab {
@@ -138,7 +166,9 @@ table.genstatus td.spaceshipstatus ul li {
 }
 
 /* Barre d'onglets Small(Mush) */
-#SMtabs { height: 30px; }
+#SMtabs {
+	height: 30px;
+}
 
 #SMtabs li {
 	display: inline-block;
@@ -154,6 +184,7 @@ table.genstatus td.spaceshipstatus ul li {
 	font-size: 9pt;
 	font-variant: small-caps;
 	text-align: center;
+	cursor: pointer;
 }
 
 #SMtabs img {
@@ -161,9 +192,13 @@ table.genstatus td.spaceshipstatus ul li {
 	float: left;
 }
 
-#SMtabs li * { vertical-align: middle; }
+#SMtabs li * {
+	vertical-align: middle;
+}
 
-.SMtabselected { background-color: #6AC !important; }
+.SMtabselected {
+	background-color: #6AC !important;
+}
 
 .SMtabwarning {
 	box-sizing: border-box;
@@ -173,14 +208,16 @@ table.genstatus td.spaceshipstatus ul li {
 	text-align: center;
 }
 
-p.SMtabwarning { border-bottom: 2px solid navy; }
+p.SMtabwarning {
+	border-bottom: 2px solid navy;
+}
 
 
 
 
 
 /*--------------------*\
-  DIVERS
+ DIVERS
 \*--------------------*/
 
 /* Écrans couvrant la page entière pour afficher une infobulle/l'icône de chargement */
@@ -211,7 +248,9 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 	margin-bottom: 5px;
 }
 
-#content .but { margin-bottom: 30px; }
+#content .but {
+	margin-bottom: 30px;
+}
 
 /* Fenêtre d'alerte (« Vous vous êtes sali… ») */
 .ui_overlay #dialog, .poptop {
@@ -220,7 +259,9 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 }
 
 /* Fenêtre d'alerte Small(Mush), copiée depuis #dialog */
-#SMdialog_title { margin-top: 20px; }
+#SMdialog_title {
+	margin-top: 20px;
+}
 
 #SMdialog_body {
 	font-size: 10pt;
@@ -303,13 +344,21 @@ p.SMtabwarning { border-bottom: 2px solid navy; }
 	margin-bottom: 5px;
 }
 
-#SMpopup thead { font-size: 0.8em; }
+#SMpopup thead {
+	font-size: 0.8em;
+}
 
-#SMpopup thead td { padding: 15px 5px; }
+#SMpopup thead td {
+	padding: 15px 5px;
+}
 
-#SMpopup .but { margin-bottom: 20px; }
+#SMpopup .but {
+	margin-bottom: 20px;
+}
 
-.SMcenter { text-align: center; }
+.SMcenter {
+	text-align: center;
+}
 
 #SMlangselect {
 	margin-bottom: 20px;
@@ -334,21 +383,33 @@ p.SMfire {
 }
 
 /* Boutons du centre de communications */
-#trackerModule .but { margin-top: 0 !important; }
+#trackerModule .but {
+	margin-top: 0 !important;
+}
 
 /* Bouton « Afficher la minimap Small(Mush) » */
-#room_col .but { margin-top: 25px; }
+#room_col .but {
+	margin-top: 25px;
+}
 
-.readeverything { margin-bottom: 20px; }
+.readeverything {
+	margin-bottom: 20px;
+}
 
 /* Choix du personnage */
-.charac table.choosehero2 td { display: block; }
+.charac table.choosehero2 td {
+	display: block;
+}
 
 /* Distributeur classique */
-.cdDistrib { display: block; }
+.cdDistrib {
+	display: block;
+}
 
 /* Reste de bêta */
-.cdReturnFromMoveButton { display: none; }
+.cdReturnFromMoveButton {
+	display: none;
+}
 
 .SMsmallbut {
 	display: inline-block;
@@ -357,7 +418,11 @@ p.SMfire {
 	margin-right: 10px;
 }
 
-#chatBlock { min-height: 550px; height: 550px; height: 80vh; }
+#chatBlock {
+	min-height: 550px;
+	height: 550px;
+	height: 80vh;
+}
 
 .SMlogsbut {
 	position: absolute;
@@ -377,16 +442,20 @@ p.SMfire {
 	margin: 0 auto;
 }
 
-#SMtopstats { text-align: center; }
+#SMtopstats {
+	text-align: center;
+}
 
-#SMtopstats span:not(:last-of-type) { margin-right: 5px; }
+#SMtopstats span:not(:last-of-type) {
+	margin-right: 5px;
+}
 
 
 
 
 
 /*--------------------*\
-  BARRE MUSHMOBILE
+ BARRE SMALL(MUSH)
 \*--------------------*/
 
 #SMbar {
@@ -404,11 +473,17 @@ p.SMfire {
 	padding: 1px;
 }
 
-#SMbar .but, .cycletime, .cdShipCasio { margin-left: 4px; }
+#SMbar .but, .cycletime, .cdShipCasio {
+	margin-left: 4px;
+}
 
-#SMbar .but { margin-bottom: 0; }
+#SMbar .but {
+	margin-bottom: 0;
+}
 
-#SMbar .butbg { padding: 0 10px; }
+#SMbar .butbg {
+	padding: 0 10px;
+}
 
 
 /*-- HORLOGE --*/
@@ -423,10 +498,14 @@ p.SMfire {
 	margin-right: 0;
 }
 
-.cycletime img { display: none; }
+.cycletime img {
+	display: none;
+}
 
 /* Bouton Nouveau cycle */
-.cdTimeStamp .but { margin-bottom: 0; }
+.cdTimeStamp .but {
+	margin-bottom: 0;
+}
 
 
 
@@ -461,41 +540,77 @@ p.SMfire {
 
 /* Ajustement du portrait dans un cadre de hauteur 100px */
 
-.SMchun     { margin-top: -95px; }
+.SMchun {
+	margin-top: -95px;
+}
 
-.SMterrence { margin-top: -125px; }
+.SMterrence {
+	margin-top: -125px;
+}
 
-.SMeleesha  { margin-top: -164px; }
+.SMeleesha {
+	margin-top: -164px;
+}
 
-.SMfrieda   { margin-top: -164px; }
+.SMfrieda {
+	margin-top: -164px;
+}
 
-.SMjin_su   { margin-top: -95px; }
+.SMjin_su {
+	margin-top: -95px;
+}
 
-.SMkuan_ti  { margin-top: -77px; }
+.SMkuan_ti {
+	margin-top: -77px;
+}
 
-.SMchao     { margin-top: -123px; }
+.SMchao {
+	margin-top: -123px;
+}
 
-.SMpaola    { margin-top: -182px; }
+.SMpaola {
+	margin-top: -182px;
+}
 
-.SMgioele   { margin-top: -105px; }
+.SMgioele {
+	margin-top: -105px;
+}
 
-.SMstephen  { margin-top: -115px; }
+.SMstephen {
+	margin-top: -115px;
+}
 
-.SMhua      { margin-top: -128px; }
+.SMhua {
+	margin-top: -128px;
+}
 
-.SMroland   { margin-top: -128px; }
+.SMroland {
+	margin-top: -128px;
+}
 
-.SMfinola   { margin-top: -136px; }
+.SMfinola {
+	margin-top: -136px;
+}
 
-.SMraluca   { margin-top: -93px; }
+.SMraluca {
+	margin-top: -93px;
+}
 
-.SMjanice   { margin-top: -169px; }
+.SMjanice {
+	margin-top: -169px;
+}
 
-.SMian      { margin-top: -112px; }
+.SMian {
+	margin-top: -112px;
+}
 
-.SMderek    { margin-top: -110px; }
+.SMderek {
+	margin-top: -110px;
+}
 
-.SMandie    { margin-top: -170px; }
+.SMandie {
+	margin-top: -170px;
+}
 
 .SMwho { /* Nom */
 	position: absolute;
@@ -536,7 +651,9 @@ p.SMfire {
 	margin: 0;
 }
 
-.gogold a { display: block; }
+.gogold a {
+	display: block;
+}
 
 /* Fenêtre d'up de niveau en cours de jeu */
 .cdLevelDialog {
@@ -544,7 +661,9 @@ p.SMfire {
 	left: 12px !important;
 }
 
-.ui-dialog .ui-dialog-content { overflow: visible; }
+.ui-dialog .ui-dialog-content {
+	overflow: visible;
+}
 
 
 /*-- COMPÉTENCES --*/
@@ -557,7 +676,9 @@ p.SMfire {
 	text-align: center;
 }
 
-.skills .but { margin-bottom: 0; }
+.skills .but {
+	margin-bottom: 0;
+}
 
 .skills li {
 	display: inline-block !important;
@@ -565,7 +686,9 @@ p.SMfire {
 	margin: 0 !important;
 }
 
-.skills li:not(:last-of-type) { margin-right: 5px !important; }
+.skills li:not(:last-of-type) {
+	margin-right: 5px !important;
+}
 
 /* Conteneurs */
 /* skill: compétence bronze ; once_skill: compétence silver ; gold_skill: compétence or */
@@ -575,7 +698,9 @@ p.SMfire {
 	padding-top: 1px;
 }
 
-li.skill { width: 35px !important; }
+li.skill {
+	width: 35px !important;
+}
 
 /* Contenu */
 .once_skill .skill_inside, .gold_skill .skill_inside, .skill .skill_inside { /* Image */
@@ -584,9 +709,13 @@ li.skill { width: 35px !important; }
 	padding: 0;
 }
 
-.skill img { margin: 0 !important; }
+.skill img {
+	margin: 0 !important;
+}
 
-.once_skill .basicplus, .gold_skill .basicplus, .skill .basicplus { margin: 3px auto; }
+.once_skill .basicplus, .gold_skill .basicplus, .skill .basicplus {
+	margin: 3px auto;
+}
 
 .gold_blocked {
 	position: relative;
@@ -594,7 +723,9 @@ li.skill { width: 35px !important; }
 	left: 1px;
 }
 
-.genomeBt { margin: 2px auto; }
+.genomeBt {
+	margin: 2px auto;
+}
 
 
 /*-- STATUTS --*/
@@ -607,7 +738,9 @@ li.skill { width: 35px !important; }
 	text-align: center;
 }
 
-.statuses li { display: inline; }
+.statuses li {
+	display: inline;
+}
 
 
 /*-- ÉNERGIE, SANTÉ ET MORAL --*/
@@ -618,7 +751,9 @@ table.pvsm {
 }
 
 /* Santé et moral */
-.pvsmbar { padding-bottom: 5px; }
+.pvsmbar {
+	padding-bottom: 5px;
+}
 
 .pvsmbar img.what { /* Icônes Santé et Moral */
 	float: none;
@@ -637,7 +772,9 @@ table.pvsm {
 }
 
 /* Énergie */
-#SMenergybar { margin-top: 5px; }
+#SMenergybar {
+	margin-top: 5px;
+}
 
 #SMenergybar td {
 	position: relative;
@@ -655,14 +792,18 @@ table.pvsm {
 }
 
 /* Points d'action spéciaux */
-#SMextratd { text-align: center; }
+#SMextratd {
+	text-align: center;
+}
 
 .extrapa {
 	margin-right: 10px;
 	font-size: 10pt;
 }
 
-.extrapa:last-of-type { margin: 0; }
+.extrapa:last-of-type {
+	margin: 0;
+}
 
 
 /*-- INVENTAIRE ET ACTIONS PERSO --*/
@@ -679,9 +820,13 @@ table.pvsm {
 }
 
 /* Actions */
-.stSel { text-align: center; }
+.stSel {
+	text-align: center;
+}
 
-.sheetpa { margin: 10px auto; }
+.sheetpa {
+	margin: 10px auto;
+}
 
 .sheetpa, .sheetpabg {
 	margin: 10px auto;
@@ -699,7 +844,7 @@ table.pvsm {
 
 
 /*------------------*\
-  ONGLET VAISSEAU
+ ONGLET VAISSEAU
 \*------------------*/
 
 /*-- ALERTES --*/
@@ -713,6 +858,7 @@ table.pvsm {
 
 .SMnoalert {
 	background-color: rgba(0, 255, 0, 0.5);
+	border: 2px solid #009900;
 	font-variant: small-caps;
 	font-size: 12pt;
 	
@@ -723,26 +869,38 @@ table.pvsm {
 
 .SMalerton {
 	background-color: rgba(255, 0, 0, 0.5);
-	
+	border: 2px solid #990000;
 	animation: alerton 2s infinite;
 	-moz-animation: alerton 2s infinite;
 	-webkit-animation: alerton 2s infinite;
 }
 
 @keyframes alerton {
-	0% { background-color: rgba(255, 0, 0, 0.5); }
+	0% {
+		background-color: rgba(255, 0, 0, 0.7);
+	}
 	
-	50% { background-color: transparent; }
+	50% {
+		background-color: rgba(255, 0, 0, 0.4);
+	}
 	
-	100% { background-color: rgba(255, 0, 0, 0.5); }
+	100% {
+		background-color: rgba(255, 0, 0, 0.7);
+	}
 }
 
 @keyframes alertoff {
-	0% { background-color: rgba(0, 255, 0, 0.5); }
+	0% {
+		background-color: rgba(0, 255, 0, 0.5);
+	}
 	
-	50% { background-color: rgba(0, 150, 0, 0.5); }
+	50% {
+		background-color: rgba(0, 150, 0, 0.5);
+	}
 	
-	100% { background-color: rgba(0, 255, 0, 0.5); }
+	100% {
+		background-color: rgba(0, 255, 0, 0.5);
+	}
 }
 
 #SMalerts > li:first-child { /* « ALERTES : » */
@@ -751,11 +909,17 @@ table.pvsm {
 	font-variant: small-caps;
 }
 
-#SMalerts > li:not(:first-child) { margin-bottom: 5px; }
+#SMalerts > li:not(:first-child) {
+	margin-bottom: 5px;
+}
 
-#SMalerts h1 { font-size: 12pt; }
+#SMalerts h1 {
+	font-size: 12pt;
+}
 
-#SMalerts h1 img { margin-right: 5px; }
+#SMalerts h1 img {
+	margin-right: 5px;
+}
 
 #SMalerts .char { /* Équipier perdu */
 	height: 15px;
@@ -764,7 +928,9 @@ table.pvsm {
 	background: url("http://mush.vg/img/art/char.png");
 }
 
-.SMhidden_alerts, .SMshown_alerts { position: relative; }
+.SMhidden_alerts, .SMshown_alerts {
+	position: relative;
+}
 
 .SMalertexpand {
 	margin-left: 10px;
@@ -773,7 +939,9 @@ table.pvsm {
 }
 
 /* Rapports d'alerte, montrés par clic */
-.SMhidden_alerts ul { display: none; }
+.SMhidden_alerts ul {
+	display: none;
+}
 
 
 /*-- CADRE D'EXPÉDITION --*/
@@ -788,30 +956,40 @@ table.pvsm {
 /*-- PROJETS, RECHERCHES & PILGRED --*/
 
 /* Deux blocs séparant les projets, les recherches et le PILGRED sur trois lignes */
-.SMcardsbreak { display: block !important; }
+.SMcardsbreak {
+	display: block !important;
+}
 
 /* Ancien bloc de cartes projets/recherches */
-#cdBottomBlock { display: none; }
+#cdBottomBlock {
+	display: none;
+}
 
 
 
 
 
 /*--------------------*\
-  ONGLET PIÈCE
+ ONGLET PIÈCE
 \*--------------------*/
 
 /*-- DÉPLACEMENT --*/
 
-.SMbrokendoor { background-color: red; }
+.SMbrokendoor {
+	background-color: red;
+}
 
-#room_tab select { color: black; }
+#room_tab select {
+	color: black;
+}
 
 
 /*-- ÉQUIPEMENTS ET CAMARADES --*/
 
 /* Bloc de camarades */
-#SMheroes { margin: 10px 5px; }
+#SMheroes {
+	margin: 10px 5px;
+}
 
 .SMheroblock { /* Camarade */
 	position: relative;
@@ -826,10 +1004,12 @@ table.pvsm {
 }
 
 /* Camarade couché */
-.SMlaid:not(:first-of-type) { margin-left: -22px; }
+.SMlaid:not(:first-of-type) {
+	margin-left: -22px;
+}
 
 
-/*-- INVENTAIRE MUSHMOBILE --*/
+/*-- INVENTAIRE SMALL(MUSH) --*/
 
 /* Inventaire */
 #SMcdInventory {
@@ -837,7 +1017,9 @@ table.pvsm {
 	margin-top: 10px;
 }
 
-#SMroom { width: 5000px; }
+#SMroom {
+	width: 5000px;
+}
 
 .SMselected { /* Halo de sélection d'item */
 	position: absolute;
@@ -856,21 +1038,27 @@ table.pvsm {
 	margin: 5px auto;
 }
 
-#SMitemdesc > div { margin-left: 50px; }
+#SMitemdesc > div {
+	margin-left: 50px;
+}
 
 /*-- ACTIONS --*/
 
-#SMcdInventory .itemactionstop { margin-top: 25px; }
+#SMcdInventory .itemactionstop {
+	margin-top: 25px;
+}
 
 /* Cadre de présentation d'un camarade */
-.inv .selectplayer { margin-top: 0; }
+.inv .selectplayer {
+	margin-top: 0;
+}
 
 
 
 
 
 /*--------------------*\
-  ÉDITEUR DE MESSAGES
+ ÉDITEUR DE MESSAGES
 \*--------------------*/
 
 #SMeditortext {
@@ -896,14 +1084,22 @@ table.pvsm {
 	background-color: #BBF;
 }
 
-#SMeditor .tid_smileyPanel { margin-bottom: 20px; }
+#SMeditor .tid_smileyPanel {
+	margin-bottom: 20px;
+}
 
-#SMeditor .but { margin-bottom: 20px; }
+#SMeditor .but {
+	margin-bottom: 20px;
+}
 
-.tid_editorButton:last-of-type { margin-right: 10px; }
+.tid_editorButton:last-of-type {
+	margin-right: 10px;
+}
 
-/* Recherche pour la balise Joueur & sélection d'un message préformaté */
-input.tid_withFriends, { color: black; }
+/* Recherche pour la balise Joueur */
+input.tid_withFriends {
+	color: black;
+}
 
 /* Smileys Mush */
 #SMsmileysblock {
@@ -913,7 +1109,9 @@ input.tid_withFriends, { color: black; }
 	border: 1px black solid;
 }
 
-#SMsmileysblock img { margin: 5px; }
+#SMsmileysblock img {
+	margin: 5px;
+}
 
 /* Messages préformatés */
 #SMpremessages {
@@ -922,16 +1120,20 @@ input.tid_withFriends, { color: black; }
 }
 
 /* Boutons « Coller » dans l'onglet Chat */
-.SMhidepaste .SMpastebutton { display: none; }
+.SMhidepaste .SMpastebutton {
+	display: none;
+}
 
-.SMshowpaste .SMpastebutton { display: block; }
+.SMshowpaste .SMpastebutton {
+	display: block;
+}
 
 
 
 
 
 /*--------------------*\
-  MINIMAP
+ MINIMAP
 \*--------------------*/
 
 #SMminimapbloc {
@@ -964,11 +1166,17 @@ input.tid_withFriends, { color: black; }
 	stroke-width: 3;
 }
 
-.SMmapalertd { color: #F60; }
+.SMmapalertd {
+	color: #F60;
+}
 
-.SMmapalerte { color: #0AF; }
+.SMmapalerte {
+	color: #0AF;
+}
 
-#SMmapselected { fill: #0FA; }
+#SMmapselected {
+	fill: #0FA;
+}
 
 .SMmyroom {
 	fill: #FF7;
@@ -976,4 +1184,6 @@ input.tid_withFriends, { color: black; }
 	color: black;
 }
 
-.SMlegend { margin-left: 15px; }
+.SMlegend {
+	margin-left: 15px;
+}

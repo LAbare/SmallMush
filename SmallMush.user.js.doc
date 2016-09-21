@@ -61,7 +61,7 @@
 .astroTab(): si le script n'est pas un userscript, crée un onglet AstroPad avec un bouton permettant de charger le script
 
 *** Fonction de localisation : ***
-.locale(*callback): fonction de localisation de l'interface, lance une fonction de rappel au chargement de la locale
+.locale(*cb): fonction de localisation de l'interface, lance une fonction de rappel au chargement de la locale
 
 *** Fonction d'initialisation : ***
 .init(): appelée après le chargement de la locale
@@ -71,12 +71,12 @@
 .isUserscript: (bool) version script manuel ou userscript du script
 .version: (string) version du script
 .src: (string) adresse du dossier source du script
-.smileys: (list) couple raccourci/image des smileys Mush
+.smileys: (array) couple raccourci/image des smileys Mush
 .previewtext: (string) message actuel de l'éditeur de message
 .parameters: (object) paramètres de l'interface Small(Mush)
-.rooms: (list) nom des pièces du Daedalus dans la langue du serveur
-.alertrooms: (list) nom des pièces du Daedalus telles qu'elles apparaissent dans les alertes (certaines sont mal écrites : « Jardin Hydoponique »)
-.localerooms: (list) nom des pièces du Daedalus dans la langue choisie par le joueur
+.rooms: (array) nom des pièces du Daedalus dans la langue du serveur
+.alertrooms: (array) nom des pièces du Daedalus telles qu'elles apparaissent dans les alertes (certaines sont mal écrites : « Jardin Hydoponique »)
+.localerooms: (array) nom des pièces du Daedalus dans la langue choisie par le joueur
 .TEXT: (object) textes de l'interface Small(Mush), générés par SM.locale()
 .INTERR: (string) point d'interrogation avec ou sans espace insécable selon la locale
 .ME_MODULING: (bool) le personnage est en train d'accéder à un terminal
@@ -84,3 +84,6 @@
 .ME_ALONE: (bool) le personnage est seul dans la pièce
 .GUARDIAN: (bool) un Gardien est présent dans la pièce
 .GRAVITY: (bool) le Simulateur de gravité est fonctionnel
+.AstroPadLoaded: (bool) l'AstroPad a été chargé manuellement (inutilisé en version userscript)
+.inventoryOpen: (bool) l'inventaire de la pièce a été ouvert et le joueur n'a pas bougé/n'a pas interagi avec un personnage/équipement/NPC
+.currentTarget: (null or array) type et serial du dernier personnage/item/équipement/NPC sélectionné (voir .displayRoomActions())
