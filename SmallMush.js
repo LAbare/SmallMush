@@ -2,11 +2,11 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *            v1.2.1             *
+ *              v1.3             *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.2.1" };
+var SM = { isUserscript: true, version: "1.3" };
 
 //BEGIN PYTHON REPLACE GREASEMONKEY VARIABLES
 SM.isUserscript = false;

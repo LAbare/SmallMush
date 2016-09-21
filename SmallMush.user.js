@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   1.2.1
+// @version   1.3
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#*
@@ -29,11 +29,11 @@ var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *            v1.2.1             *
+ *              v1.3             *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.2.1" };
+var SM = { isUserscript: true, version: "1.3" };
 
 
 
