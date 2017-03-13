@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   1.3
+// @version   1.4
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#*
@@ -29,15 +29,19 @@ var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *              v1.3             *
+ *              v1.4             *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.3" };
+var SM = { isUserscript: true, version: "1.4" };
 
 
 
 /* FONCTIONS DÉVELOPPEUR */
+
+SM.toArray = function(obj) {
+	return [].slice.call(obj);
+};
 
 SM.sel = function(name, parent) {
 	var context = parent || document;
@@ -53,7 +57,21 @@ SM.sel = function(name, parent) {
 	}
 };
 
+SM.selAll = function(name, parent) {
+	var context = parent || document;
+	var simple = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/.test(name);
+	if (name[0] == "." && simple) {
+		return SM.toArray(context.getElementsByClassName(name.slice(1)));
+	}
+	else {
+		return SM.toArray(context.querySelectorAll(name));
+	}
+};
+
 SM.getAttributesDict = function(el) {
+	if (el.attributes == undefined) {
+		return null;
+	}
 	var attrs = {};
 	for (var i = 0; i < el.attributes.length; i++) {
 		if (el.attributes[i].name != 'id') {
@@ -125,11 +143,13 @@ SM.copyEl = function (el, dest, bef) {
 			children[i].id = 'SM' + children[i].id;
 		}
 	}
-	if (bef) {
-		dest.insertBefore(newEl, bef);
-	}
-	else {
-		dest.appendChild(newEl);
+	if (dest) {
+		if (bef) {
+			dest.insertBefore(newEl, bef);
+		}
+		else {
+			dest.appendChild(newEl);
+		}
 	}
 	return newEl;
 };
@@ -139,10 +159,6 @@ SM.getTipContent = function(tipFunction) {
 	var tipContent = SM.sel('.tipcontent').innerHTML;
 	Main.hideTip();
 	return tipContent;
-};
-
-SM.toArray = function(obj) {
-	return [].slice.call(obj);
 };
 
 SM.reformat = function(text) {
@@ -299,11 +315,11 @@ SM.toggleAlertList = function(expand) {
 	alerts = expand.parentNode;
 	if (alerts.className == 'SMhidden_alerts') {
 		alerts.className = 'SMshown_alerts';
-		expand.textContent = SM.TEXT['hide_alert_reports'];
+		expand.textContent = SM.TEXT['hide_alert_reports'].replace('%1', expand.nextElementSibling.children.length);
 	}
 	else {
 		alerts.className = 'SMhidden_alerts';
-		expand.textContent = SM.TEXT['show_alert_reports'];
+		expand.textContent = SM.TEXT['show_alert_reports'].replace('%1', expand.nextElementSibling.children.length);
 	}
 };
 
@@ -1195,8 +1211,9 @@ SM.shipTab = function() {
 				SM.moveEl(alert.firstElementChild, alertContent.firstElementChild, alertContent.firstElementChild.firstChild); //Image
 
 				//Liste de rapports (portes cassées, incendies…) → la liste est cachée (par CSS) et on ajoute un bouton « Afficher les rapports »
-				if (alertContent.lastElementChild.nodeName == 'UL') {
-					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'], { class: 'SMalertexpand' }), alertContent, alertContent.getElementsByClassName('ul')[0]);
+				var alertContentLast = alertContent.lastElementChild;
+				if (alertContentLast.nodeName == 'UL') {
+					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'].replace('%1', alertContentLast.children.length), { class: 'SMalertexpand' }), alertContent, alertContent.getElementsByClassName('ul')[0]);
 					span.addEventListener('click', function() { SM.toggleAlertList(this); });
 					alertContent.className = 'SMhidden_alerts';
 				}
@@ -1400,7 +1417,7 @@ SM.roomTab = function() {
 			else if (status.img == 'laid') {
 				laid = true;
 			}
-			else if (hero.me == 'false' && status.img == ('mastered' || 'guardian')) {
+			else if (hero.me == 'false' && status.img == 'guardian') {
 				SM.GUARDIAN = true;
 			}
 				
@@ -1606,14 +1623,23 @@ SM.chatTab = function() {
 			var t = SM.addNewEl('textarea', popup, 'SMlogsarea');
 			t.value = cycle + "\n\n";
 
-			var logs = pr.getElementsByClassName('what_happened');
+			var logs = SM.selAll('.what_happened', pr);
 			for (var j = 0; j < logs.length; j++) {
 				var log = "";
 				var ch = logs[j].childNodes;
+				console.log(ch);
 				for (var k = 0; k < ch.length; k++) {
-					var l = ch[k].textContent.trim().replace(/\s+/g, ' ');
-					if (l) {
-						log += l + " ";
+					var child = ch[k];
+					if (child.nodeName.toLowerCase() == 'img') {
+						if (child.hasAttribute('alt')) {
+							log += child.getAttribute('alt');
+						}
+					}
+					else {
+						var l = child.textContent.trim().replace(/\s+/g, ' ');
+						if (l) {
+							log += l + " ";
+						}
 					}
 				}
 				t.value += log + "\n";
@@ -1765,7 +1791,7 @@ SM.messageEditor = function() {
 		SM.addNewEl('p', form, null, SM.TEXT['premessages-title'], { style: 'color: black; margin-top: 20px;' });
 		var premessages = SM.addNewEl('select', form, 'SMpremessages');
 		premessages.addEventListener('change', SM.buildMessage);
-		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms'];
+		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms', 'shareSM'];
 		for (var i = 0; i < options.length; i++) {
 			SM.addNewEl('option', premessages, null, SM.TEXT['premessages-' + options[i]], { value: options[i] });
 		}
@@ -2122,6 +2148,12 @@ SM.buildMessage = function() {
 			wallpost.value = message;
 			SM.refreshPreview();
 			break;
+
+		case 'shareSM':
+			message += SM.TEXT['preformat-shareSM'];
+			wallpost.value = message;
+			SM.refreshPreview();
+			break;
 	}
 
 	SM.sel('#SMpremessages').selectedIndex = 0;
@@ -2234,8 +2266,8 @@ SM.locale = function(cb) {
 			SM.TEXT['AP-shoot'] = "point(s) de tir";
 			SM.TEXT['AP-cook'] = "point(s) de cuisine";
 			SM.TEXT['AP-klix'] = "Klix";
-			SM.TEXT['hide_alert_reports'] = "Cacher les rapports";
-			SM.TEXT['show_alert_reports'] = "Lister les rapports";
+			SM.TEXT['hide_alert_reports'] = "Cacher les rapports (%1)";
+			SM.TEXT['show_alert_reports'] = "Lister les rapports (%1)";
 			SM.TEXT['unvalid_move'] = "Cette porte est cassée, vous ne pouvez pas vous déplacer !";
 			SM.TEXT['move_confirm'] = "Voulez-vous vous déplacer vers "; //Espace
 			SM.TEXT['move_alert'] = "ATTENTION : il semble très probable que vous ne puissiez pas vous déplacer actuellement. Si c'est le cas, un message d'erreur peut s'afficher. Continuer ?";
@@ -2316,6 +2348,7 @@ SM.locale = function(cb) {
 			SM.TEXT['premessages-projects'] = "Lister les projets";
 			SM.TEXT['premessages-planet'] = "Partager une planète";
 			SM.TEXT['premessages-comms'] = "Partager l'avancement des communications";
+			SM.TEXT['premessages-shareSM'] = "Partager le script Small(Mush)";
 			SM.TEXT['message-overwrite_retrieve'] = "Attention : ceci va effacer votre message actuel. Continuer ?";
 			SM.TEXT['message-overwrite_build'] = "Voulez-vous effacer le message actuel (Annuler) ou écrire à sa suite (OK) ?";
 			SM.TEXT['preformat-researches-nomodule'] = "Veuillez accéder au laboratoire pour activer cette fonction.";
@@ -2357,6 +2390,7 @@ SM.locale = function(cb) {
 			SM.TEXT['preformat-comms-basesdesc'] = "Voulez-vous inclure la description des bases décodées ?";
 			SM.TEXT['preformat-comms-basesnone'] = "aucune";
 			SM.TEXT['preformat-comms-neron'] = "**Version de NERON :** "; //Espace
+			SM.TEXT['preformat-shareSM'] = "Vous pouvez jouer à Mush sur mobile avec le script **Small(Mush)**. Pour l'installer, allez sur ce topic :\n//http://twd.io/e/M6TL0w/0//";
 			SM.TEXT['abbr-day'] = "J";
 			SM.TEXT['astrotab-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>AstroPad</h1><p>Permet de charger le script AstroPad.</p></div></div></div></div>";
 			SM.TEXT['astrotab-warning'] = "En l'absence d'un gestionnaire de scripts, pour que l'AstroPad fonctionne, Small(Mush) doit faire passer par un serveur relais les données envoyées et reçues. Rien n'est enregistré. Si vous acceptez ceci, vous pouvez charger l'AstroPad manuellement via le bouton ci-dessous.";
@@ -2405,8 +2439,8 @@ SM.locale = function(cb) {
 			SM.TEXT['AP-shoot'] = "shooting point(s)";
 			SM.TEXT['AP-cook'] = "cooking point(s)";
 			SM.TEXT['AP-klix'] = "Klix";
-			SM.TEXT['hide_alert_reports'] = "Hide reports";
-			SM.TEXT['show_alert_reports'] = "Show reports";
+			SM.TEXT['hide_alert_reports'] = "Hide reports (%1)";
+			SM.TEXT['show_alert_reports'] = "Show reports (%1)";
 			SM.TEXT['unvalid_move'] = "This door is broken, you cannot move there!";
 			SM.TEXT['move_confirm'] = "Do you want to move to ";
 			SM.TEXT['move_alert'] = "WARNING: it seems that you are not able to move at the moment. An error may display. Continue?";
@@ -2487,6 +2521,7 @@ SM.locale = function(cb) {
 			SM.TEXT['premessages-projects'] = "Share projects";
 			SM.TEXT['premessages-planet'] = "Share a planet";
 			SM.TEXT['premessages-comms'] = "Share communications progress";
+			SM.TEXT['premessages-shareSM'] = "Share the Small(Mush) script";
 			SM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
 			SM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
 			SM.TEXT['preformat-researches-nomodule'] = "Please access the laboratory in order to activate research preformatting.";
@@ -2528,6 +2563,7 @@ SM.locale = function(cb) {
 			SM.TEXT['preformat-comms-basesdesc'] = "Do you want to share decoded bases descriptions?";
 			SM.TEXT['preformat-comms-basesnone'] = "none";
 			SM.TEXT['preformat-comms-neron'] = "**NERON version:** ";
+			SM.TEXT['preformat-shareSM'] = "You can play Mush on your phone using the **Small(Mush)** script. Explanations on this topic:\n//http://twd.io/e/r6LN0w/0//";
 			SM.TEXT['abbr-day'] = "D";
 			SM.TEXT['astrotab-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>AstroPad</h1><p>This tab loads the AstroPad script.</p></div></div></div></div>";
 			SM.TEXT['astrotab-warning'] = "Without any script manager, in order for the AstroPad to work, Small(Mush) needs to send its data through a relay server. Worry not, nothing is on tape. If you accept this, you may load the AstroPad manually by clicking the button below.";
@@ -2576,8 +2612,8 @@ SM.locale = function(cb) {
 			SM.TEXT['AP-shoot'] = "punto(s) de disparo";
 			SM.TEXT['AP-cook'] = "punto(s) de cocina";
 			SM.TEXT['AP-klix'] = "Klix";
-			SM.TEXT['hide_alert_reports'] = "Esconder reportes";
-			SM.TEXT['show_alert_reports'] = "Mostrar reportes";
+			SM.TEXT['hide_alert_reports'] = "Esconder reportes (%1)";
+			SM.TEXT['show_alert_reports'] = "Mostrar reportes (%1)";
 			SM.TEXT['unvalid_move'] = "¡Esta puerta está rota, no puedes desplazarte allí!";
 			SM.TEXT['move_confirm'] = "¿Quieres desplazarte a ";
 			SM.TEXT['move_alert'] = "CUIDADO : Parece que no puedes desplazarte en este momento. Puede que haya un error. ¿Continuar?";
@@ -2658,6 +2694,7 @@ SM.locale = function(cb) {
 			SM.TEXT['premessages-projects'] = "Compartir proyectos";
 			SM.TEXT['premessages-planet'] = "Compartir un planeta";
 			SM.TEXT['premessages-comms'] = "Compartir progreso de las comunicaciones";
+			SM.TEXT['premessages-shareSM'] = "Compartir el script Small(Mush)";
 			SM.TEXT['message-overwrite_retrieve'] = "Atención: Esto sobreescribirá tu mensaje actual. ¿Continuar?";
 			SM.TEXT['message-overwrite_build'] = "¿Deseas sobreescribir tu mensaje actual (Cancelar) o añadir esto al final (OK)?";
 			SM.TEXT['preformat-researches-nomodule'] = "Por favor accede al laboratorio antes de reformatear la compartición de investigaciones.";
@@ -2699,6 +2736,7 @@ SM.locale = function(cb) {
 			SM.TEXT['preformat-comms-basesdesc'] = "¿Deseas compartir las descripciones y nombres de las bases rebeldes?";
 			SM.TEXT['preformat-comms-basesnone'] = "ninguno";
 			SM.TEXT['preformat-comms-neron'] = "**Versión de NERON:** ";
+			SM.TEXT['preformat-shareSM'] = "Podéis jugar a Mush sobre móvil con el script **Small(Mush)**. Para instalarlo, vaya sobre este topic:\n//http://twd.io/e/xx7S0w/0//";
 			SM.TEXT['abbr-day'] = "D";
 			SM.TEXT['astrotab-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>AstroPad</h1><p>Permite cargar el script AstroPad.</p></div></div></div></div>";
 			SM.TEXT['astrotab-warning'] = "En ausencia de un gestor de scripts, para que AstroPad funcione, Small (Mush) debe pasar por un servidor de retransmisión los datos enviados y recibidos. Nada es registrado. Si usted acepta esto, usted puede cargar AstroPad manualmente vía el botón más abajo.";
@@ -2791,14 +2829,15 @@ SM.init = function() {
 };
 
 
+exportFunction(SM.toArray, unsafeSM, { defineAs: "toArray" });
 exportFunction(SM.sel, unsafeSM, { defineAs: "sel" });
+exportFunction(SM.selAll, unsafeSM, { defineAs: "selAll" });
 exportFunction(SM.getAttributesDict, unsafeSM, { defineAs: "getAttributesDict" });
 exportFunction(SM.addNewEl, unsafeSM, { defineAs: "addNewEl" });
 exportFunction(SM.addButton, unsafeSM, { defineAs: "addButton" });
 exportFunction(SM.moveEl, unsafeSM, { defineAs: "moveEl" });
 exportFunction(SM.copyEl, unsafeSM, { defineAs: "copyEl" });
 exportFunction(SM.getTipContent, unsafeSM, { defineAs: "getTipContent" });
-exportFunction(SM.toArray, unsafeSM, { defineAs: "toArray" });
 exportFunction(SM.reformat, unsafeSM, { defineAs: "reformat" });
 exportFunction(SM.generateMinimap, unsafeSM, { defineAs: "generateMinimap" });
 exportFunction(SM.changeTab, unsafeSM, { defineAs: "changeTab" });

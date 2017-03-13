@@ -1149,8 +1149,8 @@ input.tid_withFriends {
 }
 
 .SMmapfire {
-	fill: #F00;
-	background-color: #F00;
+	fill: #900;
+	background-color: #900;
 	padding: 0 2px;
 	stroke: #000;
 	stroke-width: 1;
@@ -1167,11 +1167,11 @@ input.tid_withFriends {
 }
 
 .SMmapalertd {
-	color: #F60;
+	color: #F90;
 }
 
 .SMmapalerte {
-	color: #0AF;
+	color: #09F;
 }
 
 #SMmapselected {

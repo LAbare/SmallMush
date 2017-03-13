@@ -2,11 +2,11 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *              v1.3             *
+ *              v1.4             *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.3" };
+var SM = { isUserscript: true, version: "1.4" };
 
 //BEGIN PYTHON REPLACE GREASEMONKEY VARIABLES
 SM.isUserscript = false;
@@ -30,6 +30,10 @@ function GM_xmlhttpRequest(object) {
 
 /* FONCTIONS DÉVELOPPEUR */
 
+SM.toArray = function(obj) {
+	return [].slice.call(obj);
+};
+
 SM.sel = function(name, parent) {
 	var context = parent || document;
 	var simple = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/.test(name);
@@ -44,7 +48,21 @@ SM.sel = function(name, parent) {
 	}
 };
 
+SM.selAll = function(name, parent) {
+	var context = parent || document;
+	var simple = /^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/.test(name);
+	if (name[0] == "." && simple) {
+		return SM.toArray(context.getElementsByClassName(name.slice(1)));
+	}
+	else {
+		return SM.toArray(context.querySelectorAll(name));
+	}
+};
+
 SM.getAttributesDict = function(el) {
+	if (el.attributes == undefined) {
+		return null;
+	}
 	var attrs = {};
 	for (var i = 0; i < el.attributes.length; i++) {
 		if (el.attributes[i].name != 'id') {
@@ -116,11 +134,13 @@ SM.copyEl = function (el, dest, bef) {
 			children[i].id = 'SM' + children[i].id;
 		}
 	}
-	if (bef) {
-		dest.insertBefore(newEl, bef);
-	}
-	else {
-		dest.appendChild(newEl);
+	if (dest) {
+		if (bef) {
+			dest.insertBefore(newEl, bef);
+		}
+		else {
+			dest.appendChild(newEl);
+		}
 	}
 	return newEl;
 };
@@ -130,10 +150,6 @@ SM.getTipContent = function(tipFunction) {
 	var tipContent = SM.sel('.tipcontent').innerHTML;
 	Main.hideTip();
 	return tipContent;
-};
-
-SM.toArray = function(obj) {
-	return [].slice.call(obj);
 };
 
 SM.reformat = function(text) {
@@ -290,11 +306,11 @@ SM.toggleAlertList = function(expand) {
 	alerts = expand.parentNode;
 	if (alerts.className == 'SMhidden_alerts') {
 		alerts.className = 'SMshown_alerts';
-		expand.textContent = SM.TEXT['hide_alert_reports'];
+		expand.textContent = SM.TEXT['hide_alert_reports'].replace('%1', expand.nextElementSibling.children.length);
 	}
 	else {
 		alerts.className = 'SMhidden_alerts';
-		expand.textContent = SM.TEXT['show_alert_reports'];
+		expand.textContent = SM.TEXT['show_alert_reports'].replace('%1', expand.nextElementSibling.children.length);
 	}
 };
 
@@ -1186,8 +1202,9 @@ SM.shipTab = function() {
 				SM.moveEl(alert.firstElementChild, alertContent.firstElementChild, alertContent.firstElementChild.firstChild); //Image
 
 				//Liste de rapports (portes cassées, incendies…) → la liste est cachée (par CSS) et on ajoute un bouton « Afficher les rapports »
-				if (alertContent.lastElementChild.nodeName == 'UL') {
-					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'], { class: 'SMalertexpand' }), alertContent, alertContent.getElementsByClassName('ul')[0]);
+				var alertContentLast = alertContent.lastElementChild;
+				if (alertContentLast.nodeName == 'UL') {
+					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'].replace('%1', alertContentLast.children.length), { class: 'SMalertexpand' }), alertContent, alertContent.getElementsByClassName('ul')[0]);
 					span.addEventListener('click', function() { SM.toggleAlertList(this); });
 					alertContent.className = 'SMhidden_alerts';
 				}
@@ -1391,7 +1408,7 @@ SM.roomTab = function() {
 			else if (status.img == 'laid') {
 				laid = true;
 			}
-			else if (hero.me == 'false' && status.img == ('mastered' || 'guardian')) {
+			else if (hero.me == 'false' && status.img == 'guardian') {
 				SM.GUARDIAN = true;
 			}
 				
@@ -1597,14 +1614,23 @@ SM.chatTab = function() {
 			var t = SM.addNewEl('textarea', popup, 'SMlogsarea');
 			t.value = cycle + "\n\n";
 
-			var logs = pr.getElementsByClassName('what_happened');
+			var logs = SM.selAll('.what_happened', pr);
 			for (var j = 0; j < logs.length; j++) {
 				var log = "";
 				var ch = logs[j].childNodes;
+				console.log(ch);
 				for (var k = 0; k < ch.length; k++) {
-					var l = ch[k].textContent.trim().replace(/\s+/g, ' ');
-					if (l) {
-						log += l + " ";
+					var child = ch[k];
+					if (child.nodeName.toLowerCase() == 'img') {
+						if (child.hasAttribute('alt')) {
+							log += child.getAttribute('alt');
+						}
+					}
+					else {
+						var l = child.textContent.trim().replace(/\s+/g, ' ');
+						if (l) {
+							log += l + " ";
+						}
 					}
 				}
 				t.value += log + "\n";
@@ -1756,7 +1782,7 @@ SM.messageEditor = function() {
 		SM.addNewEl('p', form, null, SM.TEXT['premessages-title'], { style: 'color: black; margin-top: 20px;' });
 		var premessages = SM.addNewEl('select', form, 'SMpremessages');
 		premessages.addEventListener('change', SM.buildMessage);
-		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms'];
+		var options = ['NULL', 'inventory', 'researches', 'researches++', 'projects', 'planet', 'comms', 'shareSM'];
 		for (var i = 0; i < options.length; i++) {
 			SM.addNewEl('option', premessages, null, SM.TEXT['premessages-' + options[i]], { value: options[i] });
 		}
@@ -2110,6 +2136,12 @@ SM.buildMessage = function() {
 			//MÀJ NERON
 			message += SM.TEXT['preformat-comms-neron'] + SM.sel('#trackerModule .neron h2').textContent.match(/[0-9]+\.[0-9]+/)[0] + "\n\n\n\n//Over.//";
 
+			wallpost.value = message;
+			SM.refreshPreview();
+			break;
+
+		case 'shareSM':
+			message += SM.TEXT['preformat-shareSM'];
 			wallpost.value = message;
 			SM.refreshPreview();
 			break;
