@@ -2,7 +2,7 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *             v1.4.1            *
+ *             v1.4.2            *
 \**—————————————————————————————**/
 
 
@@ -1202,9 +1202,8 @@ SM.shipTab = function() {
 				SM.moveEl(alert.firstElementChild, alertContent.firstElementChild, alertContent.firstElementChild.firstChild); //Image
 
 				//Liste de rapports (portes cassées, incendies…) → la liste est cachée (par CSS) et on ajoute un bouton « Afficher les rapports »
-				var alertContentLast = alertContent.lastElementChild;
-				if (alertContentLast.nodeName == 'UL') {
-					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'].replace('%1', alertContentLast.children.length), { class: 'SMalertexpand' }), alertContent, alertContent.getElementsByClassName('ul')[0]);
+				if (alertContent.lastElementChild.nodeName == 'UL') {
+					var span = SM.moveEl(SM.addNewEl('span', null, null, SM.TEXT['show_alert_reports'].replace('%1', alertContent.getElementsByTagName('ul').length), { class: 'SMalertexpand' }), alertContent, alertContent.getElementsByTagName('ul')[0]);
 					span.addEventListener('click', function() { SM.toggleAlertList(this); });
 					alertContent.className = 'SMhidden_alerts';
 				}
