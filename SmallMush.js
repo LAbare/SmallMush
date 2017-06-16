@@ -2,7 +2,7 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *              v1.4             *
+ *             v1.4.1            *
 \**—————————————————————————————**/
 
 
@@ -306,11 +306,11 @@ SM.toggleAlertList = function(expand) {
 	alerts = expand.parentNode;
 	if (alerts.className == 'SMhidden_alerts') {
 		alerts.className = 'SMshown_alerts';
-		expand.textContent = SM.TEXT['hide_alert_reports'].replace('%1', expand.nextElementSibling.children.length);
+		expand.textContent = SM.TEXT['hide_alert_reports'].replace('%1', alerts.getElementsByTagName('ul').length);
 	}
 	else {
 		alerts.className = 'SMhidden_alerts';
-		expand.textContent = SM.TEXT['show_alert_reports'].replace('%1', expand.nextElementSibling.children.length);
+		expand.textContent = SM.TEXT['show_alert_reports'].replace('%1', alerts.getElementsByTagName('ul').length);
 	}
 };
 

@@ -171,6 +171,7 @@ table.genstatus td.spaceshipstatus ul li {
 }
 
 #SMtabs li {
+	position: relative;
 	display: inline-block;
 	vertical-align: top;
 	box-sizing: border-box;
@@ -183,13 +184,16 @@ table.genstatus td.spaceshipstatus ul li {
 	background-color: #66C;
 	font-size: 9pt;
 	font-variant: small-caps;
-	text-align: center;
+	text-align: right;
+	padding-right: 2px;
 	cursor: pointer;
 }
 
 #SMtabs img {
 	margin: 3px 2px;
-	float: left;
+	position: absolute;
+	top: 1px;
+	left: 1px;
 }
 
 #SMtabs li * {
