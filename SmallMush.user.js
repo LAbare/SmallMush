@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   1.4.2
+// @version   1.4.3
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#*
@@ -29,11 +29,11 @@ var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *             v1.4.2            *
+ *             v1.4.3            *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.4" };
+var SM = { isUserscript: true, version: "1.4.3" };
 
 
 
@@ -1237,9 +1237,12 @@ SM.shipTab = function() {
 	var expoblock = SM.sel('.exploring');
 	if (expoblock) {
 		var firstalert = SM.sel('.alarm_bg li:first-of-type');
-		SM.copyEl(expoblock, ship_tab, SM.sel('#SMalerts')).style.display = 'block'; //Copie, et pas déplacement, sinon le bloc est perdu au rechargement interne
+		var expocopy = SM.copyEl(expoblock, ship_tab, SM.sel('#SMalerts')).style.display = 'block'; //Copie, et pas déplacement, sinon le bloc est perdu au rechargement interne
 		expoblock.style.display = 'none';
 		SM.moveEl(SM.addNewEl('img', null, null, null, { src: '/img/icons/ui/planet.png' }), firstalert, firstalert.firstChild); //Icône planète = expédition en cours
+		if (SM.sel('#exploration')) {
+			expocopy.addEventListener('click', function() { SM.changeTab("room_col"); });
+		}
 	}
 
 	// PROJETS, RECHERCHES & PILGRED //
@@ -1631,16 +1634,17 @@ SM.chatTab = function() {
 					var child = ch[k];
 					if (child.nodeName.toLowerCase() == 'img') {
 						if (child.hasAttribute('alt')) {
-							log += child.getAttribute('alt');
+							log += child.getAttribute('alt') + " ";
 						}
 					}
 					else {
-						var l = child.textContent.trim().replace(/\s+/g, ' ');
+						var l = child.textContent.trim().replace(/\s+/g, " ");
 						if (l) {
 							log += l + " ";
 						}
 					}
 				}
+				log = log.replace(" .", ".");
 				t.value += log + "\n";
 			}
 		});
