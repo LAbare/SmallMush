@@ -2,11 +2,11 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *             v1.4.3            *
+ *             v1.4.5            *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.4.3" };
+var SM = { isUserscript: true, version: "1.4.5" };
 
 //BEGIN PYTHON REPLACE GREASEMONKEY VARIABLES
 SM.isUserscript = false;
@@ -1355,6 +1355,9 @@ SM.roomTab = function() {
 				if (!eqname) {
 					eqname = SM.TEXT[item.iid + '_unknown'];
 				}
+				break;
+			case 'PASIPHAE_COMMAND': //Le Pasiphae a un item Pasiphae dans son inventaire…
+				eqname = item.name;
 				break;
 
 			default: //Autres équipements (sans aucune particularité) et items
