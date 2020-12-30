@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 source = open('SmallMush.js', 'r')
 FR = open('SMlang-fr.js', 'r')
 EN = open('SMlang-en.js', 'r')
@@ -17,25 +19,31 @@ source.seek(0)
 dest.write('// ==UserScript==\n')
 dest.write('// @name      Small(Mush)\n')
 dest.write('// @version   ' + input('Version : ') + '\n')
-dest.write('// @icon      http://labare.github.io/SmallMush/ico.png\n')
-dest.write('// @match     http://mush.vg/\n')
-dest.write('// @match     http://mush.vg/#*\n')
-dest.write('// @match     http://mush.vg/?*\n')
-dest.write('// @match     http://mush.vg/play*\n')
-dest.write('// @match     http://mush.twinoid.com/\n')
-dest.write('// @match     http://mush.twinoid.com/#*\n')
-dest.write('// @match     http://mush.twinoid.com/?*\n')
-dest.write('// @match     http://mush.twinoid.com/play*\n')
-dest.write('// @match     http://mush.twinoid.es/\n')
-dest.write('// @match     http://mush.twinoid.es/#*\n')
-dest.write('// @match     http://mush.twinoid.es/?*\n')
-dest.write('// @match     http://mush.twinoid.es/play*\n')
-dest.write('// @run-at    document-start\n')
-dest.write('// @grant     unsafeWindow\n')
-dest.write('// @author    LAbare\n')
-dest.write('// ==/UserScript==\n\n\n')
-dest.write('var Main = unsafeWindow.Main || Main;\n\n')
-dest.write('var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });\n\n\n')
+dest.write("""
+// @icon      http://labare.github.io/SmallMush/ico.png
+// @match     http://mush.vg/
+// @match     http://mush.vg/#*
+// @match     http://mush.vg/?*
+// @match     http://mush.vg/play*
+// @match     http://mush.twinoid.com/
+// @match     http://mush.twinoid.com/#*
+// @match     http://mush.twinoid.com/?*
+// @match     http://mush.twinoid.com/play*
+// @match     http://mush.twinoid.es/
+// @match     http://mush.twinoid.es/#*
+// @match     http://mush.twinoid.es/?*
+// @match     http://mush.twinoid.es/play*
+// @run-at    document-start
+// @grant     unsafeWindow
+// @author    LAbare
+// ==/UserScript==
+
+
+var Main; // Defined later once the DOM is loaded
+var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });
+
+
+""")
 
 for line in source:
 	if line[0:3] == 'SM.' and '= function' in line:
@@ -66,10 +74,10 @@ for line in source:
 
 	elif 'END PYTHON REPLACE LOCALE' in line:
 		replacingLocale = False
-	
+
 	elif 'BEGIN PYTHON REPLACE GREASEMONKEY VARIABLES' in line:
 		replacingGreasemonkey = True
-	
+
 	elif 'END PYTHON REPLACE GREASEMONKEY VARIABLES' in line:
 		replacingGreasemonkey = False
 

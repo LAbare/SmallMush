@@ -2,11 +2,11 @@
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *             v1.4.5            *
+ *              v1.5             *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.4.5" };
+var SM = { isUserscript: true, version: "1.5" };
 
 //BEGIN PYTHON REPLACE GREASEMONKEY VARIABLES
 SM.isUserscript = false;
@@ -16,7 +16,7 @@ function createObjectIn(a, b) { return {}; }
 function exportFunction(a, b, c) { return true; }
 function GM_xmlhttpRequest(object) {
 	var req = new XMLHttpRequest();
-	req.open('POST', 'http://labare.alwaysdata.net/SmallMush/astropadRelay.php', true); //Headers nécessaires pour les CORS
+	req.open('POST', 'http://labare.net/SmallMush/astropadRelay.php', true); //Headers nécessaires pour les CORS
 	req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	req.onreadystatechange = function() {
 		if (req.readyState == 4 && req.status == 200) {
@@ -252,6 +252,8 @@ SM.generateMinimap = function() {
 };
 
 SM.changeTab = function(newtab) {
+	if (SM.settings['islarge'] && newtab == 'chat_col') return;
+
 	//#room_col n'est pas caché pour que le jeu Flash fonctionne, juste hors-champ ; on fait glisser #content, la barre d'info et le logo/les liens/les onglets
 	var char = SM.sel('#char_col');
 	if (newtab == 'room_col') {
@@ -268,6 +270,9 @@ SM.changeTab = function(newtab) {
 		SM.sel('#room_tab').style.display = 'none';
 		SM.sel('#chat_col').style.display = 'none';
 		SM.sel('#' + newtab).style.display = 'block';
+		if (SM.settings['islarge']) {
+			SM.sel('#chat_col').style.display = 'table-cell';
+		}
 	}
 	SM.sel('.SMtabselected').className = '';
 	SM.sel('#SMtab-' + newtab).className = 'SMtabselected';
@@ -362,12 +367,12 @@ SM.changeRoom = function(el) {
 				return false;
 			}
 		}
-		
+
 		if (SM.GUARDIAN && !confirm(SM.TEXT['move_guardian'])) {
 			return false;
 		}
-		
-		if (SM.parameters['confirm_action']) {
+
+		if (SM.settings['confirm_action']) {
 			if (!confirm(SM.TEXT['move_confirm'] + roomname + SM.INTERR)) {
 				return false;
 			}
@@ -552,7 +557,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1/5: équipment
 				? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour obtenir la compétence de l'apprenton dans le nom
 				: item.getAttribute('data-name') //Pour avoir les attributs (charges, objet lourd, caché…) dans les autres cas
 			);
-			if (SM.parameters['food_desc'] && item.getAttribute('data-id') == 'CONSUMABLE') {
+			if (SM.settings['food_desc'] && item.getAttribute('data-id') == 'CONSUMABLE') {
 				SM.sel('#SMitemdesc').innerHTML = SM.reformat(item.getAttribute('data-desc'));
 			}
 			else {
@@ -574,7 +579,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1/5: équipment
 
 SM.changeChatTab = function(el) {
 	var tab = el.getAttribute('data-tab');
-	
+
 	var tabs = SM.sel('#cdTabsChat').children;
 	for (var i = 0; i < tabs.length; i++) {
 		tabs[i].className = tabs[i].className.replace(/tabon/, 'taboff');
@@ -588,7 +593,9 @@ SM.changeChatTab = function(el) {
 
 	if (tab) { //Onglet original
 		Main.selChat(parseInt(tab));
+		// Il faut forcer une hauteur sinon c’est tout étendu
 		SM.sel('#chatBlock').style.height = '80vh';
+
 		//On force le cookie curChat pour les cas de message dans le mauvais canal (rare et intestable…)
 		var date = new Date();
 		date.setTime(date.getTime() + 31536000000);
@@ -615,7 +622,7 @@ SM.changeChatTab = function(el) {
 				area.style.display = 'none';
 			}
 		}
-		
+
 		el.className = 'tab tabon';
 		var scriptTab = el.getAttribute('data-script-tab');
 		if (scriptTab) {
@@ -639,7 +646,7 @@ SM.changeChatTab = function(el) {
 SM.SMexitModule = function(func) {
 	var button = SM.sel(".cdExitModuleButton");
 	//Confirmation d'action
-	if (SM.parameters['confirm_action']) {
+	if (SM.settings['confirm_action']) {
 		if (!confirm(SM.TEXT['confirm_action'] + button.textContent.trim() + "'" + SM.INTERR)) {
 			return false;
 		}
@@ -709,7 +716,7 @@ SM.beforeAction = function(el) {
 	}
 
 	//Confirmation d'action
-	if (SM.parameters['confirm_action']) {
+	if (SM.settings['confirm_action']) {
 		var name = SM.reformat(el.innerHTML.trim().replace(/<\/?span>/g, ''));
 		name = name.replace(/<img(?:.*)\/(.*)\.png(?:.*)\/?>/g, function (s, p) {
 			var pa;
@@ -868,101 +875,132 @@ SM.itemRight = function() {
 
 /* FONCTIONS RELATIVES AUX PARAMÈTRES SMALL(MUSH) */
 
-SM.getSMParameters = function() {
-	SM.parameters = {};
-	SM.parameters['first_time'] = true;
-	SM.parameters['confirm_action'] = false;
-	SM.parameters['food_desc'] = true;
-	SM.parameters['forced_locale'] = false;
-	SM.parameters['locale'] = '0'; //0: non forcé ; 1: FR ; 2: EN ; 3: ES
+SM.getSMsettings = function() {
+	SM.settings = {};
+	SM.settings['first_time'] = true;
+	SM.settings['confirm_action'] = false;
+	SM.settings['food_desc'] = true;
+	SM.settings['forced_locale'] = false;
+	SM.settings['locale'] = '0'; //0: non forcé ; 1: FR ; 2: EN ; 3: ES
+	SM.settings['islarge'] = false;
 
-	var offset = document.cookie.search('SMparams');
+	var offset = document.cookie.search('SMsettings');
 	if (offset != -1) {
-		var parameters = document.cookie.slice(offset + 9);
-		SM.parameters['first_time'] = ((parameters[0] == '1') ? true : false);
-		SM.parameters['confirm_action'] = ((parameters[1] == '1') ? true : false);
-		SM.parameters['food_desc'] = ((parameters[2] == '1') ? true : false);
-		SM.parameters['forced_locale'] = ((['1', '2', '3'].indexOf(parameters[3]) != -1) ? true : false);
-		if (SM.parameters['forced_locale']) {
-			SM.parameters['locale'] = parseInt(parameters[3]);
+		var settings = document.cookie.slice(offset + "SMsettings=".length);
+		SM.settings['first_time'] = ((settings[0] == '1') ? true : false);
+		SM.settings['confirm_action'] = ((settings[1] == '1') ? true : false);
+		SM.settings['food_desc'] = ((settings[2] == '1') ? true : false);
+		SM.settings['forced_locale'] = ((['1', '2', '3'].indexOf(settings[3]) != -1) ? true : false);
+		SM.settings['islarge'] = ((settings[4] == '1') ? true : false);
+		if (SM.settings['forced_locale']) {
+			SM.settings['locale'] = parseInt(settings[3]);
 		}
 		else {
-			SM.parameters['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
-			if (SM.parameters['locale'] == -1) {
-				SM.parameters['locale'] = 2; //Défaut : anglais
+			SM.settings['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
+			if (SM.settings['locale'] == -1) {
+				SM.settings['locale'] = 2; //Défaut : anglais
 			}
 		}
 	}
 	else {
-		SM.setSMParameters();
+		SM.setSMsettings();
 	}
 };
 
 
-SM.setSMParameters = function() {
-	var parameters = '0'; //paramètre 'first-time' passant forcément à false
-	parameters += ((SM.parameters['confirm_action']) ? 1 : 0);
-	parameters += ((SM.parameters['food_desc']) ? 1 : 0);
-	parameters += ((SM.parameters['forced_locale']) ? SM.parameters['locale'] : 0);
+SM.setSMsettings = function() {
+	var settings = '0'; //paramètre 'first-time' passant forcément à false
+	settings += ((SM.settings['confirm_action']) ? 1 : 0);
+	settings += ((SM.settings['food_desc']) ? 1 : 0);
+	settings += ((SM.settings['forced_locale']) ? SM.settings['locale'] : 0);
+	settings += ((SM.settings['islarge']) ? 1 : 0);
 
 	var date = new Date();
 	date.setTime(date.getTime() + 31536000000);
-	document.cookie = 'SMparams=' + parameters + '; expires=' + date.toGMTString() + '; path=/';
+	document.cookie = 'SMsettings=' + settings + '; expires=' + date.toGMTString() + '; path=/';
+
+	let chat_col = SM.sel('#chat_col'); // Not created yet at beginning of script, hence the IFs
+	let SMbottom = SM.sel('#SMbottom');
+	if (SM.settings['islarge']) {
+		document.body.setAttribute('data-islarge', 'true');
+		if (chat_col) {
+			chat_col.style.display = 'table-cell';
+		}
+		if (SMbottom) {
+			SMbottom.setAttribute('src', SM.src + "ui/bottom_large.png");
+			SM.sel('#maincontainer').style.background = 'transparent url("' + SM.src + 'ui/background_large.png")';
+		}
+	}
+	else {
+		document.body.setAttribute('data-islarge', 'false');
+		if (SMbottom) {
+			SMbottom.setAttribute('src', SM.src + "ui/bottom.png");
+			SM.sel('#maincontainer').style.background = 'transparent url("' + SM.src + 'ui/background.png")';
+		}
+		if ( // Could be written better but IDGAF
+			chat_col
+			&& SM.sel('.SMtabselected')
+			&& SM.sel('.SMtabselected').getAttribute('id') != 'SMtab-chat_col'
+		) {
+			chat_col.style.display = 'none';
+		}
+	}
 };
 
 
-SM.buildParamsMenu = function() {
+SM.buildSettingsMenu = function() {
 	var popup = SM.sel('#SMpopup');
 	popup.innerHTML = '';
 
 	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
-	SM.addNewEl('h4', popup, null, SM.TEXT['SMparams-title'] + "  <img src='" + SM.src + "ico.png' />");
+	SM.addNewEl('h4', popup, null, SM.TEXT['SMsettings-title'] + "  <img src='" + SM.src + "ico.png' />");
 
-	var parameters = ['confirm_action', 'food_desc', 'forced_locale'];
-	for (i in parameters) {
-		var parameter = parameters[i];
+	var settings = ['islarge', 'confirm_action', 'food_desc', 'forced_locale'];
+	for (i in settings) {
+		var parameter = settings[i];
 		var div = SM.addNewEl('div', popup);
-		if (SM.parameters[parameter]) {
+		if (SM.settings[parameter]) {
 			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', checked: 'true', 'data-parameter': parameter })
 			input.addEventListener('change', function() {
 				var p = this.getAttribute('data-parameter');
-				SM.parameters[p] = false;
+				SM.settings[p] = false;
 				if (p == 'forced_locale') {
-					SM.parameters['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
+					// Use .locale() to load language
+					SM.settings['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
 					SM.locale(function() {
-						SM.setSMParameters();
-						SM.buildParamsMenu();
+						SM.setSMsettings();
+						SM.buildSettingsMenu();
 					});
 				}
 				else {
-					SM.setSMParameters();
-					SM.buildParamsMenu();
+					SM.setSMsettings();
+					SM.buildSettingsMenu();
 				}
 			});
 		}
 		else {
 			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', 'data-parameter': parameter })
 			input.addEventListener('change', function() {
-				SM.parameters[this.getAttribute('data-parameter')] = true;
-				SM.setSMParameters();
-				SM.buildParamsMenu();
+				SM.settings[this.getAttribute('data-parameter')] = true;
+				SM.setSMsettings();
+				SM.buildSettingsMenu();
 			});
 		}
-		SM.addNewEl('label', div, null, SM.TEXT['SMparams-' + parameter], { 'for': 'SMlabel_' + parameter });
-		div.className = 'SMparamsdiv';
+		SM.addNewEl('label', div, null, SM.TEXT['SMsettings-' + parameter], { 'for': 'SMlabel_' + parameter });
+		div.className = 'SMsettingsdiv';
 	}
 
-	if (SM.parameters['forced_locale']) {
-		SM.addNewEl('p', popup, null, SM.TEXT['SMparams-lang_title']);
+	if (SM.settings['forced_locale']) {
+		SM.addNewEl('p', popup, null, SM.TEXT['SMsettings-lang_title']);
 		var langs = SM.addNewEl('select', popup, 'SMlangselect');
-		SM.addNewEl('option', langs, null, "Français", ((SM.parameters['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
-		SM.addNewEl('option', langs, null, "English", ((SM.parameters['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
-		SM.addNewEl('option', langs, null, "Español", ((SM.parameters['locale'] == 3) ? { value: '3', selected: 'selected' } : { value: '3' }));
+		SM.addNewEl('option', langs, null, "Français", ((SM.settings['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
+		SM.addNewEl('option', langs, null, "English", ((SM.settings['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
+		SM.addNewEl('option', langs, null, "Español", ((SM.settings['locale'] == 3) ? { value: '3', selected: 'selected' } : { value: '3' }));
 		langs.addEventListener('change', function() {
-			SM.parameters['locale'] = this.value;
+			SM.settings['locale'] = this.value;
 			SM.locale(function() {
-				SM.setSMParameters();
-				SM.buildParamsMenu();
+				SM.setSMsettings();
+				SM.buildSettingsMenu();
 			});
 		});
 	}
@@ -976,19 +1014,19 @@ SM.buildParamsMenu = function() {
 		SM.sel('#roomActionList2').style.opacity = 1;
 	});
 
-	SM.addButton(popup, SM.TEXT['SMparams-chat_unload'], { 'data-tip': SM.TEXT['SMparams-chat_unload_tip'] }).addEventListener('click', function() {
+	SM.addButton(popup, SM.TEXT['SMsettings-chat_unload'], { 'data-tip': SM.TEXT['SMsettings-chat_unload_tip'] }).addEventListener('click', function() {
 		var date = new Date();
 		date.setTime(new Date().getTime() - 42000);
 		document.cookie = 'sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
 		document.cookie = 'mush_sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
-		SM.sel('#SMloadscreen').innerHTML = SM.TEXT['SMparams-chat_unload_reload'];
+		SM.sel('#SMloadscreen').innerHTML = SM.TEXT['SMsettings-chat_unload_reload'];
 		SM.sel('#SMloadscreen').style.display = 'block';
 		window.setTimeout(function() { window.location = '/'; }, 3000);
 	});
 
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams-credits'], { class: 'SMnospace' });
-	SM.addNewEl('p', popup, null, "<a href='http://github.com/LAbare/SmallMush/releases' target='_blank'>v" + SM.version + "</a>", { class: 'SMnospace' });
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams-credits_beta'], { style: 'font-size: 0.7em; margin-bottom: 0;' });
+	SM.addNewEl('p', popup, null, SM.TEXT['SMsettings-credits'], { class: 'SMnospace' });
+	SM.addNewEl('p', popup, null, "<a href='http://github.com/LAbare/SmallMush' target='_blank'>v" + SM.version + "</a>", { class: 'SMnospace' });
+	SM.addNewEl('p', popup, null, SM.TEXT['SMsettings-credits_beta'], { style: 'font-size: 0.7em; margin-bottom: 0;' });
 };
 
 
@@ -1008,7 +1046,16 @@ SM.initCss = function() {
 	}
 	SM.addNewEl('meta', document.head, null, null, { name: 'viewport', content: 'width=424px, initial-scale=' + zoom });
 
-	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: SM.src + "ui/bottom.png" }), document.body, SM.sel('#tid_bar_down'));
+	let bottom_src = SM.src + 'ui/bottom.png';
+	if (SM.settings['islarge']) {
+		// UI image adjustments
+		bottom_src = SM.src + 'ui/bottom_large.png';
+		SM.sel('#maincontainer').style.background = 'transparent url("' + SM.src + 'ui/background_large.png")';
+	}
+	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: bottom_src }), document.body, SM.sel('#tid_bar_down'));
+
+	// I don’t know what I messed up but this is now necessary here?
+	SM.sel('#chatBlock').style.height = '80vh';
 
 	//Styles CSS basés sur des URLs
 	var relcss = SM.addNewEl('style', document.head);
@@ -1057,8 +1104,8 @@ SM.initMenubar = function() {
 	SM.copyEl(SM.sel('.cdShipCasio'), bar); //Horloge
 
 	//Paramètres Small(Mush)
-	SM.addNewEl('img', bar, 'SMparams', null, { src: SM.src + "ui/params.png" }).addEventListener('click', function() {
-		SM.buildParamsMenu();
+	SM.addNewEl('img', bar, 'SMsettings', null, { src: SM.src + "ui/params.png" }).addEventListener('click', function() {
+		SM.buildSettingsMenu();
 		SM.sel('#SMpopup').style.display = 'block';
 	});
 
@@ -1097,7 +1144,7 @@ SM.initMenubar = function() {
 	});
 
 	SM.addNewEl('div', document.body, 'SMpopup').style.display = 'none';
-	SM.buildParamsMenu();
+	SM.buildSettingsMenu();
 };
 
 
@@ -1416,7 +1463,7 @@ SM.roomTab = function() {
 			else if (hero.me == 'false' && status.img == 'guardian') {
 				SM.GUARDIAN = true;
 			}
-				
+
 			if (hero.me == 'true' && status.img == 'moduling') {
 				SM.ME_MODULING = true;
 			}
@@ -1454,7 +1501,7 @@ SM.roomTab = function() {
 		var catli = SM.addNewEl('li', herolist, null, "<img src='" + SM.src + "ui/chars/schrodinger.png' />", { class: 'SMheroblock', 'data-serial': cat.next().serial });
 		catli.addEventListener('click', function() { SM.displayRoomActions(3, this.getAttribute('data-serial')); });
 	}
-	
+
 	// DRONES (GRAPHIQUE) //
 	var drones = Main.items.iterator();
 	while (drones.hasNext()) {
@@ -1623,7 +1670,6 @@ SM.chatTab = function() {
 			for (var j = 0; j < logs.length; j++) {
 				var log = "";
 				var ch = logs[j].childNodes;
-				console.log(ch);
 				for (var k = 0; k < ch.length; k++) {
 					var child = ch[k];
 					if (child.nodeName.toLowerCase() == 'img') {
@@ -1658,7 +1704,7 @@ SM.gameTab = function() {
 			SM.reInit();
 		});
 	});
-	
+
 	//Bouton Coller pour annonces et missions
 	var writeblock = SM.sel('#msg_write_form'); //Formulaire d'annonce / ordre
 	if (writeblock) {
@@ -2224,7 +2270,7 @@ SM.astroTab = function() {
 
 SM.locale = function(cb) {
 	SM.TEXT = {};
-	var lang = parseInt(SM.parameters['locale']);
+	var lang = parseInt(SM.settings['locale']);
 	if (typeof cb == 'undefined') {
 		var cb = function() { return true; };
 	}
@@ -2283,8 +2329,14 @@ SM.init = function() {
 	SM.changeActionFunctions();
 	window.setTimeout(function() { SM.sel('#content').scrollLeft = 0; }, 500);
 
+	// Computer Mode
+	if (SM.settings['islarge']) {
+		document.body.setAttribute('data-islarge', 'true');
+		SM.sel('#chat_col').style.display = 'table-cell';
+	}
+
 	//Première fois : alerte à lire
-	if (SM.parameters['first_time']) {
+	if (SM.settings['first_time']) {
 		var SMdialog = SM.copyEl(SM.sel('#dialog'), document.body);
 		SMdialog.style.display = 'block';
 		SMdialog.style.left = '12px !important';
@@ -2294,8 +2346,8 @@ SM.init = function() {
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning-2']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning-3']);
 		SM.sel('#SMdialog_ok').addEventListener('click', function() { document.body.removeChild(SM.sel('#SMdialog')); });
-		SM.parameters['first_time'] = false;
-		SM.setSMParameters();
+		SM.settings['first_time'] = false;
+		SM.setSMsettings();
 	}
 
 	//Le rechargement interne de la page écrase les modifications et ajouts, donc on fait une vérification régulière
@@ -2312,7 +2364,7 @@ SM.init = function() {
 
 /* VARIABLES */
 
-//SM.src = "http://labare.alwaysdata.net/SmallMush/";
+//SM.src = "http://labare.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 
 SM.smileys = [['pa_pm', 'pslots.png'], ['pa', 'pa_slot1.png'], ['pm', 'pa_slot2.png'], ['pv|hp', 'lp.png'], ['xp', 'xp.png'], ['xpbig', 'xpbig.png'], ['pa_heal', 'pa_heal.png'], ['asocial', 'status/unsociable.png'], ['disabled', 'status/disabled.png'], ['hungry', 'status/hungry.png'], ['hurt', 'status/hurt.png'], ['ill', 'status/disease.png'], ['psy_disease', 'status/psy_disease.png'], ['commander', 'title_01.png'], ['admin_neron', 'title_02.png'], ['resp_comm', 'title_03.png'], ['alert', 'alert.png'], ['com', 'comm.png'], ['door', 'door.png'], ['plant_youngling', 'plant_youngling.png'], ['plant_thirsty', 'plant_thirsty.png'], ['plant_dry', 'plant_dry.png'], ['plant_diseased', 'plant_diseased.png'], ['bin', 'bin.png'], ['next', 'pageright.png'], ['ship_triumph', 'daedalus_triumph.png'], ['pa_comp', 'pa_comp.png'], ['pa_cook', 'pa_cook.png'], ['pa_core', 'pa_core.png'], ['pa_eng|eng', 'pa_eng.png'], ['pa_garden', 'pa_garden.png'], ['pa_pilgred', 'pa_pilgred.png'], ['pa_shoot', 'pa_shoot.png'], ['laid', 'status/laid.png'], ['mastered', 'status/mastered.png'], ['mush', 'mush.png'], ['stink', 'status/stinky.png'], ['fuel', 'fuel.png'], ['o2', 'o2.png'], ['moral|pmo', 'moral.png'], ['eat', 'sat.png'], ['pills', 'demoralized2.png'], ['dead', 'dead.png'], ['hunter', 'hunter.png'], ['fire', 'fire.png'], ['more', 'more.png'], ['less', 'less.png'], ['chut', 'discrete.png'], ['talk', 'talk.gif'], ['talky', 'talkie.png'], ['cat', 'cat.png'], ['time', 'casio.png'], ['tip', 'tip.png'], ['triumph', 'triumph.png']];
@@ -2325,12 +2377,30 @@ SM.GRAVITY = true;
 
 
 /** INITIALISATION **/
+var SMpageload;
 var startInterval = setInterval(function() { //Pour ne pas empêcher le chargement de l'userscript sur les connexions lentes/data à la traîne
+	if (document.body) {
+		SMpageload = document.createElement('div');
+		SMpageload.setAttribute('id', 'SMpageload');
+		SMpageload.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> Small(Mush)…";
+		SMpageload.style.position = 'fixed';
+		SMpageload.style.top = '40px';
+		SMpageload.style.left = '10px';
+		SMpageload.style.border = '2px solid white';
+		SMpageload.style.backgroundColor = 'black';
+		SMpageload.style.padding = '4px';
+		document.body.appendChild(SMpageload);
+	}
+
 	if (SM.sel('#cdBottomBlock')) {
 		clearInterval(startInterval);
+		document.body.removeChild(SMpageload);
+		if (SM.isUserscript) {
+			Main = unsafeWindow.Main || Main;
+		}
 		if (!SM.sel('#SMbar')) {
-			SM.getSMParameters();
+			SM.getSMsettings();
 			SM.locale(SM.init);
 		}
 	}
-}, 200);
+}, 500);

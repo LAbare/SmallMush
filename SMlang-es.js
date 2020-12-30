@@ -1,3 +1,4 @@
+SM.TEXT['SMpageload'] = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> Small(Mush) is loading…";
 SM.TEXT['stats_perso'] = "<b>Tus estadísticas actuales:</b> ";
 SM.TEXT['AP-general'] = "punto(s) de acción";
 SM.TEXT['AP-eng'] = "punto(s) de reparación";
@@ -19,16 +20,17 @@ SM.TEXT['current_room'] = "Estás en : ";
 SM.TEXT['move_button'] = "Desplazare a :";
 SM.TEXT['broken_door'] = " — ROTA";
 SM.TEXT['door_to'] = "Puerta → ";
-SM.TEXT['SMparams-title'] = "Parámetros de Small(Mush)";
-SM.TEXT['SMparams-confirm_action'] = "Confirmar acciones";
-SM.TEXT['SMparams-food_desc'] = "Mostrar efectos de consumibles bajo el inventario";
-SM.TEXT['SMparams-forced_locale'] = "Forzar cambio de idioma de Small(Mush)";
-SM.TEXT['SMparams-lang_title'] = "Idioma de Small(Mush):";
-SM.TEXT['SMparams-chat_unload'] = "Limpiar el chat";
-SM.TEXT['SMparams-chat_unload_tip'] = "Limpiar el chat<br />El canal principal tardará menos en recargar";
-SM.TEXT['SMparams-chat_unload_reload'] = "¡Recarga forzosa inminente!<br />(Lo siento por eso...)<br />Por favor ajusten sus cinturones.";
-SM.TEXT['SMparams-credits'] = "Script desarrollado por <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <a onclick='SM.showLicense();'>Licencia MIT</a>.<br />Traducción al Español por <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> y <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (¡de nada!).";
-SM.TEXT['SMparams-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Gracias al equipo de la beta:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (¿sí, por qué no?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rechazado por todos, inclusive Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> el pony apocalíptico<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, perdido en el espacio<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a>, la dulzura aterradora<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la mas beta de los probadores<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, programador del limpiador del chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la callada<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, quien volvió al SS justo en el medio de la beta";
+SM.TEXT['SMsettings-title'] = "Parámetros de Small(Mush)";
+SM.TEXT['SMsettings-islarge'] = "Computer Mode";
+SM.TEXT['SMsettings-confirm_action'] = "Confirmar acciones";
+SM.TEXT['SMsettings-food_desc'] = "Mostrar efectos de consumibles bajo el inventario";
+SM.TEXT['SMsettings-forced_locale'] = "Forzar cambio de idioma de Small(Mush)";
+SM.TEXT['SMsettings-lang_title'] = "Idioma de Small(Mush):";
+SM.TEXT['SMsettings-chat_unload'] = "Limpiar el chat";
+SM.TEXT['SMsettings-chat_unload_tip'] = "Limpiar el chat<br />El canal principal tardará menos en recargar";
+SM.TEXT['SMsettings-chat_unload_reload'] = "¡Recarga forzosa inminente!<br />(Lo siento por eso...)<br />Por favor ajusten sus cinturones.";
+SM.TEXT['SMsettings-credits'] = "Script desarrollado por <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <a onclick='SM.showLicense();'>Licencia MIT</a>.<br />Traducción al Español por <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> y <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (¡de nada!).";
+SM.TEXT['SMsettings-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Gracias al equipo de la beta:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (¿sí, por qué no?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rechazado por todos, inclusive Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> el pony apocalíptico<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, perdido en el espacio<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a>, la dulzura aterradora<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la mas beta de los probadores<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, programador del limpiador del chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la callada<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, quien volvió al SS justo en el medio de la beta";
 SM.TEXT['confirm_action'] = "¿Quieres '";
 SM.TEXT['tabs-char'] = "Yo";
 SM.TEXT['tabs-ship'] = "Nave";
@@ -162,7 +164,42 @@ SM.TEXT['chat_bug-p'] = "canal privado #";
 SM.TEXT['chat_bug-'] = "DESCONOCIDO";
 SM.TEXT['copy_logs-button'] = "Registros en formato de texto";
 
-SM.loadingTexts = ["Experimento gato/microondas en progreso…", "Recargando blasters con mermelada de tallos de cereza…", "Máquina expendedora fuera de servicio…", "Resolviendo el Kubo…", "Coseando cosas…", "Reiniciado el hada de los anuncios vocodificados…", "Localizando drones…", "Mapeando Terminatransmisores PILGRED…", "Evitando colisión gaviota/reactor…", "Vacíando tanques de oxígeno…", "Decapitando inactivos…", "Disparando a gallinas intergalácticas…", "Buscando a Wally…", "Fortificando el Jardín hidropónico…", "Sobrecalentando PDAs…", "Limpiando los dientes del minino…", "Recolectando hongos…", "Destruyendo raciones no-perecibles. No tenías hambre, ¿verdad?…", "Incrementando nivel de irritación de los Mankarog…", "Caballo a Plataforma Alpha. Jaque mate.", "Colocando salchicas en el reactor lateral izquierdo…", "Reciclador de heces activado. Cocinando raciones…", "¡Piedra, papel, circuito! Neron pierde. Simulador de gravedad (aún no) roto.", "Regaderas automáticas: concurso de camisetas mojadas iniciando.", "Escasez de café: validando uso de cápsulas de cianuro…", "Permitiendo acceso completo a la nave al dron asesino... [HAX]", "Proyectando hologramas de esparragos en el comedor… [Listo]", "Acelerando el ritmo de pedaleo de los Ositos Pilgredositos…", "Error cuatrocientos-gato…", "Apagando luces. Comenzando análisis del código…", "Desempolvando capsulas de Cryoletárgo…", "Yendo AL bare…", "Schrödinger murió. Causa: El electrón tomó la ruta B…", "Ah, nada como el olor a carne neuro-críptica nueva…", "Inactivos detectados en el pasillo. Compra de bolas de bolos SNC…"];
+SM.loadingTexts = ["Experimento gato/microondas en progreso…",
+	"Recargando blasters con mermelada de tallos de cereza…",
+	"Máquina expendedora fuera de servicio…",
+	"Resolviendo el Kubo…",
+	"Coseando cosas…",
+	"Reiniciado el hada de los anuncios vocodificados…",
+	"Localizando drones…",
+	"Mapeando Terminatransmisores PILGRED…",
+	"Evitando colisión gaviota/reactor…",
+	"Vacíando tanques de oxígeno…",
+	"Decapitando inactivos…",
+	"Disparando a gallinas intergalácticas…",
+	"Buscando a Wally…",
+	"Fortificando el Jardín hidropónico…",
+	"Sobrecalentando PDAs…",
+	"Limpiando los dientes del minino…",
+	"Recolectando hongos…",
+	"Destruyendo raciones no-perecibles. No tenías hambre, ¿verdad?…",
+	"Incrementando nivel de irritación de los Mankarog…",
+	"Caballo a Plataforma Alpha. Jaque mate.",
+	"Colocando salchicas en el reactor lateral izquierdo…",
+	"Reciclador de heces activado. Cocinando raciones…",
+	"¡Piedra, papel, circuito! Neron pierde. Simulador de gravedad (aún no) roto.",
+	"Regaderas automáticas: concurso de camisetas mojadas iniciando.",
+	"Escasez de café: validando uso de cápsulas de cianuro…",
+	"Permitiendo acceso completo a la nave al dron asesino... [HAX]",
+	"Proyectando hologramas de esparragos en el comedor… [Listo]",
+	"Acelerando el ritmo de pedaleo de los Ositos Pilgredositos…",
+	"Error cuatrocientos-gato…",
+	"Apagando luces. Comenzando análisis del código…",
+	"Desempolvando capsulas de Cryoletárgo…",
+	"Yendo AL bare…",
+	"Schrödinger murió. Causa: El electrón tomó la ruta B…",
+	"Ah, nada como el olor a carne neuro-críptica nueva…",
+	"Inactivos detectados en el pasillo. Compra de bolas de bolos SNC…",
+];
 
 SM.localerooms = ['Puente de mando', 'Plataforma Alpha', 'Plataforma Beta', 'Plataforma Alpha 2', 'Nexus', 'Enfermería', 'Laboratorio', 'Comedor', 'Jardín Hidropónico', 'Sala de motores', 'Cañón Alpha delantero', 'Cañón Alpha central', 'Cañón Alpha trasero', 'Cañón Beta delantero', 'Cañón Beta central', 'Cañón Beta trasero', 'Patrullero Longane', 'Patrullero Jujube', 'Patrullero Tamarindo', 'Patrullero Sócrates', 'Patrullero Epicuro', 'Patrullero Platón', 'Patrullero Wallis', 'Pasiphae', 'Pasillo delantero', 'Pasillo central', 'Pasillo trasero', 'Planeta', 'Icarus', 'Dormitorio Alpha', 'Dormitorio Beta', 'Almacén delantero', 'Almacén Alpha central', 'Almacén Alpha trasero', 'Almacén Beta central', 'Almacén Beta trasero', 'Espacio infinito', 'El limbo'];
 

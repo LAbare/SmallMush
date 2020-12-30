@@ -200,7 +200,7 @@ table.genstatus td.spaceshipstatus ul li {
 	vertical-align: middle;
 }
 
-.SMtabselected {
+#SMtabs li:hover, .SMtabselected {
 	background-color: #6AC !important;
 }
 
@@ -289,7 +289,7 @@ p.SMtabwarning {
 }
 
 /* Paramètres Small(Mush) */
-#SMparams { /* Bouton Paramètres */
+#SMsettings { /* Bouton Paramètres */
 	position: absolute;
 	top: 5px;
 	right: 5px;
@@ -297,9 +297,10 @@ p.SMtabwarning {
 	border: 2px solid white;
 	border-radius: 2px;
 	background-color: navy;
+	cursor: pointer;
 }
 
-.SMparamsdiv { /* Paramètre */
+.SMsettingsdiv { /* Paramètre */
 	margin-bottom: 25px;
 	margin-left: 25px;
 }
@@ -1190,4 +1191,51 @@ input.tid_withFriends {
 
 .SMlegend {
 	margin-left: 15px;
+}
+
+
+#SMpageload {
+	position: fixed;
+	top: 40px;
+	left: 10px;
+	border: 2px solid white;
+	background-color: black;
+	padding: 4px;
+}
+
+
+
+/* Ajustements pour version ordi */
+
+body[data-islarge="true"] #SMloadscreen {
+	font-size: 1.2em;
+}
+
+body[data-islarge="true"] #content {
+	width: 848px;
+}
+
+body[data-islarge="true"] .genstatus {
+	float: none;
+	margin: auto;
+}
+
+body[data-islarge="true"] .genstatus tr, body[data-islarge="true"] .genstatus td {
+	display: inline-block;
+}
+
+body[data-islarge="true"] #SMtabs li {
+	width: 141px;
+	width: calc(848px / 6);
+	font-size: 12pt;
+	text-align: center;
+}
+
+body[data-islarge="true"] #cdMainChat, body[data-islarge="true"] #cdTabsChat {
+	width: 424px !important;
+}
+
+body[data-islarge="true"] #SMtab-chat_col {
+	opacity: 0.3;
+	cursor: not-allowed;
 }

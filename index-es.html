@@ -30,13 +30,14 @@
 	<script>function showImage(el) { el.firstElementChild.style.display = 'none'; el.lastElementChild.style.display = 'inline'; }</script>
 	<h1><img src='ico.png' /> Small(Mush) <img src='ico.png' /></h1>
 
-	<p style='text-align: center;'><a href='#Use'>Uso</a> — <a href='#Install'>Instalación</a> — <a href='#Flash'>Instalar Flash</a> — <a href='#FAQ'>Preguntas Frecuentes</a></p>
-	
+	<p style='text-align: center;'><a href='#Use'>Uso</a> — <a href='#Install'>Instalación</a> — <a href='#FAQ'>Preguntas Frecuentes</a></p>
+
 	<p>Todas las imágenes en esta página tienen texto en inglés (perdón), pero no va a prevenir que entiendas lo que muestran.</p>
 
 	<h2>Presentación</h2>
 	<p class='text'>Small(Mush) es un <em>script para Mush</em> programado por <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>, gracias al cual puedes jugar tu juego favorito en tu teléfono. Sí, así es. Además, si tu teléfono no soporta Flash, el script puede emular las funciones básicas del juego. ¿Genial, no?</p>
-	<p class='text'>No obstante, tengo que resaltar que esto es un <b>script</b>. <b>No una app</b> para teléfonos de Mush. Fue programado por un mero jugador sin que Motion Twin tuviera nada que ver; la interfaz del juego tuvo que ser ligeramente modificada, y todos los bugs que se encuentren con este script activado deben ser reportados a mí, no en los foros. La funcionalidad principal de este script es adecuar el juego al tamaño de la pantalla de tu teléfono. Si tienes alguna pregunta, sugerencia, chocolate o amor que quieras darme <a href='http://twinoid.com/user/8412516' target='_blank'>envíame un mensaje</a>. No hablo Español, envíame mensajes solo en Inglés o Francés.</p>
+
+	<!--<p class='text'>No obstante, tengo que resaltar que esto es un <b>script</b>. <b>No una app</b> para teléfonos de Mush. Fue programado por un mero jugador sin que Motion Twin tuviera nada que ver; la interfaz del juego tuvo que ser ligeramente modificada, y todos los bugs que se encuentren con este script activado deben ser reportados a mí, no en los foros. La funcionalidad principal de este script es adecuar el juego al tamaño de la pantalla de tu teléfono. Si tienes alguna pregunta, sugerencia, chocolate o amor que quieras darme <a href='http://twinoid.com/user/8412516' target='_blank'>envíame un mensaje</a>. No hablo Español, envíame mensajes solo en Inglés o Francés.</p>-->
 
 
 	<h2 id='Use'>Uso</h2>
@@ -48,21 +49,19 @@
 
 
 	<h2 id='Install'>Instalación y activación</h2>
-	<p>Este script se activará automáticamente en <b class='outdated'>Firefox</b> y <b>Dolphin Browser</b> en Android; para otros navegadores, como Chrome, tendrás que activarlo manualmente cada vez que juegues Mush.</p>
+	<h3>En una computadora</h3>
+	<ol>
+		<li>Instalar la extension Greasemonkey (<a href='https://addons.mozilla.org/es/firefox/addon/greasemonkey' target='_blank'>Firefox</a>) o Tampermonkey (<a href='https://addons.mozilla.org/es/firefox/addon/tampermonkey' target='_blank'>Firefox</a>, <a href='https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=es' target='_blank'>Chrome</a>).</li>
+		<li>Instalar el script haciendo click en <a href='SmallMush.user.js'>este link</a>, e «Instalar» en la pestaña que se va a abrir.</li>
+	</ol>
 
-	<h3 class='outdated'>Firefox (Android)</h3>
-	<p><ol>
-		<li class='outdated'>Instalar <a href='FirefoxAddon/smallmush.xpi'>la extensión Small(Mush)</a>.</li>
-	</ol></p>
-	<p>¡Extensión Firefox obsoleta, perdón!</p>
-
-	<h3>Dolphin Browser (Android)</h3>
+	<h3>En un teléfono: Dolphin Browser (Android)</h3>
 	<p><ol>
 		<li>Instalar la extension <a href='market://details?id=net.tampermonkey.dolphin'>Tampermonkey for Dolphin Browser</a> desde la Play Store.</li>
 		<li>Instalar el script haciendo click en <a href='SmallMush.user.js'>este link</a>, e «Instalar» en la pestaña que se va a abrir.</li>
 	</ol></p>
 
-	<h3>Otros navegadores (activación manual)</h3>
+	<h3>En un teléfono: Otros navegadores (activación manual)</h3>
 	<p><b>Atención:</b> puede que esto no funcione dependiendo del navegador que uses.</p>
 	<p><ol>
 		<li>Hacer click en <a href='#javascript:(function(){var%20MM=document.createElement(%22script%22);MM.src=%22http://labare.github.io/SmallMush/SmallMush.js%22;document.head.appendChild(MM);})();'>este link</a>, y añadir la página a tus favoritos. (Solo el URL cambia, no la página.)</li>
@@ -70,37 +69,27 @@
 		<li>En el campo de URL borra la almohadilla/numeral (#) y todo lo que esté antes de ella, debería quedar algo de código empezando con <i>javascript:</i>.</li>
 		<li>Una vez que estés en Mush y la página esté cargada, escribe «Small(Mush)» en la barra de dirección de tu navegador. Debería mostrar algunos links, entre ellos el favorito; haz click en él. Abrir el favorito desde la carpeta de favoritos no funciona siempre.</li>
 	</ol></p>
-	<p>Esto funciona correctamente con Chrome y <a href='http://m.youtube.com/watch?v=Jm1j9-lfw98' target='_blank'>con Safari</a>.</p>
+	<p>Esto funciona correctamente con Firefox y Chrome, y <a href='https://m.youtube.com/watch?v=Jm1j9-lfw98' target='_blank'>con Safari</a>.</p>
 	<div class='img' onclick='showImage(this);'>
 		<p>Click para mostrar la imagen: ejemplo usando Chrome.</p>
 		<img src='img/Manuel.jpg' alt="Ejemplo usando Chrome" />
 	</div>
 
 
-	<h2 id='Flash'>Instalar Flash</h2>
-	<p>Aunque no es necesario para que este script funcione, Flash permitirá que experimentes Mush por completo.</p>
-	<p><b>Requerido:</b> Android 4.3 como máximo. (Ver Ajustes → Acerca del dispositivo → Versión de Android)</p>
-	<ol>
-		<li>Permite la instalación de apps de terceros (Ajustes → Seguridad → Marcar Orígenes Desconocidos → Aceptar el aviso de Android);</li>
-		<li>Instalar <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.115.81/install_flash_player_ics.apk">Flash Player for Android 4.0+</a> o <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.111.73/install_flash_player_pre_ics.apk">Flash Player for Android 2 and 3</a> (una vez la descarga termine, abre tu barra de notificacionesy dale al archive para instalarlo directamente);</li>
-		<li>Usa un navegador compatible con Flash (Firefox, Dolphin Browser).</li>
-	</ol>
-
-
 	<h2 id='FAQ'>Preguntas Frecuentes</h2>
 	<h3 class='question'>¿Qué y cómo emulas el juego?</h3>
 	<p class='answer text'>El scipt encuentra en la página toda la información usada por el juego original que puede procesar (no todo). En la pestaña Sala, puedes ver los equipamientos, los miembros de la tripulación presentes y los objetos en la estantería, puedes moverte, y deberías ser avisado si la sala está incendiándose. Sin Flash, <b>no</b> puedes ver el minimapa de Flash, tampoco ver o apuntar a los hunters desde las torretas o patrulleros. En los patrulleros, aún puedes diparar al azar desde el equipamiento <b>Puesto de pilotaje</b>, lo que puede ayudar.</p>
-	<h3 class='question'>¿Por qué no acercas más el juego?</h3>
-	<p class='answer text'>No puedo mejorarlo, pero debería ser lo suficiente para jugar.</p>
+
 	<h3 class='question'>¿Cómo sé si una cámara me vigila?</h3>
 	<p class='answer text'>Una cámara instalada es considerada como un equipamiento por el juego, la verás en la pestaña de Sala.</p>
+
 	<h3 class='question'>¿Es normal que el juego tarde mucho en recargar?</h3>
 	<p class='answer text'>Desafortunadamente sí, un teléfono tiene un menor poder de procesamiento, y por lo tanto es más lento que una PC. El chat es la parte más pesada, así que puedes deshacerte de algunos viejos favoritos o reabrir canales privados cuando se vuelven viejos para acelerarlo un poco. También puedes limpiar el chat desde los parámetros del script para aligerar el canal principal, de la misma forma que lo hace el script Ctrl+W.</p>
+
 	<h3 class='question'>¿Jugar Mush en mi teléfono consume mucha data?</h3>
 	<p class='answer text'>A menos que borres tu caché todo el tiempo, no realmente. El script solo cambia cuando lo actualizo, así que tu teléfono solo descargara la página en sí: 50 a 100 KB, recargada con cada acción. Esto es entre dos veces menos que una búsqueda de Google.</p>
-	<h3 class='question'>¿Cómo están organizadas las camas de los dormitorios?</h3>
-	<p class='answer text'>Desde el frente al final de la nave. (El osito de peluche está en la cama 1 del dormitorio Beta :P) Las imágenes de las camas en la pestaña Sala son escogidas al azar, porque no puedo saber quien está en cuál cama.</p>
+
 	<h3 class='question'>¡Uno de mis mensajes fue publicado en el canal equivocado!</h3>
-	<p class='answer text'>Este bug no es causado por el script (me ocurrió una vez mucho antes de empezar este proyecto), es un problema que puede (raramente) ocurrir con navegadores para teléfonos. Traté de arreglarlo, pero es muy difícil de reproducir. Aún así, recientemente añadí la función de mostrar en que canal el juego cree estás, pero no sé si eso va a ayudar.</p>
+	<p class='answer text'>Este bug no es causado por el script, es un problema que puede (raramente) ocurrir con navegadores para teléfonos. Traté de arreglarlo, pero es muy difícil de reproducir. Aún así, añadí la función de mostrar en que canal el juego cree estás, pero no sé si eso va a ayudar.</p>
 </body>
 </html>

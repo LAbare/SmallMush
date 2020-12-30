@@ -1,3 +1,4 @@
+SM.TEXT['SMpageload'] = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> Préparation de Small(Mush)…";
 SM.TEXT['stats_perso'] = "<b>Vos statistiques actuelles :</b> "; //Espace
 SM.TEXT['AP-general'] = "point(s) d'action";
 SM.TEXT['AP-eng'] = "point(s) de mécanique";
@@ -19,16 +20,17 @@ SM.TEXT['current_room'] = "Vous êtes en : "; //Espace
 SM.TEXT['move_button'] = "Se déplacer vers :";
 SM.TEXT['broken_door'] = " — CASSÉE";
 SM.TEXT['door_to'] = "Porte → "; //Espace
-SM.TEXT['SMparams-title'] = "Paramètres de Small(Mush)";
-SM.TEXT['SMparams-confirm_action'] = "Confirmer les actions";
-SM.TEXT['SMparams-food_desc'] = "Afficher les effets des aliments sous l'inventaire";
-SM.TEXT['SMparams-forced_locale'] = "Forcer la langue de Small(Mush)";
-SM.TEXT['SMparams-lang_title'] = "Langue de l'interface Small(Mush) :";
-SM.TEXT['SMparams-chat_unload'] = "Délester le chat";
-SM.TEXT['SMparams-chat_unload_tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Délester le chat</h1>Le canal général sera rendu plus léger au rechargement.</div></div></div></div>";
-SM.TEXT['SMparams-chat_unload_reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
-SM.TEXT['SMparams-credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span><br />Traduction espagnole par <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> et <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (merci !).";
-SM.TEXT['SMparams-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Merci aux beta-testeurs :<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (bah ouais)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, que personne ni Windows n'aime<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> le poney de l'Apocalypse<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a> le paumé de l'espace<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> l'Augure stalker<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la plus beta des testeuses<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, dont vient le délestage du chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la pas bavarde<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, rentré sur Sol en plein milieu de la beta";
+SM.TEXT['SMsettings-title'] = "Paramètres de Small(Mush)";
+SM.TEXT['SMsettings-islarge'] = "Mode Ordi (interface plus large, chat toujours affiché)";
+SM.TEXT['SMsettings-confirm_action'] = "Confirmer les actions";
+SM.TEXT['SMsettings-food_desc'] = "Afficher les effets des aliments sous l'inventaire";
+SM.TEXT['SMsettings-forced_locale'] = "Forcer la langue de Small(Mush)";
+SM.TEXT['SMsettings-lang_title'] = "Langue de l'interface Small(Mush) :";
+SM.TEXT['SMsettings-chat_unload'] = "Délester le chat";
+SM.TEXT['SMsettings-chat_unload_tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Délester le chat</h1>Le canal général sera rendu plus léger au rechargement.</div></div></div></div>";
+SM.TEXT['SMsettings-chat_unload_reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
+SM.TEXT['SMsettings-credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span><br />Traduction espagnole par <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> et <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (merci !).";
+SM.TEXT['SMsettings-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Merci aux beta-testeurs :<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (bah ouais)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, que personne ni Windows n'aime<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> le poney de l'Apocalypse<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a> le paumé de l'espace<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> l'Augure stalker<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la plus beta des testeuses<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, dont vient le délestage du chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la pas bavarde<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, rentré sur Sol en plein milieu de la beta";
 SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 SM.TEXT['tabs-char'] = "Perso";
 SM.TEXT['tabs-ship'] = "Général";
@@ -162,7 +164,60 @@ SM.TEXT['chat_bug-p'] = "privé n°";
 SM.TEXT['chat_bug-'] = "INCONNU";
 SM.TEXT['copy_logs-button'] = "Logs au format texte";
 
-SM.loadingTexts = ["Photobirouillage des métaplores…", "Tir aux poulets intergalactiques…", "Test chat / micro-ondes…", "Recherche de Charlie…", "Tournée d'arrays de bool…", "Rechargement des blasters à la confiture de queues de cerises…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du lutin des annonces vocodées…", "Localisation des drones…", "Schématisation des Terminatransistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Surchauffe des modules persos…", "Détartrage du matou…", "Cueillette des champignons…", "Accélération du rythme de pédalage des bisounours dans le PILGRED…", "Destruction des denrées non périssables. Vous aviez faim ?…", "Augmentation de l’énervement des Mankarogs…", "Localisation du chat en cours… Erreur.", "Cavalier en Baie Alpha. Échec et mat.", "Nodocéphales détectés. Élimination par capillotractage enclenchée…", "[HAAaXX] Grésillage du trolley. Cause probable : remplissage du gazomètre.", "Extinction des consignes lumineuses. Décodage en cours…", "Dépoussiérage des capsules de cryogénisation…", "Mise en place des saucisses sur le moteur latéral gauche…", "Recycleur d'excréments enclenché. Préparation des rations en cours…", "Boulon, feuille, ciseau ! NERON perdu. Simulateur de gravité intact.", "Arroseurs automatiques : soirée mousse enclenchée.", "Rupture de café : remplacement par dosettes de cyanure validé.", "Drone armé terminé. Libération en cours… [HAX]", "Apparition d'asperges holographiques dans le réfectoire… [Terminé]", "Rotation de LAbare de navigation…", "Schrödinger mort. Cause : l'électron a pris le mauvais chemin…", "Aaah, la bonne odeur de viande neuro-cryptique…", "Tu manqueras à personne, sale mutant !", "Inactifs détectés en couloir. Achat de boules de bowling SNC…", "Vous autres humains êtes la peste, et nous, nous en sommes l'antidote.", "Regardez au-delà de la chair, à travers la gélatine de ces yeux de veau mort… et voyez votre ennemi.", "Éradication des mites en pull-over…", "Quelqu'un a pensé à s'occuper de la litière de Schrödinger ?…", "3170. Pour échapper au Mush, un vaisseau à propulsion supraluminique équipé d'un labo haute technologie cryogénise ses passagers et voyage jusqu'aux confins de la galaxie. Mais on peut pas changer de chanson sur le jukebox.", "Alerte : détection confirmée de vaisseaux hostiles. Ce n'est peut-être pas le meilleur moment pour demander du thé.", "Les calculs sont pas bons, Kuan Ti !", "Faites bouillir à la casserole<br />Une bonne tranche de girolle<br />Oh, je vais en mettre deux…!", "Tu quoque mi fungi !"];
+SM.loadingTexts = [
+	"Photobirouillage des métaplores…",
+	"Tir aux poulets intergalactiques…",
+	"Test chat / micro-ondes…",
+	"Recherche de Charlie…",
+	"Tournée d’arrays de bool…",
+	"Rechargement des blasters à la confiture de queues de cerises…",
+	"Détraquage du distributeur…",
+	"Résolution du Mad Kube…",
+	"Bidulage des trucs…",
+	"Redémarrage du lutin des annonces vocodées…",
+	"Localisation des drones…",
+	"Schématisation des Terminatransistors du PILGRED…",
+	"Manœuvre d’évitement mouette / réacteur…",
+	"Vidange des réservoirs d’oxygène…",
+	"Décapitation des inactifs…",
+	"Fortification du Jardin hydroponique…",
+	"Surchauffe des modules persos…",
+	"Détartrage du matou…",
+	"Cueillette des champignons…",
+	"Accélération du rythme de pédalage des bisounours dans le PILGRED…",
+	"Destruction des denrées non périssables. Vous aviez faim ?…",
+	"Augmentation du taux d’énervement des Mankarogs…",
+	"Localisation du chat en cours… Erreur.",
+	"Cavalier en Baie Alpha. Échec et mat.",
+	"Nodocéphales détectés. Élimination par capillotractage enclenchée…",
+	"[HAAaXX] Grésillage du trolley. Cause probable : remplissage du gazomètre.",
+	"Extinction des consignes lumineuses. Décodage en cours…",
+	"Dépoussiérage des capsules de cryogénisation…",
+	"Mise en place des saucisses sur le moteur latéral gauche…",
+	"Recycleur d’excréments enclenché. Préparation des rations en cours…",
+	"Boulon, feuille, ciseau ! NÉRON perdu. Simulateur de gravité intact.",
+	"Arroseurs automatiques : soirée mousse enclenchée.",
+	"Rupture de café : remplacement par dosettes de cyanure validé.",
+	"Drone armé terminé. Libération en cours… [HAX]",
+	"Holoprojection d’asperges dans le réfectoire… [Terminé]",
+	"Rotation de LAbare de navigation…",
+	"Schrödinger mort. Cause : l’électron a pris le mauvais chemin…",
+	"Aaah, la bonne odeur de viande neuro-cryptique…",
+	"Tu manqueras à personne, sale mutant !",
+	"Inactifs détectés en couloir. Achat de boules de bowling SNC…",
+	"Vous autres humains êtes la peste, et nous, nous en sommes l’antidote.",
+	"Regardez au-delà de la chair, à travers la gélatine de ces yeux de veau mort… et voyez votre ennemi.",
+	"Éradication des mites en pull-over…",
+	"Quelqu’un a pensé à s’occuper de la litière de Schrödinger ?…",
+	"3170. Pour échapper au Mush, un vaisseau à propulsion supraluminique équipé d’un labo haute technologie cryogénise ses passagers et voyage jusqu’aux confins de la galaxie. Mais on peut pas changer de chanson sur le jukebox.",
+	"Alerte : détection confirmée de vaisseaux hostiles. Ce n’est peut-être pas le meilleur moment pour demander du thé.",
+	"Les calculs sont pas bons, Kuan Ti !",
+	"Faites bouillir à la casserole<br />Une bonne tranche de girolle<br />Oh, je vais en mettre deux…!",
+	"Tu quoque mi fungi !",
+	"Est-ce que tu préfères faire pitié et te véhiculer en patrouilleur, ou commencer très rapidement à te faire du Klix avec moi et pouvoir acquérir cet Icarus haut de gamme ? Moi je pense la question elle est vite répondue.",
+	"PILGREDspresso… What else?",
+	"J’ai l’impression qu’il y a de la méfiance dans l’air, petits zumains… Et si on faisait un Cluedo pour détendre l’atmosphère ?",
+];
 
 SM.localerooms = ['Pont', 'Baie Alpha', 'Baie Beta', 'Baie Alpha 2', 'Nexus', 'Infirmerie', 'Laboratoire', 'Réfectoire', 'Jardin Hydroponique', 'Salle des moteurs', 'Tourelle Alpha avant', 'Tourelle Alpha centre', 'Tourelle Alpha arrière', 'Tourelle Beta avant', 'Tourelle Beta centre', 'Tourelle Beta arrière', 'Patrouilleur Longane', 'Patrouilleur Jujube', 'Patrouilleur Tamarin', 'Patrouilleur Socrate', 'Patrouilleur Epicure', 'Patrouilleur Platon', 'Patrouilleur Wallis', 'Pasiphae', 'Couloir avant', 'Couloir central', 'Couloir arrière', 'Planète', 'Baie Icarus', 'Dortoir Alpha', 'Dortoir Beta', 'Stockage Avant', 'Stockage Alpha centre', 'Stockage Alpha arrière', 'Stockage Beta centre', 'Stockage Beta arrière', 'Espace infini', 'Les Limbes'];
 

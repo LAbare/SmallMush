@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name      Small(Mush)
-// @version   1.4.5
+// @version   1.5
+
 // @icon      http://labare.github.io/SmallMush/ico.png
 // @match     http://mush.vg/
 // @match     http://mush.vg/#*
@@ -20,8 +21,7 @@
 // ==/UserScript==
 
 
-var Main = unsafeWindow.Main || Main;
-
+var Main; // Defined later once the DOM is loaded
 var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });
 
 
@@ -29,11 +29,11 @@ var unsafeSM = createObjectIn(unsafeWindow, { defineAs: "SM" });
  *          SMALL(MUSH)          *
  *           by LAbare           *
  *  Script pour Mush sur mobile  *
- *             v1.4.5            *
+ *              v1.5             *
 \**—————————————————————————————**/
 
 
-var SM = { isUserscript: true, version: "1.4.5" };
+var SM = { isUserscript: true, version: "1.5" };
 
 
 
@@ -261,6 +261,8 @@ SM.generateMinimap = function() {
 };
 
 SM.changeTab = function(newtab) {
+	if (SM.settings['islarge'] && newtab == 'chat_col') return;
+
 	//#room_col n'est pas caché pour que le jeu Flash fonctionne, juste hors-champ ; on fait glisser #content, la barre d'info et le logo/les liens/les onglets
 	var char = SM.sel('#char_col');
 	if (newtab == 'room_col') {
@@ -277,6 +279,9 @@ SM.changeTab = function(newtab) {
 		SM.sel('#room_tab').style.display = 'none';
 		SM.sel('#chat_col').style.display = 'none';
 		SM.sel('#' + newtab).style.display = 'block';
+		if (SM.settings['islarge']) {
+			SM.sel('#chat_col').style.display = 'table-cell';
+		}
 	}
 	SM.sel('.SMtabselected').className = '';
 	SM.sel('#SMtab-' + newtab).className = 'SMtabselected';
@@ -371,12 +376,12 @@ SM.changeRoom = function(el) {
 				return false;
 			}
 		}
-		
+
 		if (SM.GUARDIAN && !confirm(SM.TEXT['move_guardian'])) {
 			return false;
 		}
-		
-		if (SM.parameters['confirm_action']) {
+
+		if (SM.settings['confirm_action']) {
 			if (!confirm(SM.TEXT['move_confirm'] + roomname + SM.INTERR)) {
 				return false;
 			}
@@ -561,7 +566,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1/5: équipment
 				? decodeURIComponent(/namey[0-9]+:(.+)g$/.exec(item.getAttribute('data-tip'))[1]) //Pour obtenir la compétence de l'apprenton dans le nom
 				: item.getAttribute('data-name') //Pour avoir les attributs (charges, objet lourd, caché…) dans les autres cas
 			);
-			if (SM.parameters['food_desc'] && item.getAttribute('data-id') == 'CONSUMABLE') {
+			if (SM.settings['food_desc'] && item.getAttribute('data-id') == 'CONSUMABLE') {
 				SM.sel('#SMitemdesc').innerHTML = SM.reformat(item.getAttribute('data-desc'));
 			}
 			else {
@@ -583,7 +588,7 @@ SM.updateRoomActions = function(type, serial) { //0: personnage; 1/5: équipment
 
 SM.changeChatTab = function(el) {
 	var tab = el.getAttribute('data-tab');
-	
+
 	var tabs = SM.sel('#cdTabsChat').children;
 	for (var i = 0; i < tabs.length; i++) {
 		tabs[i].className = tabs[i].className.replace(/tabon/, 'taboff');
@@ -597,7 +602,9 @@ SM.changeChatTab = function(el) {
 
 	if (tab) { //Onglet original
 		Main.selChat(parseInt(tab));
+		// Il faut forcer une hauteur sinon c’est tout étendu
 		SM.sel('#chatBlock').style.height = '80vh';
+
 		//On force le cookie curChat pour les cas de message dans le mauvais canal (rare et intestable…)
 		var date = new Date();
 		date.setTime(date.getTime() + 31536000000);
@@ -624,7 +631,7 @@ SM.changeChatTab = function(el) {
 				area.style.display = 'none';
 			}
 		}
-		
+
 		el.className = 'tab tabon';
 		var scriptTab = el.getAttribute('data-script-tab');
 		if (scriptTab) {
@@ -648,7 +655,7 @@ SM.changeChatTab = function(el) {
 SM.SMexitModule = function(func) {
 	var button = SM.sel(".cdExitModuleButton");
 	//Confirmation d'action
-	if (SM.parameters['confirm_action']) {
+	if (SM.settings['confirm_action']) {
 		if (!confirm(SM.TEXT['confirm_action'] + button.textContent.trim() + "'" + SM.INTERR)) {
 			return false;
 		}
@@ -718,7 +725,7 @@ SM.beforeAction = function(el) {
 	}
 
 	//Confirmation d'action
-	if (SM.parameters['confirm_action']) {
+	if (SM.settings['confirm_action']) {
 		var name = SM.reformat(el.innerHTML.trim().replace(/<\/?span>/g, ''));
 		name = name.replace(/<img(?:.*)\/(.*)\.png(?:.*)\/?>/g, function (s, p) {
 			var pa;
@@ -877,101 +884,132 @@ SM.itemRight = function() {
 
 /* FONCTIONS RELATIVES AUX PARAMÈTRES SMALL(MUSH) */
 
-SM.getSMParameters = function() {
-	SM.parameters = {};
-	SM.parameters['first_time'] = true;
-	SM.parameters['confirm_action'] = false;
-	SM.parameters['food_desc'] = true;
-	SM.parameters['forced_locale'] = false;
-	SM.parameters['locale'] = '0'; //0: non forcé ; 1: FR ; 2: EN ; 3: ES
+SM.getSMsettings = function() {
+	SM.settings = {};
+	SM.settings['first_time'] = true;
+	SM.settings['confirm_action'] = false;
+	SM.settings['food_desc'] = true;
+	SM.settings['forced_locale'] = false;
+	SM.settings['locale'] = '0'; //0: non forcé ; 1: FR ; 2: EN ; 3: ES
+	SM.settings['islarge'] = false;
 
-	var offset = document.cookie.search('SMparams');
+	var offset = document.cookie.search('SMsettings');
 	if (offset != -1) {
-		var parameters = document.cookie.slice(offset + 9);
-		SM.parameters['first_time'] = ((parameters[0] == '1') ? true : false);
-		SM.parameters['confirm_action'] = ((parameters[1] == '1') ? true : false);
-		SM.parameters['food_desc'] = ((parameters[2] == '1') ? true : false);
-		SM.parameters['forced_locale'] = ((['1', '2', '3'].indexOf(parameters[3]) != -1) ? true : false);
-		if (SM.parameters['forced_locale']) {
-			SM.parameters['locale'] = parseInt(parameters[3]);
+		var settings = document.cookie.slice(offset + "SMsettings=".length);
+		SM.settings['first_time'] = ((settings[0] == '1') ? true : false);
+		SM.settings['confirm_action'] = ((settings[1] == '1') ? true : false);
+		SM.settings['food_desc'] = ((settings[2] == '1') ? true : false);
+		SM.settings['forced_locale'] = ((['1', '2', '3'].indexOf(settings[3]) != -1) ? true : false);
+		SM.settings['islarge'] = ((settings[4] == '1') ? true : false);
+		if (SM.settings['forced_locale']) {
+			SM.settings['locale'] = parseInt(settings[3]);
 		}
 		else {
-			SM.parameters['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
-			if (SM.parameters['locale'] == -1) {
-				SM.parameters['locale'] = 2; //Défaut : anglais
+			SM.settings['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
+			if (SM.settings['locale'] == -1) {
+				SM.settings['locale'] = 2; //Défaut : anglais
 			}
 		}
 	}
 	else {
-		SM.setSMParameters();
+		SM.setSMsettings();
 	}
 };
 
 
-SM.setSMParameters = function() {
-	var parameters = '0'; //paramètre 'first-time' passant forcément à false
-	parameters += ((SM.parameters['confirm_action']) ? 1 : 0);
-	parameters += ((SM.parameters['food_desc']) ? 1 : 0);
-	parameters += ((SM.parameters['forced_locale']) ? SM.parameters['locale'] : 0);
+SM.setSMsettings = function() {
+	var settings = '0'; //paramètre 'first-time' passant forcément à false
+	settings += ((SM.settings['confirm_action']) ? 1 : 0);
+	settings += ((SM.settings['food_desc']) ? 1 : 0);
+	settings += ((SM.settings['forced_locale']) ? SM.settings['locale'] : 0);
+	settings += ((SM.settings['islarge']) ? 1 : 0);
 
 	var date = new Date();
 	date.setTime(date.getTime() + 31536000000);
-	document.cookie = 'SMparams=' + parameters + '; expires=' + date.toGMTString() + '; path=/';
+	document.cookie = 'SMsettings=' + settings + '; expires=' + date.toGMTString() + '; path=/';
+
+	let chat_col = SM.sel('#chat_col'); // Not created yet at beginning of script, hence the IFs
+	let SMbottom = SM.sel('#SMbottom');
+	if (SM.settings['islarge']) {
+		document.body.setAttribute('data-islarge', 'true');
+		if (chat_col) {
+			chat_col.style.display = 'table-cell';
+		}
+		if (SMbottom) {
+			SMbottom.setAttribute('src', SM.src + "ui/bottom_large.png");
+			SM.sel('#maincontainer').style.background = 'transparent url("' + SM.src + 'ui/background_large.png")';
+		}
+	}
+	else {
+		document.body.setAttribute('data-islarge', 'false');
+		if (SMbottom) {
+			SMbottom.setAttribute('src', SM.src + "ui/bottom.png");
+			SM.sel('#maincontainer').style.background = 'transparent url("' + SM.src + 'ui/background.png")';
+		}
+		if ( // Could be written better but IDGAF
+			chat_col
+			&& SM.sel('.SMtabselected')
+			&& SM.sel('.SMtabselected').getAttribute('id') != 'SMtab-chat_col'
+		) {
+			chat_col.style.display = 'none';
+		}
+	}
 };
 
 
-SM.buildParamsMenu = function() {
+SM.buildSettingsMenu = function() {
 	var popup = SM.sel('#SMpopup');
 	popup.innerHTML = '';
 
 	SM.addButton(popup, "X", { id: 'SMpopupclose' }).addEventListener('click', function() { SM.sel('#SMpopup').style.display = 'none'; });
-	SM.addNewEl('h4', popup, null, SM.TEXT['SMparams-title'] + "  <img src='" + SM.src + "ico.png' />");
+	SM.addNewEl('h4', popup, null, SM.TEXT['SMsettings-title'] + "  <img src='" + SM.src + "ico.png' />");
 
-	var parameters = ['confirm_action', 'food_desc', 'forced_locale'];
-	for (i in parameters) {
-		var parameter = parameters[i];
+	var settings = ['islarge', 'confirm_action', 'food_desc', 'forced_locale'];
+	for (i in settings) {
+		var parameter = settings[i];
 		var div = SM.addNewEl('div', popup);
-		if (SM.parameters[parameter]) {
+		if (SM.settings[parameter]) {
 			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', checked: 'true', 'data-parameter': parameter })
 			input.addEventListener('change', function() {
 				var p = this.getAttribute('data-parameter');
-				SM.parameters[p] = false;
+				SM.settings[p] = false;
 				if (p == 'forced_locale') {
-					SM.parameters['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
+					// Use .locale() to load language
+					SM.settings['locale'] = ['', 'mush.vg', 'mush.twinoid.com', 'mush.twinoid.es'].indexOf(document.domain);
 					SM.locale(function() {
-						SM.setSMParameters();
-						SM.buildParamsMenu();
+						SM.setSMsettings();
+						SM.buildSettingsMenu();
 					});
 				}
 				else {
-					SM.setSMParameters();
-					SM.buildParamsMenu();
+					SM.setSMsettings();
+					SM.buildSettingsMenu();
 				}
 			});
 		}
 		else {
 			var input = SM.addNewEl('input', div, 'SMlabel_' + parameter, null, { type: 'checkbox', 'data-parameter': parameter })
 			input.addEventListener('change', function() {
-				SM.parameters[this.getAttribute('data-parameter')] = true;
-				SM.setSMParameters();
-				SM.buildParamsMenu();
+				SM.settings[this.getAttribute('data-parameter')] = true;
+				SM.setSMsettings();
+				SM.buildSettingsMenu();
 			});
 		}
-		SM.addNewEl('label', div, null, SM.TEXT['SMparams-' + parameter], { 'for': 'SMlabel_' + parameter });
-		div.className = 'SMparamsdiv';
+		SM.addNewEl('label', div, null, SM.TEXT['SMsettings-' + parameter], { 'for': 'SMlabel_' + parameter });
+		div.className = 'SMsettingsdiv';
 	}
 
-	if (SM.parameters['forced_locale']) {
-		SM.addNewEl('p', popup, null, SM.TEXT['SMparams-lang_title']);
+	if (SM.settings['forced_locale']) {
+		SM.addNewEl('p', popup, null, SM.TEXT['SMsettings-lang_title']);
 		var langs = SM.addNewEl('select', popup, 'SMlangselect');
-		SM.addNewEl('option', langs, null, "Français", ((SM.parameters['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
-		SM.addNewEl('option', langs, null, "English", ((SM.parameters['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
-		SM.addNewEl('option', langs, null, "Español", ((SM.parameters['locale'] == 3) ? { value: '3', selected: 'selected' } : { value: '3' }));
+		SM.addNewEl('option', langs, null, "Français", ((SM.settings['locale'] == 1) ? { value: '1', selected: 'selected' } : { value: '1' }));
+		SM.addNewEl('option', langs, null, "English", ((SM.settings['locale'] == 2) ? { value: '2', selected: 'selected' } : { value: '2' }));
+		SM.addNewEl('option', langs, null, "Español", ((SM.settings['locale'] == 3) ? { value: '3', selected: 'selected' } : { value: '3' }));
 		langs.addEventListener('change', function() {
-			SM.parameters['locale'] = this.value;
+			SM.settings['locale'] = this.value;
 			SM.locale(function() {
-				SM.setSMParameters();
-				SM.buildParamsMenu();
+				SM.setSMsettings();
+				SM.buildSettingsMenu();
 			});
 		});
 	}
@@ -985,19 +1023,19 @@ SM.buildParamsMenu = function() {
 		SM.sel('#roomActionList2').style.opacity = 1;
 	});
 
-	SM.addButton(popup, SM.TEXT['SMparams-chat_unload'], { 'data-tip': SM.TEXT['SMparams-chat_unload_tip'] }).addEventListener('click', function() {
+	SM.addButton(popup, SM.TEXT['SMsettings-chat_unload'], { 'data-tip': SM.TEXT['SMsettings-chat_unload_tip'] }).addEventListener('click', function() {
 		var date = new Date();
 		date.setTime(new Date().getTime() - 42000);
 		document.cookie = 'sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
 		document.cookie = 'mush_sid=; expires=' + date.toGMTString() + '; path=/; domain=.' + document.domain;
-		SM.sel('#SMloadscreen').innerHTML = SM.TEXT['SMparams-chat_unload_reload'];
+		SM.sel('#SMloadscreen').innerHTML = SM.TEXT['SMsettings-chat_unload_reload'];
 		SM.sel('#SMloadscreen').style.display = 'block';
 		window.setTimeout(function() { window.location = '/'; }, 3000);
 	});
 
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams-credits'], { class: 'SMnospace' });
-	SM.addNewEl('p', popup, null, "<a href='http://github.com/LAbare/SmallMush/releases' target='_blank'>v" + SM.version + "</a>", { class: 'SMnospace' });
-	SM.addNewEl('p', popup, null, SM.TEXT['SMparams-credits_beta'], { style: 'font-size: 0.7em; margin-bottom: 0;' });
+	SM.addNewEl('p', popup, null, SM.TEXT['SMsettings-credits'], { class: 'SMnospace' });
+	SM.addNewEl('p', popup, null, "<a href='http://github.com/LAbare/SmallMush' target='_blank'>v" + SM.version + "</a>", { class: 'SMnospace' });
+	SM.addNewEl('p', popup, null, SM.TEXT['SMsettings-credits_beta'], { style: 'font-size: 0.7em; margin-bottom: 0;' });
 };
 
 
@@ -1017,7 +1055,16 @@ SM.initCss = function() {
 	}
 	SM.addNewEl('meta', document.head, null, null, { name: 'viewport', content: 'width=424px, initial-scale=' + zoom });
 
-	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: SM.src + "ui/bottom.png" }), document.body, SM.sel('#tid_bar_down'));
+	let bottom_src = SM.src + 'ui/bottom.png';
+	if (SM.settings['islarge']) {
+		// UI image adjustments
+		bottom_src = SM.src + 'ui/bottom_large.png';
+		SM.sel('#maincontainer').style.background = 'transparent url("' + SM.src + 'ui/background_large.png")';
+	}
+	SM.moveEl(SM.addNewEl('img', null, 'SMbottom', null, { src: bottom_src }), document.body, SM.sel('#tid_bar_down'));
+
+	// I don’t know what I messed up but this is now necessary here?
+	SM.sel('#chatBlock').style.height = '80vh';
 
 	//Styles CSS basés sur des URLs
 	var relcss = SM.addNewEl('style', document.head);
@@ -1066,8 +1113,8 @@ SM.initMenubar = function() {
 	SM.copyEl(SM.sel('.cdShipCasio'), bar); //Horloge
 
 	//Paramètres Small(Mush)
-	SM.addNewEl('img', bar, 'SMparams', null, { src: SM.src + "ui/params.png" }).addEventListener('click', function() {
-		SM.buildParamsMenu();
+	SM.addNewEl('img', bar, 'SMsettings', null, { src: SM.src + "ui/params.png" }).addEventListener('click', function() {
+		SM.buildSettingsMenu();
 		SM.sel('#SMpopup').style.display = 'block';
 	});
 
@@ -1106,7 +1153,7 @@ SM.initMenubar = function() {
 	});
 
 	SM.addNewEl('div', document.body, 'SMpopup').style.display = 'none';
-	SM.buildParamsMenu();
+	SM.buildSettingsMenu();
 };
 
 
@@ -1425,7 +1472,7 @@ SM.roomTab = function() {
 			else if (hero.me == 'false' && status.img == 'guardian') {
 				SM.GUARDIAN = true;
 			}
-				
+
 			if (hero.me == 'true' && status.img == 'moduling') {
 				SM.ME_MODULING = true;
 			}
@@ -1463,7 +1510,7 @@ SM.roomTab = function() {
 		var catli = SM.addNewEl('li', herolist, null, "<img src='" + SM.src + "ui/chars/schrodinger.png' />", { class: 'SMheroblock', 'data-serial': cat.next().serial });
 		catli.addEventListener('click', function() { SM.displayRoomActions(3, this.getAttribute('data-serial')); });
 	}
-	
+
 	// DRONES (GRAPHIQUE) //
 	var drones = Main.items.iterator();
 	while (drones.hasNext()) {
@@ -1632,7 +1679,6 @@ SM.chatTab = function() {
 			for (var j = 0; j < logs.length; j++) {
 				var log = "";
 				var ch = logs[j].childNodes;
-				console.log(ch);
 				for (var k = 0; k < ch.length; k++) {
 					var child = ch[k];
 					if (child.nodeName.toLowerCase() == 'img') {
@@ -1667,7 +1713,7 @@ SM.gameTab = function() {
 			SM.reInit();
 		});
 	});
-	
+
 	//Bouton Coller pour annonces et missions
 	var writeblock = SM.sel('#msg_write_form'); //Formulaire d'annonce / ordre
 	if (writeblock) {
@@ -2233,7 +2279,7 @@ SM.astroTab = function() {
 
 SM.locale = function(cb) {
 	SM.TEXT = {};
-	var lang = parseInt(SM.parameters['locale']);
+	var lang = parseInt(SM.settings['locale']);
 	if (typeof cb == 'undefined') {
 		var cb = function() { return true; };
 	}
@@ -2261,6 +2307,7 @@ SM.locale = function(cb) {
 	switch (lang)
 	{
 		case 1: //Français
+			SM.TEXT['SMpageload'] = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> Préparation de Small(Mush)…";
 			SM.TEXT['stats_perso'] = "<b>Vos statistiques actuelles :</b> "; //Espace
 			SM.TEXT['AP-general'] = "point(s) d'action";
 			SM.TEXT['AP-eng'] = "point(s) de mécanique";
@@ -2282,16 +2329,17 @@ SM.locale = function(cb) {
 			SM.TEXT['move_button'] = "Se déplacer vers :";
 			SM.TEXT['broken_door'] = " — CASSÉE";
 			SM.TEXT['door_to'] = "Porte → "; //Espace
-			SM.TEXT['SMparams-title'] = "Paramètres de Small(Mush)";
-			SM.TEXT['SMparams-confirm_action'] = "Confirmer les actions";
-			SM.TEXT['SMparams-food_desc'] = "Afficher les effets des aliments sous l'inventaire";
-			SM.TEXT['SMparams-forced_locale'] = "Forcer la langue de Small(Mush)";
-			SM.TEXT['SMparams-lang_title'] = "Langue de l'interface Small(Mush) :";
-			SM.TEXT['SMparams-chat_unload'] = "Délester le chat";
-			SM.TEXT['SMparams-chat_unload_tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Délester le chat</h1>Le canal général sera rendu plus léger au rechargement.</div></div></div></div>";
-			SM.TEXT['SMparams-chat_unload_reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
-			SM.TEXT['SMparams-credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span><br />Traduction espagnole par <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> et <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (merci !).";
-			SM.TEXT['SMparams-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Merci aux beta-testeurs :<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (bah ouais)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, que personne ni Windows n'aime<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> le poney de l'Apocalypse<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a> le paumé de l'espace<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> l'Augure stalker<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la plus beta des testeuses<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, dont vient le délestage du chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la pas bavarde<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, rentré sur Sol en plein milieu de la beta";
+			SM.TEXT['SMsettings-title'] = "Paramètres de Small(Mush)";
+			SM.TEXT['SMsettings-islarge'] = "Mode Ordi (interface plus large, chat toujours affiché)";
+			SM.TEXT['SMsettings-confirm_action'] = "Confirmer les actions";
+			SM.TEXT['SMsettings-food_desc'] = "Afficher les effets des aliments sous l'inventaire";
+			SM.TEXT['SMsettings-forced_locale'] = "Forcer la langue de Small(Mush)";
+			SM.TEXT['SMsettings-lang_title'] = "Langue de l'interface Small(Mush) :";
+			SM.TEXT['SMsettings-chat_unload'] = "Délester le chat";
+			SM.TEXT['SMsettings-chat_unload_tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Délester le chat</h1>Le canal général sera rendu plus léger au rechargement.</div></div></div></div>";
+			SM.TEXT['SMsettings-chat_unload_reload'] = "Rechargement total imminent !<br />(Désolé…)<br />Veuillez attacher vos ceintures.";
+			SM.TEXT['SMsettings-credits'] = "Script codé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>Licence MIT.</span><br />Traduction espagnole par <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> et <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (merci !).";
+			SM.TEXT['SMsettings-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Merci aux beta-testeurs :<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (bah ouais)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, que personne ni Windows n'aime<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> le poney de l'Apocalypse<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a> le paumé de l'espace<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> l'Augure stalker<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la plus beta des testeuses<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, dont vient le délestage du chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la pas bavarde<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, rentré sur Sol en plein milieu de la beta";
 			SM.TEXT['confirm_action'] = "Voulez-vous effectuer l'action '";
 			SM.TEXT['tabs-char'] = "Perso";
 			SM.TEXT['tabs-ship'] = "Général";
@@ -2425,7 +2473,60 @@ SM.locale = function(cb) {
 			SM.TEXT['chat_bug-'] = "INCONNU";
 			SM.TEXT['copy_logs-button'] = "Logs au format texte";
 			
-			SM.loadingTexts = ["Photobirouillage des métaplores…", "Tir aux poulets intergalactiques…", "Test chat / micro-ondes…", "Recherche de Charlie…", "Tournée d'arrays de bool…", "Rechargement des blasters à la confiture de queues de cerises…", "Détraquage du distributeur…", "Résolution du Mad Kube…", "Bidulage des trucs…", "Redémarrage du lutin des annonces vocodées…", "Localisation des drones…", "Schématisation des Terminatransistors du PILGRED…", "Manœuvre d'évitement mouette / réacteur…", "Vidange des réservoirs d'oxygène…", "Décapitation des inactifs…", "Fortification du Jardin hydroponique…", "Surchauffe des modules persos…", "Détartrage du matou…", "Cueillette des champignons…", "Accélération du rythme de pédalage des bisounours dans le PILGRED…", "Destruction des denrées non périssables. Vous aviez faim ?…", "Augmentation de l’énervement des Mankarogs…", "Localisation du chat en cours… Erreur.", "Cavalier en Baie Alpha. Échec et mat.", "Nodocéphales détectés. Élimination par capillotractage enclenchée…", "[HAAaXX] Grésillage du trolley. Cause probable : remplissage du gazomètre.", "Extinction des consignes lumineuses. Décodage en cours…", "Dépoussiérage des capsules de cryogénisation…", "Mise en place des saucisses sur le moteur latéral gauche…", "Recycleur d'excréments enclenché. Préparation des rations en cours…", "Boulon, feuille, ciseau ! NERON perdu. Simulateur de gravité intact.", "Arroseurs automatiques : soirée mousse enclenchée.", "Rupture de café : remplacement par dosettes de cyanure validé.", "Drone armé terminé. Libération en cours… [HAX]", "Apparition d'asperges holographiques dans le réfectoire… [Terminé]", "Rotation de LAbare de navigation…", "Schrödinger mort. Cause : l'électron a pris le mauvais chemin…", "Aaah, la bonne odeur de viande neuro-cryptique…", "Tu manqueras à personne, sale mutant !", "Inactifs détectés en couloir. Achat de boules de bowling SNC…", "Vous autres humains êtes la peste, et nous, nous en sommes l'antidote.", "Regardez au-delà de la chair, à travers la gélatine de ces yeux de veau mort… et voyez votre ennemi.", "Éradication des mites en pull-over…", "Quelqu'un a pensé à s'occuper de la litière de Schrödinger ?…", "3170. Pour échapper au Mush, un vaisseau à propulsion supraluminique équipé d'un labo haute technologie cryogénise ses passagers et voyage jusqu'aux confins de la galaxie. Mais on peut pas changer de chanson sur le jukebox.", "Alerte : détection confirmée de vaisseaux hostiles. Ce n'est peut-être pas le meilleur moment pour demander du thé.", "Les calculs sont pas bons, Kuan Ti !", "Faites bouillir à la casserole<br />Une bonne tranche de girolle<br />Oh, je vais en mettre deux…!", "Tu quoque mi fungi !"];
+			SM.loadingTexts = [
+				"Photobirouillage des métaplores…",
+				"Tir aux poulets intergalactiques…",
+				"Test chat / micro-ondes…",
+				"Recherche de Charlie…",
+				"Tournée d’arrays de bool…",
+				"Rechargement des blasters à la confiture de queues de cerises…",
+				"Détraquage du distributeur…",
+				"Résolution du Mad Kube…",
+				"Bidulage des trucs…",
+				"Redémarrage du lutin des annonces vocodées…",
+				"Localisation des drones…",
+				"Schématisation des Terminatransistors du PILGRED…",
+				"Manœuvre d’évitement mouette / réacteur…",
+				"Vidange des réservoirs d’oxygène…",
+				"Décapitation des inactifs…",
+				"Fortification du Jardin hydroponique…",
+				"Surchauffe des modules persos…",
+				"Détartrage du matou…",
+				"Cueillette des champignons…",
+				"Accélération du rythme de pédalage des bisounours dans le PILGRED…",
+				"Destruction des denrées non périssables. Vous aviez faim ?…",
+				"Augmentation du taux d’énervement des Mankarogs…",
+				"Localisation du chat en cours… Erreur.",
+				"Cavalier en Baie Alpha. Échec et mat.",
+				"Nodocéphales détectés. Élimination par capillotractage enclenchée…",
+				"[HAAaXX] Grésillage du trolley. Cause probable : remplissage du gazomètre.",
+				"Extinction des consignes lumineuses. Décodage en cours…",
+				"Dépoussiérage des capsules de cryogénisation…",
+				"Mise en place des saucisses sur le moteur latéral gauche…",
+				"Recycleur d’excréments enclenché. Préparation des rations en cours…",
+				"Boulon, feuille, ciseau ! NÉRON perdu. Simulateur de gravité intact.",
+				"Arroseurs automatiques : soirée mousse enclenchée.",
+				"Rupture de café : remplacement par dosettes de cyanure validé.",
+				"Drone armé terminé. Libération en cours… [HAX]",
+				"Holoprojection d’asperges dans le réfectoire… [Terminé]",
+				"Rotation de LAbare de navigation…",
+				"Schrödinger mort. Cause : l’électron a pris le mauvais chemin…",
+				"Aaah, la bonne odeur de viande neuro-cryptique…",
+				"Tu manqueras à personne, sale mutant !",
+				"Inactifs détectés en couloir. Achat de boules de bowling SNC…",
+				"Vous autres humains êtes la peste, et nous, nous en sommes l’antidote.",
+				"Regardez au-delà de la chair, à travers la gélatine de ces yeux de veau mort… et voyez votre ennemi.",
+				"Éradication des mites en pull-over…",
+				"Quelqu’un a pensé à s’occuper de la litière de Schrödinger ?…",
+				"3170. Pour échapper au Mush, un vaisseau à propulsion supraluminique équipé d’un labo haute technologie cryogénise ses passagers et voyage jusqu’aux confins de la galaxie. Mais on peut pas changer de chanson sur le jukebox.",
+				"Alerte : détection confirmée de vaisseaux hostiles. Ce n’est peut-être pas le meilleur moment pour demander du thé.",
+				"Les calculs sont pas bons, Kuan Ti !",
+				"Faites bouillir à la casserole<br />Une bonne tranche de girolle<br />Oh, je vais en mettre deux…!",
+				"Tu quoque mi fungi !",
+				"Est-ce que tu préfères faire pitié et te véhiculer en patrouilleur, ou commencer très rapidement à te faire du Klix avec moi et pouvoir acquérir cet Icarus haut de gamme ? Moi je pense la question elle est vite répondue.",
+				"PILGREDspresso… What else?",
+				"J’ai l’impression qu’il y a de la méfiance dans l’air, petits zumains… Et si on faisait un Cluedo pour détendre l’atmosphère ?",
+			];
 			
 			SM.localerooms = ['Pont', 'Baie Alpha', 'Baie Beta', 'Baie Alpha 2', 'Nexus', 'Infirmerie', 'Laboratoire', 'Réfectoire', 'Jardin Hydroponique', 'Salle des moteurs', 'Tourelle Alpha avant', 'Tourelle Alpha centre', 'Tourelle Alpha arrière', 'Tourelle Beta avant', 'Tourelle Beta centre', 'Tourelle Beta arrière', 'Patrouilleur Longane', 'Patrouilleur Jujube', 'Patrouilleur Tamarin', 'Patrouilleur Socrate', 'Patrouilleur Epicure', 'Patrouilleur Platon', 'Patrouilleur Wallis', 'Pasiphae', 'Couloir avant', 'Couloir central', 'Couloir arrière', 'Planète', 'Baie Icarus', 'Dortoir Alpha', 'Dortoir Beta', 'Stockage Avant', 'Stockage Alpha centre', 'Stockage Alpha arrière', 'Stockage Beta centre', 'Stockage Beta arrière', 'Espace infini', 'Les Limbes'];
 			
@@ -2434,6 +2535,7 @@ SM.locale = function(cb) {
 			break;
 
 		case 2: //Anglais
+			SM.TEXT['SMpageload'] = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> Small(Mush) is loading…";
 			SM.TEXT['stats_perso'] = "<b>Your current statistics:</b> ";
 			SM.TEXT['AP-general'] = "action point(s)";
 			SM.TEXT['AP-eng'] = "tech point(s)";
@@ -2447,24 +2549,25 @@ SM.locale = function(cb) {
 			SM.TEXT['AP-klix'] = "Klix";
 			SM.TEXT['hide_alert_reports'] = "Hide reports (%1)";
 			SM.TEXT['show_alert_reports'] = "Show reports (%1)";
-			SM.TEXT['unvalid_move'] = "This door is broken, you cannot move there!";
+			SM.TEXT['unvalid_move'] = "This door is broken, you can’t move there!";
 			SM.TEXT['move_confirm'] = "Do you want to move to ";
 			SM.TEXT['move_alert'] = "WARNING: it seems that you are not able to move at the moment. An error may display. Continue?";
-			SM.TEXT['move_guardian'] = "WARNING: someone is guarding this room. Unless you're Sneaky, you shall only move to the room whence you came, else an error may display. Continue?";
+			SM.TEXT['move_guardian'] = "WARNING: someone is guarding this room. Unless you’re Sneaky, you should only move to the room whence you came, else an error may display. Continue?";
 			SM.TEXT['current_room'] = "You are in: ";
 			SM.TEXT['move_button'] = "Move to:";
 			SM.TEXT['broken_door'] = " — BROKEN";
 			SM.TEXT['door_to'] = "Door → ";
-			SM.TEXT['SMparams-title'] = "Small(Mush) parameters";
-			SM.TEXT['SMparams-confirm_action'] = "Confirm actions";
-			SM.TEXT['SMparams-food_desc'] = "Show consumables effects under inventory";
-			SM.TEXT['SMparams-forced_locale'] = "Force Small(Mush) language";
-			SM.TEXT['SMparams-lang_title'] = "Small(Mush) language:";
-			SM.TEXT['SMparams-chat_unload'] = "Unload chat";
-			SM.TEXT['SMparams-chat_unload_tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Unload chat</h1>The main channel will be lighter to reload.</div></div></div></div>";
-			SM.TEXT['SMparams-chat_unload_reload'] = "Incoming hard reload!<br />(Sorry for that…)<br />Please fasten your seat belts.";
-			SM.TEXT['SMparams-credits'] = "Script developed by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span><br />Spanish translation by <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> and <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (thanks!).";
-			SM.TEXT['SMparams-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rejected by everybody including Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, coder of the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who came back to Sol right in the middle of the beta";
+			SM.TEXT['SMsettings-title'] = "Small(Mush) settings";
+			SM.TEXT['SMsettings-islarge'] = "Computer Mode (larger UI, always display chat)";
+			SM.TEXT['SMsettings-confirm_action'] = "Confirm actions";
+			SM.TEXT['SMsettings-food_desc'] = "Show the effects of consumables under inventory";
+			SM.TEXT['SMsettings-forced_locale'] = "Force Small(Mush) language";
+			SM.TEXT['SMsettings-lang_title'] = "Small(Mush) language:";
+			SM.TEXT['SMsettings-chat_unload'] = "Unload chat";
+			SM.TEXT['SMsettings-chat_unload_tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Unload chat</h1>The main channel will reload faster.</div></div></div></div>";
+			SM.TEXT['SMsettings-chat_unload_reload'] = "Hard reload incoming!<br />(Sorry for that…)<br />Please fasten your seat belts.";
+			SM.TEXT['SMsettings-credits'] = "Script coded by <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <span onclick='SM.showLicense();'>MIT licensed.</span><br />Spanish translation by <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> and <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (thanks!).";
+			SM.TEXT['SMsettings-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Thanks to the beta team:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (yeah, why not?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, the only Windows Phone user left on Earth<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> the Apocalyptic pony<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, lost in space<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a> the creepy cutie<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, smart as her smartphone<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, who coded the chat unloader<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> the quiet<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, who went back to Sol right in the middle of the beta";
 			SM.TEXT['confirm_action'] = "Do you want to '";
 			SM.TEXT['tabs-char'] = "Myself";
 			SM.TEXT['tabs-ship'] = "Ship";
@@ -2473,10 +2576,10 @@ SM.locale = function(cb) {
 			SM.TEXT['tabs-game'] = "Module";
 			SM.TEXT['tabs-shop'] = "Shop";
 			SM.TEXT['SM-added_tab'] = "<img src='" + SM.src + "ico.png' /> <b>Warning:</b> Small(Mush) tab <img src='" + SM.src + "ico.png' />";
-			SM.TEXT['SM-added_tab_text'] = "This tab is an addition of the Small(Mush) script. If a bug happens here, it would definitely be a <em>script bug</em> and should be reported only to the author of this script.";
+			SM.TEXT['SM-added_tab_text'] = "This tab has been added by the Small(Mush) script. If a bug happens here, it would definitely be a <em>script bug</em> and should be reported only to the author of this script.";
 			SM.TEXT['plasma_onmouseover'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Plasma shield</h1>The plasma shield is active.</div></div></div></div>";
 			SM.TEXT['cards_title'] = "Projects and researches:";
-			SM.TEXT['roomtab_focused'] = "You are currently Focused on a terminal, which means you cannot see what's in the room. The room will be displayed as soon as you exit your terminal. (If stuck with the Focused status, access then exit the vending machine to get rid of it.)";
+			SM.TEXT['roomtab_focused'] = "You are currently Focused on a terminal, which means you cannot see what’s in the room. The room will be displayed as soon as you exit your terminal. (If stuck with the Focused status, access then exit the vending machine to get rid of it.)";
 			SM.TEXT['fire'] = "There is a fire in the room. Quick, grab an extinguisher!";
 			SM.TEXT['equipments'] = "Equipments";
 			SM.TEXT['broken'] = " — BROKEN";
@@ -2501,16 +2604,16 @@ SM.locale = function(cb) {
 			SM.TEXT['PATROL_SHIP_AA_1'] = "Pasiphae";
 			SM.TEXT['PATROL_INTERFACE_unknown'] = "Unknown patrol ship";
 			SM.TEXT['warning-title'] = "Small(Mush) — loaded";
-			SM.TEXT['warning-1'] = "<strong>WARNING:</strong> this script reshapes the game's interface. In case of an unfortunate bug, <em>reproduce it on a computer</em> to make sure that it is an in-game bug, and not a script bug. Only warn the forums in case of a <em>computer-reproduced in-game bug in a scriptless browser</em>.";
-			SM.TEXT['warning-2'] = "In case of a script bug, contact its author from the parameters menu. Neither the author nor the script have any link with Motion Twin, and they cannot be held responsible in case of a bug (although this script has been thoroughly developed and tested in order not to generate any game-breaking bug).";
+			SM.TEXT['warning-1'] = "<strong>WARNING:</strong> this script reshapes the game’s interface. In case of an unfortunate bug, <em>please reproduce that bug on a computer</em> to make sure that it is an in-game bug, and not a script bug. Only post it on the forums if it’s a <em>computer-reproduced in-game bug in a scriptless browser</em>.";
+			SM.TEXT['warning-2'] = "If it’s a script bug, please contact the author from the settings menu. Neither the author nor the script have any link with Motion Twin, and they cannot be held responsible in case of a bug (although this script has been thoroughly coded and tested in order not to generate any game-breaking bug).";
 			SM.TEXT['warning-3'] = "Have a nice game!";
-			SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) — MIT License</h4><p>Copyright © 2015-2016 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I'm not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
-			SM.TEXT['help_screen-A'] = "Click on an element to show its tooltip.<br />This won't make you do any action.";
+			SM.TEXT['license'] = "<h4><img src='" + SM.src + "ico.png' /> Small(Mush) — MIT License</h4><p>Copyright © 2015-2016 LAbare</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>The Software is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software. Basically, if the script goes berzerk, stabs your kids and burns your house, I’m not to blame. But nothing bad should happen, not even a script-breaking bug. Trust me.</p>";
+			SM.TEXT['help_screen-A'] = "Click on an element to show its tooltip.<br />This won’t make you do any action.";
 			SM.TEXT['help_screen-B'] = "Click again to hide the tooltip.";
 			SM.TEXT['show_inventory'] = "Show inventory";
 			SM.TEXT['show_flash_inventory'] = "DEBUG: Show Flash inventory";
-			SM.TEXT['editor-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Small(Mush) Message editor</h1><p>Allows for message formatting and preview.</p></div></div></div></div>";
-			SM.TEXT['editor-tags_warning'] = "<span class='buddy'>Warning:</span> these tags only work in <em>private channels</em>; on the main channel, only the <strong>bold</strong> and <em>italics</em> tags display.";
+			SM.TEXT['editor-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>Small(Mush) Message editor</h1><p>Allows formatting and previewing messages.</p></div></div></div></div>";
+			SM.TEXT['editor-tags_warning'] = "<span class='buddy'>Warning:</span> these tags only work in <em>private channels</em>; on the main channel, only the <strong>bold</strong> and <em>italics</em> tags will be parsed.";
 			SM.TEXT['editor-mush_smileys'] = "Mush smileys";
 			SM.TEXT['paste'] = "Paste";
 			SM.TEXT['preview-refresh'] = "Refresh";
@@ -2529,7 +2632,7 @@ SM.locale = function(cb) {
 			SM.TEXT['premessages-comms'] = "Share communications progress";
 			SM.TEXT['premessages-shareSM'] = "Share the Small(Mush) script";
 			SM.TEXT['message-overwrite_retrieve'] = "Warning: this will overwrite your current message. Continue?";
-			SM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or add this to its end (OK)?";
+			SM.TEXT['message-overwrite_build'] = "Do you wish to overwrite your current message (Cancel) or append this at the end (OK)?";
 			SM.TEXT['preformat-researches-nomodule'] = "Please access the laboratory in order to activate research preformatting.";
 			SM.TEXT['preformat-researches-title'] = "Researches:";
 			SM.TEXT['preformat-researches++-title'] = "<img src='" + SM.src + "ico.png' /> Sharing researches — advanced mode";
@@ -2549,7 +2652,7 @@ SM.locale = function(cb) {
 			SM.TEXT['preformat-inventory-broken'] = "broken";
 			SM.TEXT['preformat-inventory-charge'] = "charge(s)";
 			SM.TEXT['preformat-inventory-empty'] = "empty";
-			SM.TEXT['preformat-planet-none'] = "You haven't scanned any planet yet.";
+			SM.TEXT['preformat-planet-none'] = "You haven’t scanned any planet yet.";
 			SM.TEXT['preformat-planet-title'] = "Choose a planet:";
 			SM.TEXT['preformat-planet-nomodule'] = "Please access the Astro Terminal in order to activate planet preformatting.";
 			SM.TEXT['preformat-planet-both'] = "Share both";
@@ -2562,32 +2665,32 @@ SM.locale = function(cb) {
 			SM.TEXT['preformat-comms-signal'] = "**Signal quality:** ";
 			SM.TEXT['preformat-comms-Xyloph'] = "**Xyloph databases decoded:** ";
 			SM.TEXT['preformat-comms-Xylophnone'] = "none";
-			SM.TEXT['preformat-comms-Xylophdesc'] = "Do you want to share Xyloph databases descriptions?";
+			SM.TEXT['preformat-comms-Xylophdesc'] = "Do you want to share the description of each Xyloph database?";
 			SM.TEXT['preformat-comms-bases'] = "**Rebel bases progress:** ";
 			SM.TEXT['preformat-comms-basedecoded'] = "decoded";
 			SM.TEXT['preformat-comms-baselost'] = "signal lost";
-			SM.TEXT['preformat-comms-basesdesc'] = "Do you want to share decoded bases descriptions?";
+			SM.TEXT['preformat-comms-basesdesc'] = "Do you want to share the description of each decoded base?";
 			SM.TEXT['preformat-comms-basesnone'] = "none";
 			SM.TEXT['preformat-comms-neron'] = "**NERON version:** ";
 			SM.TEXT['preformat-shareSM'] = "You can play Mush on your phone using the **Small(Mush)** script. Explanations on this topic:\n//http://twd.io/e/r6LN0w/0//";
 			SM.TEXT['abbr-day'] = "D";
 			SM.TEXT['astrotab-tip'] = "<div class='tiptop'><div class='tipbottom'><div class='tipbg'><div class='tipcontent'><h1>AstroPad</h1><p>This tab loads the AstroPad script.</p></div></div></div></div>";
-			SM.TEXT['astrotab-warning'] = "Without any script manager, in order for the AstroPad to work, Small(Mush) needs to send its data through a relay server. Worry not, nothing is on tape. If you accept this, you may load the AstroPad manually by clicking the button below.";
+			SM.TEXT['astrotab-warning'] = "Without any script manager, in order for the AstroPad to work, Small(Mush) needs to send its data through a relay server. Worry not, nothing is logged. If you accept this, you may load the AstroPad manually by clicking the button below.";
 			SM.TEXT['astrotab-button'] = "Load the AstroPad script";
 			SM.TEXT['astrotab-loading'] = "Loading the AstroPad script…";
 			SM.TEXT['minimap-button'] = "Show the Small(Mush) minimap";
 			SM.TEXT['minimap-title'] = "Small(Mush) minimap";
-			SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not that of the Flash game, but merely a map of the Daedalus containing a little information. It may also not display certain reports.";
+			SM.TEXT['minimap-warning'] = "<b>WARNING:</b> This minimap is not the one from the Flash game, but merely a recreated map of the Daedalus with limited information. It may also not display certain reports.";
 			SM.TEXT['minimap-legend'] = "<b>Legend:</b><br /><span class='SMmapfire SMlegend'>Reported fire</span><br /><span class='SMmapalertd SMlegend'>Reported doors</span><br /><span class='SMmapalerte SMlegend'>Reported equipments</span><br /><span class='SMmyroom SMlegend'>You are here!</span>";
 			SM.TEXT['minimap-room'] = "You selected: <b><span id='SMminimaproom'>nothing</span></b>.";
-			SM.TEXT['tabtip-chartab'] = "<h1>Character tab</h1>This tab contains all information relative to your character.";
-			SM.TEXT['tabtip-shiptab'] = "<h1>Ship tab</h1>This tab contains all information relative to the ship in general: current alerts, exploration, projects and researches done…";
-			SM.TEXT['tabtip-roomtab'] = "<h1>Room tab</h1>This tab contains all information about the room you're in.";
-			SM.TEXT['tabtip-chattab'] = "<h1>Chat tab</h1>This tab is for the chat and logs and the Small(Mush) message editor.";
+			SM.TEXT['tabtip-chartab'] = "<h1>Character tab</h1>This tab contains all the information relative to your character.";
+			SM.TEXT['tabtip-shiptab'] = "<h1>Ship tab</h1>This tab contains all the information relative to the ship in general: current alerts, exploration, projects and researches done…";
+			SM.TEXT['tabtip-roomtab'] = "<h1>Room tab</h1>This tab contains all the information about the room you’re in.";
+			SM.TEXT['tabtip-chattab'] = "<h1>Chat tab</h1>This tab is for the chat and logs, as well as the Small(Mush) message editor.";
 			SM.TEXT['tabtip-gametab'] = "<h1>Game/Terminal tab</h1>This tab contains the Flash game and the terminals you access.";
 			SM.TEXT['tabtip-shoptab'] = "<h1>Vending machine tab</h1>This tab allows you to access the vending machine.";
-			SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game as common actions do.";
-			SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (including some mobile-malfunctioning ones) as well as Small(Mush) script additions help tooltips.";
+			SM.TEXT['buttontip-reload'] = "<h1>Refresh</h1>Refreshes the game like common actions do.";
+			SM.TEXT['buttontip-help'] = "<h1>Help</h1>Displays game tooltips (fixing those who don’t work properly on mobile) as well as the help tooltips for Small(Mush) script additions.";
 			SM.TEXT['chat_bug'] = "You are in the tab: ";
 			SM.TEXT['chat_bug-local'] = "logs.";
 			SM.TEXT['chat_bug-mush'] = "Mush channel.";
@@ -2598,7 +2701,59 @@ SM.locale = function(cb) {
 			SM.TEXT['chat_bug-'] = "UNKNOWN";
 			SM.TEXT['copy_logs-button'] = "Logs in text format";
 			
-			SM.loadingTexts = ["Photoscamping the scransons…", "Shooting intergalactic chicken…", "Cat / microwave experiment in progress…", "Looking for Waldo…", "Serving round of read bools…", "Reloading blasters with cherry stalk jam…", "Out-of-servicing the vending machine…", "Solving the Kube…", "Thinging thingys…", "Rebooting vocoded announcements fairy…", "Locating drones…", "Mapping PILGRED Terminatransistors…", "Avoiding seagull / reactor collision…", "Emptying oxygen tanks…", "Beheading inactives…", "Fortifying the Hydroponic garden…", "Overheating PDAs…", "Scaling the kitty's teeth…", "Picking mushrooms…", "Accelerating PILGRED Carebears' pedalling rhythm…", "Destroying non-perishable rations. Were you by any chance hungry?…", "Raising Mankarogs' irritation levels…", "Locating the cat… Error.", "Knight in Alpha Bay. Checkmate.", "Curmudgeons detected aboard. Triggering death by discombobulation…", "[HAAaXX] Going off my trolley… Probable cause: tanking up.", "Turning off cabin lights. Starting cipher analysis…", "Blowing dust off the Cryosleep capsules…", "Setting sausages on the left lateral reactor…", "Feces recycler activated. Baking rations…", "Bolt, paper, scissors! NERON lost. Gravity Simulator unscathed yet.", "Automatic sprinklers: wet shirt contest beginning…", "Coffee shortage: validating use of cyanure capsules…", "Killer drone completed. Allowing ship-wide access… [HAX]", "Projecting asparagus holograms in the refectory… [Done]", "Schrödinger died. Cause: the electron took the route B…", "Nothing like the smell of new neuro-cryptic meat…", "Thanks for standing still, inactive!", "Inactives detected in the corridors. Buying SNC bowling balls…", "You humans are a plague, and we are the cure.", "Look past the flesh, look through the soft gelatin of these dull cow eyes… and see your enemy.", "Melting meat popsicles…", "Who's in charge of cleaning Schrödinger's litter box?…", "3170. To escape from the Mush, a faster-than-light ship hosting a state of the art lab and 16 cryogenized crewmembers flies to the farthest reaches of the galaxy. And yet you can't select which song you want to listen to on the jukebox.", "Warning: hostile ships detected. Now may not be a great time to ask for a cup of tea.", "\"Don't tell me; we're about to meet a huge hunter wave.\"<br />\"Yup.\"<br />\"All Trax and no lenses?\"<br />\"Most likely.\"<br />\"<i>Bring it on.</i>\"", "Tu quoque mi fungi!"];
+			SM.loadingTexts = [
+				"Photoscamping the scransons…",
+				"Shooting intergalactic chicken…",
+				"Cat / microwave experiment in progress…",
+				"Looking for Waldo…",
+				"Serving a round of read bools…",
+				"Reloading blasters with cherry stalk jam…",
+				"Out-of-servicing the vending machine…",
+				"Solving the Kube…",
+				"Thinging thingys…",
+				"Rebooting the vocoded announcements fairy…",
+				"Locating drones…",
+				"Mapping PILGRED Terminatransistors…",
+				"Avoiding seagull / reactor collision…",
+				"Emptying oxygen tanks…",
+				"Beheading inactives…",
+				"Adding ramparts to the Hydroponic garden…",
+				"Overheating PDAs…",
+				"Performing a comb sort on the kitty’s fur…",
+				"Stalking mushrooms…",
+				"Boosting the PILGRED elves…",
+				"Destroying non-perishable rations. My apologies if you were hungry…",
+				"Tickling Mankarogs…",
+				"Locating the cat… <b>Error</b>.",
+				"Knight in Alpha Bay. Checkmate.",
+				"Curmudgeons detected aboard. Triggering death by discombobulation…",
+				"[HAAaXX] Going off my trolley… Probable cause: tanking up.",
+				"Turning off cabin lights. Starting cipher analysis…",
+				"Blowing the dust off the Cryosleep capsules…",
+				"Grilling sausages on the left lateral reactor…",
+				"Feces recycler activated. Baking rations…",
+				"Bolt, paper, scissors! NERON lost. Gravity Simulator still running.",
+				"Automatic sprinklers announcement: wet shirt contest is a go!",
+				"Coffee shortage: authorizing replacement by cyanure capsules…",
+				"Killer drone completed. Allowing ship-wide access… [HAX]",
+				"Holoprojecting asparagus in the refectory… [Done]",
+				"Schrödinger died. Cause: the electron took the route B…",
+				"Nothing like the smell of new neuro-cryptic meat…",
+				"Thanks for standing still, inactive!",
+				"Inactives detected in the corridors. Buying SNC bowling balls…",
+				"You humans are a plague, and we are the cure.",
+				"Look past the flesh, look through the soft gelatin of these dull cow eyes… and see your enemy.",
+				"Melting meat popsicles…",
+				"Who’s in charge of cleaning Schrödinger’s litter box?…",
+				"3170. To escape the Mush, a ship going faster than light, hosting a state of the art lab and 16 cryogenized crewmembers warps to the farthest reaches of the galaxy. And you can’t even choose the song that plays on the jukebox.",
+				"Warning: hostile ships detected. Now may not be a great time to ask for a cup of tea.",
+				"“Don’t tell me; we’re about to meet a huge hunter wave.”<br />“Yup.”<br />“All Trax and no lenses?”<br />“Most likely.”<br />“<i>Bring it on.</i>”",
+				"Tu quoque mi fungi!",
+				"Since the dawn of time immemorial, humans have wondered, “What happened before the beginning of history?” The answer… is “fungus, mostly”. Unfortunately, the mycorrhicene era has ended, giving way to the meatier, louder, and less efficient anthropocene. But what if I told you—we could bring it back? <i>(shoots you with a spore dart)</i>",
+				"Then Andie opened their eyes, and it turned out it was all just a dream… Reality was in fact much, much worse.",
+				"Science fact: Mushocondria is the spowerhouse of the cell.",
+				"You hoomans seem a bit tense and wary. A team building exercise wouldn’t hurt! How about a good old murder mystery party?",
+			];
 			
 			SM.localerooms = ['Bridge', 'Alpha Bay', 'Bravo Bay', 'Alpha Bay 2', 'Nexus', 'Medlab', 'Laboratory', 'Refectory', 'Hydroponic Garden', 'Engine Room', 'Front Alpha Turret', 'Centre Alpha Turret', 'Rear Alpha Turret', 'Front Bravo Turret', 'Centre Bravo Turret', 'Rear Bravo Turret', 'Patrol Ship Tomorrowland', 'Patrol Ship Olive Grove', 'Patrol Ship Yasmin', 'Patrol Ship Wolf', 'Patrol Ship E-Street', 'Patrol Ship Eponine', 'Patrol Ship Carpe Diem', 'Pasiphae', 'Front Corridor', 'Central Corridor', 'Rear Corridor', 'Planet', 'Icarus Bay', 'Alpha Dorm', 'Bravo Dorm', 'Front Storage', 'Centre Alpha Storage', 'Rear Alpha Storage', 'Centre Bravo Storage', 'Rear Bravo Storage', 'Outer Space', 'Limbo'];
 			
@@ -2607,6 +2762,7 @@ SM.locale = function(cb) {
 			break;
 
 		case 3: //Espagnol
+			SM.TEXT['SMpageload'] = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> Small(Mush) is loading…";
 			SM.TEXT['stats_perso'] = "<b>Tus estadísticas actuales:</b> ";
 			SM.TEXT['AP-general'] = "punto(s) de acción";
 			SM.TEXT['AP-eng'] = "punto(s) de reparación";
@@ -2628,16 +2784,17 @@ SM.locale = function(cb) {
 			SM.TEXT['move_button'] = "Desplazare a :";
 			SM.TEXT['broken_door'] = " — ROTA";
 			SM.TEXT['door_to'] = "Puerta → ";
-			SM.TEXT['SMparams-title'] = "Parámetros de Small(Mush)";
-			SM.TEXT['SMparams-confirm_action'] = "Confirmar acciones";
-			SM.TEXT['SMparams-food_desc'] = "Mostrar efectos de consumibles bajo el inventario";
-			SM.TEXT['SMparams-forced_locale'] = "Forzar cambio de idioma de Small(Mush)";
-			SM.TEXT['SMparams-lang_title'] = "Idioma de Small(Mush):";
-			SM.TEXT['SMparams-chat_unload'] = "Limpiar el chat";
-			SM.TEXT['SMparams-chat_unload_tip'] = "Limpiar el chat<br />El canal principal tardará menos en recargar";
-			SM.TEXT['SMparams-chat_unload_reload'] = "¡Recarga forzosa inminente!<br />(Lo siento por eso...)<br />Por favor ajusten sus cinturones.";
-			SM.TEXT['SMparams-credits'] = "Script desarrollado por <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <a onclick='SM.showLicense();'>Licencia MIT</a>.<br />Traducción al Español por <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> y <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (¡de nada!).";
-			SM.TEXT['SMparams-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Gracias al equipo de la beta:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (¿sí, por qué no?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rechazado por todos, inclusive Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> el pony apocalíptico<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, perdido en el espacio<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a>, la dulzura aterradora<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la mas beta de los probadores<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, programador del limpiador del chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la callada<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, quien volvió al SS justo en el medio de la beta";
+			SM.TEXT['SMsettings-title'] = "Parámetros de Small(Mush)";
+			SM.TEXT['SMsettings-islarge'] = "Computer Mode";
+			SM.TEXT['SMsettings-confirm_action'] = "Confirmar acciones";
+			SM.TEXT['SMsettings-food_desc'] = "Mostrar efectos de consumibles bajo el inventario";
+			SM.TEXT['SMsettings-forced_locale'] = "Forzar cambio de idioma de Small(Mush)";
+			SM.TEXT['SMsettings-lang_title'] = "Idioma de Small(Mush):";
+			SM.TEXT['SMsettings-chat_unload'] = "Limpiar el chat";
+			SM.TEXT['SMsettings-chat_unload_tip'] = "Limpiar el chat<br />El canal principal tardará menos en recargar";
+			SM.TEXT['SMsettings-chat_unload_reload'] = "¡Recarga forzosa inminente!<br />(Lo siento por eso...)<br />Por favor ajusten sus cinturones.";
+			SM.TEXT['SMsettings-credits'] = "Script desarrollado por <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>. <a onclick='SM.showLicense();'>Licencia MIT</a>.<br />Traducción al Español por <a href='http://twinoid.com/user/8822437' target='_blank'>CptArgentina</a> y <a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a> (¡de nada!).";
+			SM.TEXT['SMsettings-credits_beta'] = "<img src='/img/icons/ui/likemush.gif' /> Gracias al equipo de la beta:<br /><a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a> (¿sí, por qué no?)<br /><a href='http://twinoid.com/user/2718866' target='_blank'>Heimdall</a>, rechazado por todos, inclusive Windows<br /><a href='http://twinoid.com/user/1729323' target='_blank'>Breith</a> el pony apocalíptico<br /><a href='http://twinoid.com/user/6541022' target='_blank'>lucasmore</a>, perdido en el espacio<br /><a href='http://twinoid.com/user/6207430' target='_blank'>Hyomin</a>, la dulzura aterradora<br /><a href='http://twinoid.com/user/20309' target='_blank'>Guilherande</a>, la mas beta de los probadores<br /><a href='http://twinoid.com/user/1244143' target='_blank'>badconker</a>, programador del limpiador del chat<br /><a href='http://twinoid.com/user/839307' target='_blank'>Contry</a> la callada<br /><a href='http://twinoid.com/user/110901' target='_blank'>Bronu</a>, quien volvió al SS justo en el medio de la beta";
 			SM.TEXT['confirm_action'] = "¿Quieres '";
 			SM.TEXT['tabs-char'] = "Yo";
 			SM.TEXT['tabs-ship'] = "Nave";
@@ -2771,7 +2928,42 @@ SM.locale = function(cb) {
 			SM.TEXT['chat_bug-'] = "DESCONOCIDO";
 			SM.TEXT['copy_logs-button'] = "Registros en formato de texto";
 			
-			SM.loadingTexts = ["Experimento gato/microondas en progreso…", "Recargando blasters con mermelada de tallos de cereza…", "Máquina expendedora fuera de servicio…", "Resolviendo el Kubo…", "Coseando cosas…", "Reiniciado el hada de los anuncios vocodificados…", "Localizando drones…", "Mapeando Terminatransmisores PILGRED…", "Evitando colisión gaviota/reactor…", "Vacíando tanques de oxígeno…", "Decapitando inactivos…", "Disparando a gallinas intergalácticas…", "Buscando a Wally…", "Fortificando el Jardín hidropónico…", "Sobrecalentando PDAs…", "Limpiando los dientes del minino…", "Recolectando hongos…", "Destruyendo raciones no-perecibles. No tenías hambre, ¿verdad?…", "Incrementando nivel de irritación de los Mankarog…", "Caballo a Plataforma Alpha. Jaque mate.", "Colocando salchicas en el reactor lateral izquierdo…", "Reciclador de heces activado. Cocinando raciones…", "¡Piedra, papel, circuito! Neron pierde. Simulador de gravedad (aún no) roto.", "Regaderas automáticas: concurso de camisetas mojadas iniciando.", "Escasez de café: validando uso de cápsulas de cianuro…", "Permitiendo acceso completo a la nave al dron asesino... [HAX]", "Proyectando hologramas de esparragos en el comedor… [Listo]", "Acelerando el ritmo de pedaleo de los Ositos Pilgredositos…", "Error cuatrocientos-gato…", "Apagando luces. Comenzando análisis del código…", "Desempolvando capsulas de Cryoletárgo…", "Yendo AL bare…", "Schrödinger murió. Causa: El electrón tomó la ruta B…", "Ah, nada como el olor a carne neuro-críptica nueva…", "Inactivos detectados en el pasillo. Compra de bolas de bolos SNC…"];
+			SM.loadingTexts = ["Experimento gato/microondas en progreso…",
+				"Recargando blasters con mermelada de tallos de cereza…",
+				"Máquina expendedora fuera de servicio…",
+				"Resolviendo el Kubo…",
+				"Coseando cosas…",
+				"Reiniciado el hada de los anuncios vocodificados…",
+				"Localizando drones…",
+				"Mapeando Terminatransmisores PILGRED…",
+				"Evitando colisión gaviota/reactor…",
+				"Vacíando tanques de oxígeno…",
+				"Decapitando inactivos…",
+				"Disparando a gallinas intergalácticas…",
+				"Buscando a Wally…",
+				"Fortificando el Jardín hidropónico…",
+				"Sobrecalentando PDAs…",
+				"Limpiando los dientes del minino…",
+				"Recolectando hongos…",
+				"Destruyendo raciones no-perecibles. No tenías hambre, ¿verdad?…",
+				"Incrementando nivel de irritación de los Mankarog…",
+				"Caballo a Plataforma Alpha. Jaque mate.",
+				"Colocando salchicas en el reactor lateral izquierdo…",
+				"Reciclador de heces activado. Cocinando raciones…",
+				"¡Piedra, papel, circuito! Neron pierde. Simulador de gravedad (aún no) roto.",
+				"Regaderas automáticas: concurso de camisetas mojadas iniciando.",
+				"Escasez de café: validando uso de cápsulas de cianuro…",
+				"Permitiendo acceso completo a la nave al dron asesino... [HAX]",
+				"Proyectando hologramas de esparragos en el comedor… [Listo]",
+				"Acelerando el ritmo de pedaleo de los Ositos Pilgredositos…",
+				"Error cuatrocientos-gato…",
+				"Apagando luces. Comenzando análisis del código…",
+				"Desempolvando capsulas de Cryoletárgo…",
+				"Yendo AL bare…",
+				"Schrödinger murió. Causa: El electrón tomó la ruta B…",
+				"Ah, nada como el olor a carne neuro-críptica nueva…",
+				"Inactivos detectados en el pasillo. Compra de bolas de bolos SNC…",
+			];
 			
 			SM.localerooms = ['Puente de mando', 'Plataforma Alpha', 'Plataforma Beta', 'Plataforma Alpha 2', 'Nexus', 'Enfermería', 'Laboratorio', 'Comedor', 'Jardín Hidropónico', 'Sala de motores', 'Cañón Alpha delantero', 'Cañón Alpha central', 'Cañón Alpha trasero', 'Cañón Beta delantero', 'Cañón Beta central', 'Cañón Beta trasero', 'Patrullero Longane', 'Patrullero Jujube', 'Patrullero Tamarindo', 'Patrullero Sócrates', 'Patrullero Epicuro', 'Patrullero Platón', 'Patrullero Wallis', 'Pasiphae', 'Pasillo delantero', 'Pasillo central', 'Pasillo trasero', 'Planeta', 'Icarus', 'Dormitorio Alpha', 'Dormitorio Beta', 'Almacén delantero', 'Almacén Alpha central', 'Almacén Alpha trasero', 'Almacén Beta central', 'Almacén Beta trasero', 'Espacio infinito', 'El limbo'];
 			
@@ -2811,8 +3003,14 @@ SM.init = function() {
 	SM.changeActionFunctions();
 	window.setTimeout(function() { SM.sel('#content').scrollLeft = 0; }, 500);
 
+	// Computer Mode
+	if (SM.settings['islarge']) {
+		document.body.setAttribute('data-islarge', 'true');
+		SM.sel('#chat_col').style.display = 'table-cell';
+	}
+
 	//Première fois : alerte à lire
-	if (SM.parameters['first_time']) {
+	if (SM.settings['first_time']) {
 		var SMdialog = SM.copyEl(SM.sel('#dialog'), document.body);
 		SMdialog.style.display = 'block';
 		SMdialog.style.left = '12px !important';
@@ -2822,8 +3020,8 @@ SM.init = function() {
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning-2']);
 		SM.addNewEl('p', SM.sel('#SMdialog_body'), null, SM.TEXT['warning-3']);
 		SM.sel('#SMdialog_ok').addEventListener('click', function() { document.body.removeChild(SM.sel('#SMdialog')); });
-		SM.parameters['first_time'] = false;
-		SM.setSMParameters();
+		SM.settings['first_time'] = false;
+		SM.setSMsettings();
 	}
 
 	//Le rechargement interne de la page écrase les modifications et ajouts, donc on fait une vérification régulière
@@ -2863,9 +3061,9 @@ exportFunction(SM.showLicense, unsafeSM, { defineAs: "showLicense" });
 exportFunction(SM.selectItem, unsafeSM, { defineAs: "selectItem" });
 exportFunction(SM.itemLeft, unsafeSM, { defineAs: "itemLeft" });
 exportFunction(SM.itemRight, unsafeSM, { defineAs: "itemRight" });
-exportFunction(SM.getSMParameters, unsafeSM, { defineAs: "getSMParameters" });
-exportFunction(SM.setSMParameters, unsafeSM, { defineAs: "setSMParameters" });
-exportFunction(SM.buildParamsMenu, unsafeSM, { defineAs: "buildParamsMenu" });
+exportFunction(SM.getSMsettings, unsafeSM, { defineAs: "getSMsettings" });
+exportFunction(SM.setSMsettings, unsafeSM, { defineAs: "setSMsettings" });
+exportFunction(SM.buildSettingsMenu, unsafeSM, { defineAs: "buildSettingsMenu" });
 exportFunction(SM.initCss, unsafeSM, { defineAs: "initCss" });
 exportFunction(SM.initMenubar, unsafeSM, { defineAs: "initMenubar" });
 exportFunction(SM.initTabs, unsafeSM, { defineAs: "initTabs" });
@@ -2890,7 +3088,7 @@ exportFunction(SM.init, unsafeSM, { defineAs: "init" });
 
 /* VARIABLES */
 
-//SM.src = "http://labare.alwaysdata.net/SmallMush/";
+//SM.src = "http://labare.net/SmallMush/";
 SM.src = "http://labare.github.io/SmallMush/";
 
 SM.smileys = [['pa_pm', 'pslots.png'], ['pa', 'pa_slot1.png'], ['pm', 'pa_slot2.png'], ['pv|hp', 'lp.png'], ['xp', 'xp.png'], ['xpbig', 'xpbig.png'], ['pa_heal', 'pa_heal.png'], ['asocial', 'status/unsociable.png'], ['disabled', 'status/disabled.png'], ['hungry', 'status/hungry.png'], ['hurt', 'status/hurt.png'], ['ill', 'status/disease.png'], ['psy_disease', 'status/psy_disease.png'], ['commander', 'title_01.png'], ['admin_neron', 'title_02.png'], ['resp_comm', 'title_03.png'], ['alert', 'alert.png'], ['com', 'comm.png'], ['door', 'door.png'], ['plant_youngling', 'plant_youngling.png'], ['plant_thirsty', 'plant_thirsty.png'], ['plant_dry', 'plant_dry.png'], ['plant_diseased', 'plant_diseased.png'], ['bin', 'bin.png'], ['next', 'pageright.png'], ['ship_triumph', 'daedalus_triumph.png'], ['pa_comp', 'pa_comp.png'], ['pa_cook', 'pa_cook.png'], ['pa_core', 'pa_core.png'], ['pa_eng|eng', 'pa_eng.png'], ['pa_garden', 'pa_garden.png'], ['pa_pilgred', 'pa_pilgred.png'], ['pa_shoot', 'pa_shoot.png'], ['laid', 'status/laid.png'], ['mastered', 'status/mastered.png'], ['mush', 'mush.png'], ['stink', 'status/stinky.png'], ['fuel', 'fuel.png'], ['o2', 'o2.png'], ['moral|pmo', 'moral.png'], ['eat', 'sat.png'], ['pills', 'demoralized2.png'], ['dead', 'dead.png'], ['hunter', 'hunter.png'], ['fire', 'fire.png'], ['more', 'more.png'], ['less', 'less.png'], ['chut', 'discrete.png'], ['talk', 'talk.gif'], ['talky', 'talkie.png'], ['cat', 'cat.png'], ['time', 'casio.png'], ['tip', 'tip.png'], ['triumph', 'triumph.png']];
@@ -2903,12 +3101,30 @@ SM.GRAVITY = true;
 
 
 /** INITIALISATION **/
+var SMpageload;
 var startInterval = setInterval(function() { //Pour ne pas empêcher le chargement de l'userscript sur les connexions lentes/data à la traîne
+	if (document.body) {
+		SMpageload = document.createElement('div');
+		SMpageload.setAttribute('id', 'SMpageload');
+		SMpageload.innerHTML = "<img class='cdLoading' src='/img/icons/ui/loading1.gif' alt='loading…' /> Small(Mush)…";
+		SMpageload.style.position = 'fixed';
+		SMpageload.style.top = '40px';
+		SMpageload.style.left = '10px';
+		SMpageload.style.border = '2px solid white';
+		SMpageload.style.backgroundColor = 'black';
+		SMpageload.style.padding = '4px';
+		document.body.appendChild(SMpageload);
+	}
+
 	if (SM.sel('#cdBottomBlock')) {
 		clearInterval(startInterval);
+		document.body.removeChild(SMpageload);
+		if (SM.isUserscript) {
+			Main = unsafeWindow.Main || Main;
+		}
 		if (!SM.sel('#SMbar')) {
-			SM.getSMParameters();
+			SM.getSMsettings();
 			SM.locale(SM.init);
 		}
 	}
-}, 200);
+}, 500);

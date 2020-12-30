@@ -30,13 +30,14 @@
 	<script>function showImage(el) { el.firstElementChild.style.display = 'none'; el.lastElementChild.style.display = 'inline'; }</script>
 	<h1><img src='ico.png' /> Small(Mush) <img src='ico.png' /></h1>
 
-	<p style='text-align: center;'><a href='#Use'>Utilisation</a> — <a href='#Install'>Installation</a> — <a href='#Flash'>Installer Flash</a> — <a href='#FAQ'>FAQ</a></p>
+	<p style='text-align: center;'><a href='#Use'>Utilisation</a> — <a href='#Install'>Installation</a> — <a href='#FAQ'>FAQ</a></p>
 
 	<h2>Présentation</h2>
-	<p class='text'>Small(Mush) est un <em>script pour Mush</em> développé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>, grâce auquel vous allez pouvoir profiter d'un confort exceptionnel de votre jeu préféré sur mobile. Oui oui. Et en plus, pour les écrans réfractaires au Flash, les fonctions essentielles du jeu sont émulées pour vous permettre de jouer entre deux stations de métro. C'est pas trop la classe ?</p>
-	<p class='text'>Par contre, j'insiste sur le fait qu'il s'agit d'un <b>script</b>. Ce n'est <b>pas une application mobile</b> de Mush. C'est-à-dire qu'il est développé par un joueur, que la Motion Twin n'a rien à voir avec, que l'interface du jeu subit quelques modifications (pas trop déroutantes non plus), et que les éventuels bugs qui pourraient survenir ne sont pas à remonter sur le forum, mais à moi. Le script se contente principalement d'essayer de faire rentrer l'interface assez large de Mush dans l'espace réduit d'un écran portable. Toutes les questions, les suggestions, les chocolats et l'amour que vous voudriez envoyer, c'est <a href='http://twinoid.com/user/8412516' target='_blank'>par là</a> et pas vraiment ailleurs.</p>
+	<p class='text'>Small(Mush) est un <em>script pour Mush</em> développé par <a href='http://twinoid.com/user/8412516' target='_blank'>LAbare</a>, grâce auquel vous allez pouvoir profiter d'un confort exceptionnel de votre jeu préféré sur mobile. Oui oui. Et en plus, pour les écrans réfractaires au Flash, les fonctions essentielles du jeu sont émulées pour vous permettre de jouer entre deux stations de métro. <b>Et ça marche aussi sur ordinateur, pratique maintenant que Flash est mort.</b></p>
 
-	
+	<!--<p class='text'>Par contre, j'insiste sur le fait qu'il s'agit d'un <b>script</b>. Ce n'est <b>pas une application mobile</b> de Mush. C'est-à-dire qu'il est développé par un joueur, que la Motion Twin n'a rien à voir avec, que l'interface du jeu subit quelques modifications (pas trop déroutantes non plus), et que les éventuels bugs qui pourraient survenir ne sont pas à remonter sur le forum, mais à moi. Le script se contente principalement d'essayer de faire rentrer l'interface assez large de Mush dans l'espace réduit d'un écran portable. Toutes les questions, les suggestions, les chocolats et l'amour que vous voudriez envoyer, c'est <a href='http://twinoid.com/user/8412516' target='_blank'>par là</a> et pas vraiment ailleurs.</p>-->
+
+
 	<h2 id='Use'>Utilisation</h2>
 	<p>Pour tout faire rentrer dans un petit écran, Small(Mush) divise le jeu en cinq onglets.</p>
 	<img src='img/Interface.jpg' alt="Haut gauche : rafraîchissement et aide ; barre : onglets de jeu ; haut droite : accès aux paramètres du script." />
@@ -46,21 +47,19 @@
 
 
 	<h2 id='Install'>Installation et activation</h2>
-	<p>Le script peut être activé automatiquement pour <b class='outdated'>Firefox</b> et <b>Dolphin Browser</b> sur Android ; il reste parfois possible pour d'autres navigateurs (comme Chrome) de l'activer manuellement lorsque vous allez sur Mush.</p>
+	<h3>Sur ordinateur</h3>
+	<ol>
+		<li>Installez l’extension Greasemonkey (<a href='https://addons.mozilla.org/fr/firefox/addon/greasemonkey' target='_blank'>Firefox</a>) ou Tampermonkey (<a href='https://addons.mozilla.org/fr/firefox/addon/tampermonkey' target='_blank'>Firefox</a>, <a href='https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=fr' target='_blank'>Chrome</a>).</li>
+		<li>Installez le script en cliquant sur <a href='SmallMush.user.js'>ce lien</a>, puis sur « Install » dans la fenêtre qui s'ouvre.</li>
+	</ol>
 
-	<h3 class='outdated'>Firefox (Android)</h3>
-	<p><ol>
-		<li class='outdated'>Installez <a href='FirefoxAddon/smallmush.xpi'>l'addon Small(Mush)</a>.</li>
-	</ol></p>
-	<p>Cet addon Firefox n'est plus tenu à jour. Vous pouvez essayer de l'installer… si ça marche.</p>
-
-	<h3>Dolphin Browser (Android)</h3>
+	<h3>Sur mobile : Dolphin Browser (Android)</h3>
 	<p><ol>
 		<li>Installez l'addon <a href='market://details?id=net.tampermonkey.dolphin'>Tampermonkey pour Dolphin Browser</a> depuis le Play Store.</li>
 		<li>Installez le script en cliquant sur <a href='SmallMush.user.js'>ce lien</a>, puis sur « Install » dans la fenêtre qui s'ouvre.</li>
 	</ol></p>
 
-	<h3>Autres (activation manuelle)</h3>
+	<h3>Sur mobile : autres (activation manuelle)</h3>
 	<p><b>Attention :</b> cette technique peut ne pas fonctionner selon les navigateurs.</p>
 	<p><ol>
 		<li>Allez sur <a href='#javascript:(function(){var%20MM=document.createElement(%22script%22);MM.src=%22http://labare.github.io/SmallMush/SmallMush.js%22;document.head.appendChild(MM);})();'>cette page</a> et ajoutez-la en favoris / marques-pages / <i>bookmarks</i>. (Rien de nouveau ne s'affiche : c'est normal, seule l'adresse a changé.)</li>
@@ -68,38 +67,28 @@
 		<li>Dans le champ Adresse / URL, effacez le hash (#) et tout ce qui est avant. Vous devriez obtenir un bout de code commençant par <i>javascript:</i>.</li>
 		<li>Lorsque vous allez sur Mush, une fois la page chargée, entrez « Small(Mush) » dans la barre d'adresse de votre navigateur. Celui-ci devrait, pendant votre frappe, proposer quelques liens, et parmi eux le favori que vous avez ajouté ; cliquez dessus. Vous pouvez aussi essayer directement depuis le menu des favoris, mais cela ne marche pas toujours.</li>
 	</ol></p>
-	<p>Cette technique fonctionne bien sous Chrome, et apparemment <a href='http://m.youtube.com/watch?v=Jm1j9-lfw98' target='_blank'>sous Safari</a> pour les possesseurs d'iPhones.</p>
+	<p>Cette technique fonctionne bien sous Firefox et Chrome, et apparemment <a href='http://m.youtube.com/watch?v=Jm1j9-lfw98' target='_blank'>sous Safari</a> pour les possesseurs d'iPhones.</p>
 	<div class='img' onclick='showImage(this);'>
 		<p>Cliquez pour afficher l'image : exemple avec Chrome.</p>
 		<img src='img/Manuel.jpg' alt="Description de l'activation manuelle" />
 	</div>
 
 
-	<h2 id='Flash'>Installer Flash</h2>
-	<p><i>Note :</i> Plusieurs années ont passé depuis l'écriture de tuto ; il vous sera maintenant certainement impossible d'installer ou d'utiliser Flash sur mobile.</p>
-	<p>Flash n'est pas nécessaire, mais si vous pouvez l'installer, vous aurez toutes les fonctionnalités de Mush.</p>
-	<p><b>Requis :</b> Android 4.3 maximum. (Voir Paramètres → À propos du téléphone → Version d'Android)</p>
-	<ol>
-		<li>Activez l'installation d'applications externes (Paramètres → Sécurité → Sources inconnues <b>coché</b>) ;</li>
-		<li>Installez <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.115.81/install_flash_player_ics.apk">Flash Player pour Android 4.0+</a> ou <a href="http://download.macromedia.com/pub/flashplayer/installers/archive/android/11.1.111.73/install_flash_player_pre_ics.apk">Flash Player pour Android 2 et 3</a> (une fois le téléchargement terminé, ouvrez la barre de notifications et cliquez sur le fichier pour lancer directement l'installation) ;</li>
-		<li>Installez un navigateur qui sait gérer le Flash (Firefox, Dolphin Browser).</li>
-	</ol>
-
-
 	<h2 id='FAQ'>Foire Aux Questions</h2>
+
 	<h3 class='question'>C'est quoi, l'émulation ? Qu'est-ce qui est émulé exactement ?</h3>
-	<p class='answer text'>L'émulation, c'est une pâle et incomplète copie du jeu Flash grâce aux informations cachées dans la page. Dans l'onglet Pièce, vous avez accès aux équipements, aux coéquipiers et à l'inventaire, vous pouvez vous déplacer, et vous serez normalement averti s'il y a un incendie dans la pièce. Sans Flash, vous ne pouvez <b>pas</b> voir la minimap du vaisseau, ni les hunters lorsque vous êtes en tourelle ou en patrouilleur, ni les viser. Vous pouvez tout de même tirer au hasard en patrouilleur en sélectionnant l'équipement <b>Poste de tir</b>, ça peut toujours dépanner.</p>
-	<h3 class='question'>Le jeu Flash n'est pas totalement zoomé, pourquoi ?</h3>
-	<p class='answer text'>Je ne peux vraiment rien y faire, mais le zoom de départ devrait suffire.</p>
+	<p class='answer text'>L'émulation, c'est une pâle et incomplète copie du jeu Flash grâce aux informations cachées dans la page. Dans l'onglet Pièce, vous avez accès aux équipements, aux coéquipiers et à l'inventaire, vous pouvez vous déplacer, et vous serez normalement averti s'il y a un incendie dans la pièce. Sans Flash, vous ne pouvez <b>pas</b> voir la minimap du vaisseau, ni les hunters lorsque vous êtes en tourelle ou en patrouilleur, ni les viser. Vous pouvez tout de même tirer au hasard en tourelle ou en patrouilleur en sélectionnant l'équipement <b>Poste de tir</b>, ça peut toujours dépanner.</p>
+
 	<h3 class='question'>Comment faire pour savoir s'il y a une caméra d'installée dans la pièce ?</h3>
 	<p class='answer text'>Une caméra installée est un équipement, donc vous la trouverez dans l'onglet Pièce.</p>
+
 	<h3 class='question'>Le rafraîchissement de la page est lent, c'est normal ?</h3>
 	<p class='answer text'>Malheureusement oui, un portable est moins puissant qu'un ordinateur, donc plus lent à ce moment-là. Le chat en particulier est assez lourd, vous pouvez vous débarasser de quelques favoris ou recréer des canaux trop vieux pour l'alléger. Vous pouvez aussi délester le chat depuis les paramètres pour alléger le canal général, comme le fait le script Ctrl+W.</p>
+
 	<h3 class='question'>Jouer à Mush sur mobile, ça consomme beaucoup sur mon forfait ?</h3>
 	<p class='answer text'>Tant que vous n'effacez pas votre cache, ça devrait aller. Le script ne change que lorsqu'il est mis à jour, donc seul le poids de la page compte : entre 50 et 100 Ko, rechargés à chaque action. Cela représente environ deux fois moins qu'une recherche Google.</p>
-	<h3 class='question'>Comment sont numérotés les lits en dortoir ?</h3>
-	<p class='answer text'>De l'avant vers l'arrière du vaisseau. Donc si vous voulez le nounours, prenez le lit Beta 1 :P Mais les images des lits dans l'onglet Pièce sont choisies au hasard, puisque je ne peux pas savoir qui est dans quel lit.</p>
+
 	<h3 class='question'>Un de mes messages a été posté dans le mauvais canal !</h3>
-	<p class='answer text'>Ce bug n'est pas causé par le script (il m'est arrivé une fois il y a bien longtemps, avant que je ne commence à coder), c'est un problème qui arrive (rarement) avec les navigateurs mobiles. J'ai essayé de le corriger, mais il est très dur à reproduire. J'ai toutefois récemment ajouté un indicateur du canal dans lequel le jeu pense que vous êtes, mais je ne sais pas si cela suffira à détecter le problème.</p>
+	<p class='answer text'>Ce bug n'est pas causé par le script, c'est un problème qui arrive (rarement) avec les navigateurs mobiles. J'ai essayé de le corriger, mais il ne se produit évidemment jamais quand je veux le tester… J'ai toutefois ajouté un indicateur du canal dans lequel le jeu pense que vous êtes, mais je ne sais pas si cela suffira à détecter le problème.</p>
 </body>
 </html>
